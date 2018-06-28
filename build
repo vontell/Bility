@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# BUILD SCRIPT FOR BILITY
+# Written by Aaron Vontell (v0.0.1 - June 26, 2018)
+
+# Env variables for env config
+ANDROID_SDK=/Users/vontell/Library/Android/sdk
+ADB=/Users/vontell/Library/Android/sdk/platform-tools
+NDK=/Users/vontell/Library/Android/sdk/ndk-bundle
+EM=/Users/vontell/Library/Android/sdk/tools/emulator
+EM_TO_USE=Nexus_5X_API_26_x86
+
+# Bility-defined config
+MINICAP_REPO=git@github.com:openstf/minicap.git
+
+# User-defined config
+REPO=git@github.com:vontell/Bility.git
+
+# Export for other scripts
+export PATH=$PATH:$NDK:$ADB
+
+# First, download dependencies
+if [ ! -d "dependencies/" ]; then
+  # Control will enter here if $DIRECTORY doesn't exist.
+  mkdir dependencies
+fi
+
+if [ ! -d "dependencies/minicap" ]; then
+  # Control will enter here if $DIRECTORY doesn't exist.
+  cd dependencies
+  git clone $MINICAP_REPO minicap
+  cd minicap
+  git submodule init
+  git submodule update
+  ndk-build -C .
+  cd ../../
+fi
+echo Minicap setup!
+
+# Startup the emulator if not already started
+STARTEMCOMM="$EM -avd $EM_TO_USE -netdelay none -netspeed full -verbose -no-window"
+$EM -avd $EM_TO_USE -netdelay none -netspeed full -no-window &
+# possible -no-window
+echo Emulator started!
+
+A=$(adb shell getprop sys.boot_completed | tr -d '\r')
+while [ "$A" != "1" ]; do
+        sleep 2
+        A=$(adb shell getprop sys.boot_completed | tr -d '\r')
+done
+
+echo Emulator ready!
+echo Starting up minicap
+
+cd dependencies/minicap/
+./run.sh -P 1080x1920@810x1440/0 &
+
+echo Minicap started! Forwarding feed...
+adb forward tcp:1717 localabstract:minicap
+
+echo Starting viewing server...
+cd example/
+
+if [ ! -d "node_modules" ]; then
+        echo "Installing node modules"
+        npm install
+fi
+
+node app.js &
+echo Waiting for node server to start...
+while ! echo exit | nc localhost 9002; do sleep 1; done
+open http://localhost:9002
+
+adb shell input keyevent 82
+
+# Test screenshot
+# adb exec-out screencap -p > ../testResults/screen.png
+
+# First, clone the repo into apps
+cd apps/
+#git clone $REPO appToTest
+mkdir appToTest
+mkdir testResults
+#cp -R ~/Documents/AMAExampleApp/ appToTest
+cd appToTest/
+
+# Add gradle files
+touch local.properties
+echo "sdk.dir=$ANDROID_SDK" > local.properties
+
+# Run Test
+./gradlew clean app:installDebug
+./gradlew app:connectedDebugAndroidTest
+
+# Cleanup
+cd ../../
+echo Cleaning up...
+
+# Kill all started processes
+echo Shutting down node server...
+killall node
+echo Shutting down AVD...
+adb kill-server
+adb -s emulator-5554 emu kill
+rm -rf apps/appToTest
+echo Build finished!
