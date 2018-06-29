@@ -8,10 +8,12 @@ ANDROID_SDK=/Users/vontell/Library/Android/sdk
 ADB=/Users/vontell/Library/Android/sdk/platform-tools
 NDK=/Users/vontell/Library/Android/sdk/ndk-bundle
 EM=/Users/vontell/Library/Android/sdk/tools/emulator
-EM_TO_USE=Nexus_5X_API_26_x86
 
 # Bility-defined config
 MINICAP_REPO=git@github.com:openstf/minicap.git
+BUTLER_VERSION=1.3.2
+EM_TO_USE=Nexus_5X_API_26_x86
+
 
 # User-defined config
 REPO=git@github.com:vontell/Bility.git
@@ -37,9 +39,14 @@ if [ ! -d "dependencies/minicap" ]; then
 fi
 echo Minicap setup!
 
+cd dependencies
+curl -L "https://dl.bintray.com/linkedin/maven/com/linkedin/testbutler/test-butler-app/$BUTLER_VERSION" -o test-butler-app-$BUTLER_VERSION.apk
+echo Downloaded butler.apk
+cd ..
+
 # Startup the emulator if not already started
 STARTEMCOMM="$EM -avd $EM_TO_USE -netdelay none -netspeed full -verbose -no-window"
-$EM -avd $EM_TO_USE -netdelay none -netspeed full -no-window &
+$EM -avd $EM_TO_USE -netdelay none -netspeed full &
 # possible -no-window
 echo Emulator started!
 
@@ -69,19 +76,37 @@ fi
 node app.js &
 echo Waiting for node server to start...
 while ! echo exit | nc localhost 9002; do sleep 1; done
+
 open http://localhost:9002
 
 adb shell input keyevent 82
+
+# Install Butler
+cd ../../
+#echo Installing Butler apk...
+#pwd
+#adb install -t test-butler-app-$BUTLER_VERSION.apk
+#cd ..
+
+#git clone git@github.com:linkedin/test-butler.git TestButler
+#cd TestButler/
+
+# Add gradle files
+#touch local.properties
+#echo "sdk.dir=$ANDROID_SDK" > local.properties
+#./gradlew clean app:installDebug
+
+
 
 # Test screenshot
 # adb exec-out screencap -p > ../testResults/screen.png
 
 # First, clone the repo into apps
-cd apps/
+cd ../apps/
 #git clone $REPO appToTest
 mkdir appToTest
 mkdir testResults
-#cp -R ~/Documents/AMAExampleApp/ appToTest
+cp -R ~/Documents/AMAExampleApp/ appToTest
 cd appToTest/
 
 # Add gradle files
@@ -90,6 +115,7 @@ echo "sdk.dir=$ANDROID_SDK" > local.properties
 
 # Run Test
 ./gradlew clean app:installDebug
+adb shell pm grant io.github.ama_csail.amaexampleapp android.permission.SYSTEM_ALERT_WINDOW
 ./gradlew app:connectedDebugAndroidTest
 
 # Cleanup
@@ -104,3 +130,4 @@ adb kill-server
 adb -s emulator-5554 emu kill
 rm -rf apps/appToTest
 echo Build finished!
+exit 0
