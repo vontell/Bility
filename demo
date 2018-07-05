@@ -1,0 +1,2 @@
+#./build
+./startup & (sleep 19s; ./job)

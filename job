@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# JOB SCRIPT FOR BILITY
+#   Starts a job on an existing container, parsing results
+# Written by Aaron Vontell (v0.0.1 - June 29, 2018)
+
+ANDROID_SDK=/Users/vontell/Library/Android/sdk
+ADB=/Users/vontell/Library/Android/sdk/platform-tools
+EM=/Users/vontell/Library/Android/sdk/tools/emulator
+NDK=/Users/vontell/Library/Android/sdk/ndk-bundle
+
+# Export for other scripts
+export PATH=$PATH:$NDK:$ADB
+
+# User-defined config
+
+#REPO=git@github.com:avjinder/Minimal-Todo.git
+#TEST_PACKAGE=com.avjindersinghsekhon.minimaltodo
+
+REPO=git@github.com:vontell/Bility.git
+TEST_PACKAGE=io.github.ama_csail.amaexampleapp
+
+#REPO=git@github.com:nickbutcher/plaid.git
+#TEST_PACKAGE=io.plaidapp
+
+open http://localhost:9002
+
+adb shell input keyevent 82
+adb shell input keyevent 3
+
+
+# Test screenshot
+# adb exec-out screencap -p > ../testResults/screen.png
+
+# First, clone the repo into apps
+echo Installing $TEST_PACKAGE from $REPO ....
+cd apps/
+mkdir testResults
+git clone $REPO appToTest
+#mkdir appToTest
+#cp -R ~/Documents/AMAExampleApp/ appToTest
+cd appToTest
+
+echo "Installed! Preparing for testing...."
+
+# Add gradle files
+touch local.properties
+echo "sdk.dir=$ANDROID_SDK" > local.properties
+
+# Run Test
+echo "Installing and granting persmissing..."
+./gradlew installDebug --info
+adb shell pm grant $TEST_PACKAGE android.permission.SYSTEM_ALERT_WINDOW
+
+echo "Installed! Running test variant"
+./gradlew app:connectedDebugAndroidTest
+
+# Cleanup
+cd ../../
+echo Cleaning up...
+adb shell recovery --wipe_data
+rm -rf apps/appToTest
+echo Build finished!
+exit 0

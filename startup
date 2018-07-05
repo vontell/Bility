@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# STARTUP SCRIPT FOR BILITY
+#   Starts up all services needed for connecting to and using the Bility
+#   build system
+# Written by Aaron Vontell (v0.0.1 - June 29, 2018)
+
+ANDROID_SDK=/Users/vontell/Library/Android/sdk
+ADB=/Users/vontell/Library/Android/sdk/platform-tools
+EM=/Users/vontell/Library/Android/sdk/tools/emulator
+NDK=/Users/vontell/Library/Android/sdk/ndk-bundle
+
+
+# Export for other scripts
+export PATH=$PATH:$NDK:$ADB
+
+rm -rf startup.log
+touch startup.log
+
+EM_TO_USE=Nexus_5X_API_26_x86
+
+
+# Startup the emulator if not already started
+echo Starting up emulator...
+STARTEMCOMM="$EM -avd $EM_TO_USE -netdelay none -netspeed full -verbose -no-window"
+$EM -avd $EM_TO_USE -netdelay none -netspeed full &
+# possible -no-window
+
+trap 'adb kill-server; echo Killed ABD server' 0
+
+A=$(adb shell getprop sys.boot_completed | tr -d '\r')
+while [ "$A" != "1" ]; do
+        sleep 2
+        A=$(adb shell getprop sys.boot_completed | tr -d '\r')
+done
+
+echo Emulator ready!
+echo Starting up minicap...
+
+cd dependencies/minicap/
+./run.sh -P 1080x1920@810x1440/0 &> startup.log &
+
+echo Minicap started! Forwarding feed...
+adb forward tcp:1717 localabstract:minicap
+
+cd example/
+echo Waiting for node server to start...
+node app.js
