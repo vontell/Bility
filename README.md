@@ -47,6 +47,18 @@ We now want to push the Bility libary to our local maven server, so that we can 
 ```
 cd BilityPrivate/
 ./gradlew :ama:uploadArchives
+cd ..
 ```
 
 There should now be an .aar file at http://localhost:8146/artifactory/webapp/browserepo.html within the `libs-release-local` dropdown.
+
+4) Start the WebServer
+
+The webserver is written in Kotlin using Gradle and the Ktor library. Build and start the Docker container for this webserver with the following commands (remove the `it` to run in the background):
+
+```
+cd BilityWebServer/
+./gradlew build
+docker build -t bility-k-webserver .
+docker run -d -p 8080:8080 --rm bility-k-webserver
+```

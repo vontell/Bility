@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.mortbay.jetty.alpn:alpn-boot:8.1.11.v20170118">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mortbay.jetty.alpn/alpn-boot/8.1.11.v20170118/2b514ff623319584689c9fc0bbba0f3224b961d9/alpn-boot-8.1.11.v20170118.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mortbay.jetty.alpn/alpn-boot/8.1.11.v20170118/5b9be27866ba4325592c88f90b945a3957dd091f/alpn-boot-8.1.11.v20170118-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bility.iml" filepath="$PROJECT_DIR$/.idea/modules/bility.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bility_main.iml" filepath="$PROJECT_DIR$/.idea/modules/bility_main.iml" group="bility" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/bility_test.iml" filepath="$PROJECT_DIR$/.idea/modules/bility_test.iml" group="bility" />
+    </modules>
+  </component>
+</project>
