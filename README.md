@@ -2,13 +2,32 @@
 
 ## Setup Instructions
 
+0) QUICKSTART
+
+Simply run the docker-compose file to startup all services:
+
+```
+docker-compose up -d
+```
+
+To see the status of each container, run the following:
+
+```
+docker-compose ps
+```
+
+To stop the network of containers, run the following:
+
+```
+docker-compose stop
+```
+
 1) Create and Start MongoDB Container
 
 The central database for the Bility system is MongoDB, which holds build configurations, user information, build history, etc. The database server is a vanilla MongoDB Docker container, which can be built and run using the commands below:
 
 ```
-docker pull
-cd db/
+docker pull mongo
 docker run --name mongo-dev -d -p 27017:27017 mongo
 ```
 
@@ -52,6 +71,12 @@ cd ..
 
 There should now be an .aar file at http://localhost:8146/artifactory/webapp/browserepo.html within the `libs-release-local` dropdown.
 
+3) Start the OCR service
+
+```
+docker pull tesseractshadow/tesseract4re
+```
+
 4) Start the WebServer
 
 The webserver is written in Kotlin using Gradle and the Ktor library. Build and start the Docker container for this webserver with the following commands (remove the `it` to run in the background):
@@ -60,5 +85,5 @@ The webserver is written in Kotlin using Gradle and the Ktor library. Build and 
 cd BilityWebServer/
 ./gradlew build
 docker build -t bility-k-webserver .
-docker run -d -p 8080:8080 --rm bility-k-webserver
+docker run --name bility-k-webserver -d -p 8080:8080 --rm bility-k-webserver
 ```

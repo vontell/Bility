@@ -34,6 +34,8 @@ repositories {
 }
 
 dependencies {
+
+	// Ktor dependencies
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 	compile "io.ktor:ktor-server-netty:$ktor_version"
 	compile "ch.qos.logback:logback-classic:$logback_version"
@@ -51,6 +53,7 @@ dependencies {
 	compile "io.ktor:ktor-client-auth-basic:$ktor_version"
 	compile "io.ktor:ktor-client-json:$ktor_version"
 	compile "io.ktor:ktor-client-websocket:$ktor_version"
+	compile "io.ktor:ktor-freemarker:$ktor_version"
 	testCompile "io.ktor:ktor-server-tests:$ktor_version"
 	testCompile "io.ktor:ktor-server-core:$ktor_version"
 	testCompile "io.ktor:ktor-html-builder:$ktor_version"
@@ -66,6 +69,11 @@ dependencies {
 	testCompile "io.ktor:ktor-client-auth-basic:$ktor_version"
 	testCompile "io.ktor:ktor-client-json:$ktor_version"
 	testCompile "io.ktor:ktor-client-websocket:$ktor_version"
+
+	// Mongo dependencies
+	compile 'org.litote.kmongo:kmongo:3.8.0'
+	compile 'org.litote.kmongo:kmongo-coroutine:3.8.0'
+
 }
 
 kotlin.experimental.coroutines = 'enable'

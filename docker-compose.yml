@@ -1,0 +1,14 @@
+version: '3'
+services:
+  mongo:
+    build: db/
+    ports:
+      - "27017:27017"
+  maven:
+    build: maven/
+    ports:
+      - "8146:8080"
+  webserver:
+    build: BilityWebServer
+    ports:
+      - "8080:8080"

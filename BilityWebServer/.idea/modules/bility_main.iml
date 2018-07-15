@@ -43,6 +43,7 @@
     <orderEntry type="library" name="Gradle: io.ktor:ktor-websockets:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-auth:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-jackson:0.9.3" level="project" />
+    <orderEntry type="library" name="Gradle: io.ktor:ktor-freemarker:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-core:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-client-auth-basic:0.9.3" level="project" />
@@ -55,14 +56,23 @@
     <orderEntry type="library" name="Gradle: io.ktor:ktor-utils:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.2.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo:3.8.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.51" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-jackson-mapping:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-id-jackson:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.module:jackson-module-kotlin:2.9.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-core:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-property:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-shared:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-id:3.8.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.23.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-io-jvm:0.0.10" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-html-jvm:0.6.11" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-io:0.23.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-jackson-modules-service-loader:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.litote.kmongo:kmongo-data:3.8.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.51" level="project" />
     <orderEntry type="library" name="Gradle: io.dropwizard.metrics:metrics-jvm:3.2.4" level="project" />
     <orderEntry type="library" name="Gradle: io.dropwizard.metrics:metrics-core:3.2.4" level="project" />
@@ -74,6 +84,7 @@
     <orderEntry type="library" name="Gradle: org.jetbrains:kotlin-css:1.0.0-pre.31-kotlin-1.2.41" level="project" />
     <orderEntry type="library" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.freemarker:freemarker:2.3.28" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-common:0.23.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:atomicfu-common:0.10.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.2.51" level="project" />
@@ -81,13 +92,17 @@
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-http:4.1.24.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler:4.1.24.Final" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.10" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.3" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: de.undercouch:bson4jackson:2.9.2" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec:4.1.24.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-transport:4.1.24.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-buffer:4.1.24.Final" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver-core:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.mongodb:bson:3.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.3" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-resolver:4.1.24.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-common:4.1.24.Final" level="project" />
   </component>

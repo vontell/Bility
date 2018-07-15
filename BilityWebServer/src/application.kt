@@ -13,6 +13,9 @@ import io.ktor.features.*
 import org.slf4j.event.*
 import io.ktor.auth.*
 import com.fasterxml.jackson.databind.*
+import freemarker.cache.ClassTemplateLoader
+import io.ktor.freemarker.FreeMarker
+import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.jackson.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
@@ -25,14 +28,16 @@ fun Application.module() {
 		level = Level.INFO
 		filter { call -> call.request.path().startsWith("/") }
 	}
-
 	install(Authentication) {
 	}
-
 	install(ContentNegotiation) {
 		jackson {
 			enable(SerializationFeature.INDENT_OUTPUT)
 		}
+	}
+	// Feel free to use FreeMarker or kotlinx.html for html returns
+	install(FreeMarker) {
+		templateLoader = ClassTemplateLoader(Application::class.java.classLoader, "templates")
 	}
 
 	routing {
@@ -51,6 +56,10 @@ fun Application.module() {
 					}
 				}
 			}
+		}
+
+		get("/freemarker") {
+			call.respond(FreeMarkerContent("index.ftl", mapOf("name" to "Aaron", "email" to "vontell@mit.edu"), "e"))
 		}
 
 		get("/styles.css") {
