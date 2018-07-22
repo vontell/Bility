@@ -21,7 +21,7 @@ interface Pipeline {
      * this project.
      */
     fun setupProject(config: PipelineConfig)
-    
+
     fun teardownProject()
 
 }

@@ -18,5 +18,9 @@ class AndroidPipeline: Pipeline {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun teardownProject() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 
 }
