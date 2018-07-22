@@ -8,7 +8,7 @@ import java.io.File
 
 class AndroidPipeline(override var pipelineConfig: PipelineConfig) : Pipeline {
 
-    lateinit var gradle: Gradle
+    private lateinit var gradle: Gradle
 
     /**
      * This method does all setup required to run our tools on the
@@ -28,7 +28,7 @@ class AndroidPipeline(override var pipelineConfig: PipelineConfig) : Pipeline {
     override fun teardownProject(): PipelineStepResult {
 
         val dirToDelete = File(pipelineConfig.source.location)
-        //dirToDelete.deleteRecursively()
+        dirToDelete.deleteRecursively()
         //File(dirToDelete).deleteOnExit()
 
         return PipelineStepResult("TEARDOWN", !dirToDelete.exists())

@@ -38,8 +38,7 @@ class CommandRunner {
                 }
 
                 p.waitFor()
-
-                println(p.onExit().get().exitValue())
+                println("EXIT VALUE ${p.exitValue()}")
 
             } catch (e: Exception) {
                 e.printStackTrace()

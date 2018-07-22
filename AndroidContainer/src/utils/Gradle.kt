@@ -14,7 +14,7 @@ class Gradle(var project: Project? = null) {
 
     init {
         if (project != null) {
-            this.gradlePath = "./" + project!!.location + "gradlew "
+            this.gradlePath = "./" + project!!.location + project!!.entryFolder + "gradlew "
         } else {
             gradlePath = "gradle "
         }
@@ -22,20 +22,22 @@ class Gradle(var project: Project? = null) {
 
     fun replaceGradleWrapperProperties() {
 
-        val wrapperPropsFile = File(this.project!!.location + "gradle/wrapper/gradle-wrapper.properties")
+        val wrapperPropsFile = File(this.project!!.location + this.project!!.entryFolder + "gradle/wrapper/gradle-wrapper.properties")
         val correctPropsFile = File("defaultfiles/gradle-wrapper.properties")
 
         wrapperPropsFile.delete()
         wrapperPropsFile.createNewFile()
         CommandRunner.copyFileUsingStream(correctPropsFile, wrapperPropsFile)
 
+        logger?.info("REPLACED GRADLE WRAPPER PROPERTIES")
+
     }
 
     fun build() {
         logger?.info("STARTING GRADLE BUILD")
-        val executionString = this.gradlePath + "build -b " + this.project!!.location + "build.gradle --debug --stacktrace"
+        val executionString = this.gradlePath + "build -b " + this.project!!.location + this.project!!.entryFolder + "build.gradle --debug --stacktrace"
         println(executionString)
-        println(CommandRunner.executeCommand(executionString, true))
+        CommandRunner.executeCommand(executionString, true)
         logger?.info("GRADLE BUILD FINISHED")
     }
 

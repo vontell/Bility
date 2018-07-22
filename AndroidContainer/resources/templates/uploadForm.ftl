@@ -7,6 +7,7 @@
               method="post">
 
             <input type="text" name="projectName" value="Ex: My Project">
+            <input type="text" name="projectPath" value="Ex: MyProject/">
             <input type="file" name="zipFile">
             <button type="submit">Upload</button>
 
@@ -17,6 +18,7 @@
               method="post">
 
             <input type="text" name="projectName" value="Ex: My Project">
+            <input type="text" name="projectPath" value="Ex: MyProject/">
             <input type="text" name="gitPath" value="Ex: https://github.com/user/project.git">
             <button type="submit">Upload</button>
 

@@ -43,11 +43,15 @@ fun Route.publicRoutes() {
         post {
             val multipart = call.receiveMultipart()
             var title = ""
+            var projPath = ""
             var zipFile: File? = null
             multipart.forEachPart { part ->
                 if (part is PartData.FormItem) {
                     if (part.name == "projectName") {
                         title = part.value
+                    }
+                    if (part.name == "projectPath") {
+                        projPath = part.value
                     }
                 } else if (part is PartData.FileItem) {
                     val ext = File(part.originalFileName).extension
@@ -75,7 +79,7 @@ fun Route.publicRoutes() {
                 }
             }
 
-            val project = Project(ProjectSourceType.LOCALZIP, zipFile!!.absolutePath,  title, projectSaveLocation)
+            val project = Project(ProjectSourceType.LOCALZIP, zipFile!!.absolutePath, title, projPath, projectSaveLocation)
             var projectConfig = PipelineConfig(project)
             projectConfig = generateMissingConfig(projectConfig)
 
@@ -91,6 +95,7 @@ fun Route.publicRoutes() {
 
             val parameters = call.receiveParameters()
             val name = parameters["projectName"]
+            var projPath = parameters["projectPath"]
             val git = parameters["gitPath"]
 
             call.respondHtml {
@@ -99,7 +104,7 @@ fun Route.publicRoutes() {
                 }
             }
 
-            val project = Project(ProjectSourceType.GIT, git!!,  name!!, projectSaveLocation)
+            val project = Project(ProjectSourceType.GIT, git!!,  name!!, projPath!!, projectSaveLocation)
             var projectConfig = PipelineConfig(project)
             projectConfig = generateMissingConfig(projectConfig)
 
