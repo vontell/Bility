@@ -29,6 +29,8 @@ repositories {
 }
 
 test {
+    def newEnvs = test.getEnvironment()
+    newEnvs.put("ANDROID_HOME", "/Users/vontell/Library/Android/sdk")
     useJUnitPlatform()
 }
 
@@ -36,7 +38,11 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-jackson:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
+    compile "io.ktor:ktor-freemarker:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
+
+    compile 'org.litote.kmongo:kmongo:3.8.1'
 
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="AppTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2018-07-18T06:28:41" hostname="Aarons-MacBook-Pro.local" time="0.722">
-  <properties/>
-  <testcase name="Scenario: should have container info" classname="AppTest" time="0.721"/>
-  <testcase name="Feature: the webserver" classname="AppTest" time="0.723"/>
-  <system-out><![CDATA[2018-07-17 23:28:41.046 [pool-6-thread-1] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

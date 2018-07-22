@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="drivers.android.AndroidDriverTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2018-07-18T06:28:40" hostname="Aarons-MacBook-Pro.local" time="0.011">
-  <properties/>
-  <testcase name="Scenario: should pass again" classname="drivers.android.AndroidDriverTest" time="0.01"/>
-  <testcase name="Scenario: should pass" classname="drivers.android.AndroidDriverTest" time="0.02"/>
-  <testcase name="Feature: the Android info commands" classname="drivers.android.AndroidDriverTest" time="0.024"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
