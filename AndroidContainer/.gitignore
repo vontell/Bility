@@ -1,6 +1,6 @@
 out/
 build/
 .classpath
-projectuploads/
+projectupload/
 bin/
 .gradle/

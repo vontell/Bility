@@ -71,6 +71,8 @@ fun Application.main() {
         templateLoader = ClassTemplateLoader(Application::class.java.classLoader, "templates")
     }
 
+    logger = log
+
     routing {
         route("/") {
             surfacedRoutes()

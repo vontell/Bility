@@ -20,10 +20,8 @@ import kotlinx.coroutines.experimental.withContext
 import kotlinx.coroutines.experimental.yield
 import kotlinx.html.body
 import kotlinx.html.h1
-import org.vontech.androidserver.pipeline.PipelineConfig
-import org.vontech.androidserver.pipeline.PipelineRunner
-import org.vontech.androidserver.pipeline.ProjectSourceType
-import org.vontech.androidserver.pipeline.generateMissingConfig
+import org.vontech.androidserver.pipeline.*
+import org.vontech.androidserver.projectSaveLocation
 import org.vontech.androidserver.utils.CommandRunner
 import java.io.File
 import java.io.InputStream
@@ -54,9 +52,15 @@ fun Route.publicRoutes() {
                 } else if (part is PartData.FileItem) {
                     val ext = File(part.originalFileName).extension
                     val file = File(
-                            "projectuploads",
-                            "upload-${System.currentTimeMillis()}-${title.hashCode()}.$ext"
+                            projectSaveLocation,
+                            "upload.$ext"
                     )
+
+                    // Create the file and directory if it does not already exist
+                    if (!file.parentFile.exists())
+                        file.parentFile.mkdirs()
+                    if (!file.exists())
+                        file.createNewFile()
 
                     part.streamProvider().use { its -> file.outputStream().buffered().use { its.copyToSuspend(it) } }
                     zipFile = file
@@ -64,11 +68,19 @@ fun Route.publicRoutes() {
 
                 part.dispose()
             }
+
             call.respondHtml {
                 body {
                     h1 { +"Upload complete!!"}
                 }
             }
+
+            val project = Project(ProjectSourceType.LOCALZIP, zipFile!!.absolutePath,  title, projectSaveLocation)
+            var projectConfig = PipelineConfig(project)
+            projectConfig = generateMissingConfig(projectConfig)
+
+            val runner = PipelineRunner(projectConfig)
+            runner.startRunner()
 
         }
 
@@ -81,15 +93,14 @@ fun Route.publicRoutes() {
             val name = parameters["projectName"]
             val git = parameters["gitPath"]
 
-            val commandResult = CommandRunner.gitClone(git!!, "projectuploads/project/")
-
             call.respondHtml {
                 body {
                     h1 { +"Upload complete!!"}
                 }
             }
 
-            var projectConfig = PipelineConfig("projectuploads/project/", ProjectSourceType.GIT)
+            val project = Project(ProjectSourceType.GIT, git!!,  name!!, projectSaveLocation)
+            var projectConfig = PipelineConfig(project)
             projectConfig = generateMissingConfig(projectConfig)
 
             val runner = PipelineRunner(projectConfig)

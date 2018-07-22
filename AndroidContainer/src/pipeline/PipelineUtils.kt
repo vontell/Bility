@@ -4,4 +4,7 @@ enum class ProjectSourceType {
     GIT, LOCALZIP
 }
 
-data class ProjectSource(val sourceType: ProjectSourceType, val location: String)
+data class Project(val sourceType: ProjectSourceType,
+                   val source: String,
+                   val name: String,
+                   val location: String)
