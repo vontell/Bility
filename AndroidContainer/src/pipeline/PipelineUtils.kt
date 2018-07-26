@@ -7,5 +7,6 @@ enum class ProjectSourceType {
 data class Project(val sourceType: ProjectSourceType,
                    val source: String,
                    val name: String,
+                   val packageName: String,
                    val entryFolder: String,
                    val location: String)

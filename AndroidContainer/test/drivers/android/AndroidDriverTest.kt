@@ -20,6 +20,9 @@ class AndroidDriverTest: FeatureSpec({
         scenario("should have > 0 build tools installed") {
             driver.getAvailableBuildTools().size.shouldBeGreaterThan(0)
         }
+        scenario("should have >0 emulators installed") {
+            driver.getAvailableEmulators().size.shouldBeGreaterThan(0)
+        }
 
     }
 

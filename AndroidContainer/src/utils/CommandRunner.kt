@@ -7,14 +7,20 @@ class CommandRunner {
 
     companion object {
 
+        private val runtime: Runtime = Runtime.getRuntime()
+
         // https://www.mkyong.com/java/how-to-execute-shell-command-from-java/
-        fun executeCommand(command: String, printAsWeGo: Boolean = false): String {
+        fun executeCommand(command: String, printAsWeGo: Boolean = false, wait: Boolean = true): String {
 
             val output = StringBuffer()
 
             val p: Process
             try {
-                p = Runtime.getRuntime().exec(command)
+                p = runtime.exec(command)
+
+                if (!wait) {
+                    return "... not waiting for command to finish"
+                }
 
                 val inputReader = BufferedReader(InputStreamReader(p.inputStream))
                 val errorReader = BufferedReader(InputStreamReader(p.errorStream))
@@ -38,7 +44,6 @@ class CommandRunner {
                 }
 
                 p.waitFor()
-                println("EXIT VALUE ${p.exitValue()}")
 
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -56,10 +61,6 @@ class CommandRunner {
             var result = executeCommand("unzip $zipFileLocation -d $extractDestination")
             result += executeCommand("rm -rf ${extractDestination}__MACOSX")
             return result
-        }
-
-        fun createFile(path: String, fileName: File): String {
-            TODO("MUST FINISH")
         }
 
         @Throws(IOException::class)

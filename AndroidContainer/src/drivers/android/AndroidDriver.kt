@@ -1,5 +1,6 @@
 package org.vontech.androidserver.drivers.android
 
+import org.vontech.androidserver.logger
 import org.vontech.androidserver.utils.CommandRunner
 
 class AndroidDriver {
@@ -16,6 +17,16 @@ class AndroidDriver {
         /** Folder info for the Android Tools **/
         const val PLATFORM_PATH = "/platforms"
         const val BUILD_TOOLS = "/build-tools"
+        const val EMULATOR = "/tools/emulator"
+        const val ADB = "/platform-tools/adb"
+
+        /** Android Key Event Codes **/
+        /** https://developer.android.com/reference/android/view/KeyEvent **/
+        const val KEYCODE_MENU = 82
+        const val KEYCODE_HOME = 3
+
+        /** Android permission strings **/
+        const val PERMISSION_SYSTEM_ALERT_WINDOW = "android.permission.SYSTEM_ALERT_WINDOW"
 
     }
 
@@ -27,6 +38,11 @@ class AndroidDriver {
     fun getAvailableBuildTools(): List<String> {
         val result = CommandRunner.executeCommand("ls " + getAndroidHome() + BUILD_TOOLS)
         return result.split("\n").dropLast(1)
+    }
+
+    fun getAvailableEmulators(): List<String> {
+        val result = CommandRunner.executeCommand("${getAndroidHome() + EMULATOR} -avd -list-avds")
+        return result.split("\n").dropLast(1).sorted()
     }
 
     /**
@@ -42,6 +58,75 @@ class AndroidDriver {
 
     fun getAndroidHome(): String? {
         return System.getenv(ANDROID_HOME)
+    }
+
+    fun startEmulator(emulator: String) {
+        logger?.info("Starting emulator $emulator")
+        CommandRunner.executeCommand("${getAndroidHome() + EMULATOR} -avd $emulator -netdelay none -netspeed full", true, false)
+    }
+
+    fun getRunningEmulatorNames(): List<String> {
+        // Note: We can use the -l flag to get even more device info
+        val result = CommandRunner.executeCommand("${getAndroidHome() + ADB} devices")
+        val devices: MutableList<String> = mutableListOf()
+        result.split("\n")
+                .filter { it -> it.contains("device") && !it.contains("List") }
+                .forEach { it -> devices.add(it.split("\\s+".toRegex())[0]) }
+        return devices
+    }
+
+    fun waitForEmulatorOnline() {
+        logger?.info("Waiting for emulator to boot...")
+        while (true) {
+            val result = CommandRunner.executeCommand("${getAndroidHome() + ADB} shell getprop sys.boot_completed")
+            if (result.trim() == "1") {
+                break
+            }
+            Thread.sleep(1000)
+        }
+        logger?.info("Emulator booted and ready")
+    }
+
+    fun isEmulatorReady(): Boolean {
+        val result = CommandRunner.executeCommand("${getAndroidHome() + ADB} shell getprop sys.boot_completed")
+        return result.trim() == "1"
+    }
+
+    fun killAllEmulators() {
+        getRunningEmulatorNames().forEach { it ->
+            logger?.info("Killing device '$it'")
+            CommandRunner.executeCommand("${getAndroidHome() + ADB} -s $it emu kill")
+        }
+    }
+
+    fun wipeEmulator() {
+        getRunningEmulatorNames().forEach { it ->
+            CommandRunner.executeCommand("${getAndroidHome() + EMULATOR} -avd $it -wipe-data")
+            logger?.info("Wiped all data from $it")
+        }
+    }
+
+    fun emulatorGoHome() {
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} shell input keyevent $KEYCODE_MENU")
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} shell input keyevent $KEYCODE_HOME")
+    }
+
+    fun emulatorOpenApp(packageName: String) {
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} shell monkey -p $packageName -c android.intent.category.LAUNCHER 1")
+    }
+
+    fun grantEmulatorPermission(appPackage: String, permission: String) {
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} shell pm grant $appPackage $permission")
+        logger?.info("Requested permission '$permission' for app '$appPackage'")
+    }
+
+    fun startADBServer() {
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} start-server")
+        logger?.info("Started ADB server")
+    }
+
+    fun killADBServer() {
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} kill-server")
     }
 
 }
