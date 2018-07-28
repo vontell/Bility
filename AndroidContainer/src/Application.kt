@@ -7,6 +7,7 @@ import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.jackson.jackson
 import io.ktor.routing.*
+import org.vontech.androidserver.routing.internalRoutes
 import org.vontech.androidserver.routing.publicRoutes
 import org.vontech.androidserver.routing.surfacedRoutes
 
@@ -79,6 +80,9 @@ fun Application.main() {
         }
         route("/api") {
             publicRoutes()
+        }
+        route("/internal") {
+            internalRoutes()
         }
     }
 

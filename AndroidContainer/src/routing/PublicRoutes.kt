@@ -45,6 +45,7 @@ fun Route.publicRoutes() {
             var title = ""
             var projPath = ""
             var packageName = ""
+            var appModule = ""
             var zipFile: File? = null
             multipart.forEachPart { part ->
                 if (part is PartData.FormItem) {
@@ -56,6 +57,9 @@ fun Route.publicRoutes() {
                     }
                     if (part.name == "projectPath") {
                         projPath = part.value
+                    }
+                    if (part.name == "appModule") {
+                        appModule = part.value
                     }
                 } else if (part is PartData.FileItem) {
                     val ext = File(part.originalFileName).extension
@@ -83,7 +87,7 @@ fun Route.publicRoutes() {
                 }
             }
 
-            val project = Project(ProjectSourceType.LOCALZIP, zipFile!!.absolutePath, title, packageName, projPath, projectSaveLocation)
+            val project = Project(ProjectSourceType.LOCALZIP, zipFile!!.absolutePath, title, packageName, appModule, projPath, projectSaveLocation)
             var projectConfig = PipelineConfig(project)
             projectConfig = generateMissingConfig(projectConfig)
 
@@ -99,9 +103,10 @@ fun Route.publicRoutes() {
 
             val parameters = call.receiveParameters()
             val name = parameters["projectName"]
-            var projPath = parameters["projectPath"]
+            val projPath = parameters["projectPath"]
             val git = parameters["gitPath"]
             val packageName = parameters["packageName"]
+            val appModule = parameters["packageName"]
 
             call.respondHtml {
                 body {
@@ -109,7 +114,7 @@ fun Route.publicRoutes() {
                 }
             }
 
-            val project = Project(ProjectSourceType.GIT, git!!,  name!!, packageName!!, projPath!!, projectSaveLocation)
+            val project = Project(ProjectSourceType.GIT, git!!,  name!!, packageName!!, appModule!!, projPath!!, projectSaveLocation)
             var projectConfig = PipelineConfig(project)
             projectConfig = generateMissingConfig(projectConfig)
 

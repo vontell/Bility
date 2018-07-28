@@ -43,8 +43,14 @@ class AndroidPipeline(override var pipelineConfig: PipelineConfig) : Pipeline {
         driver.emulatorGoHome()
         Thread.sleep(2000)
 
-        // Now, start setting up the project files. First use correct Gradle files
+        // Now, start setting up the project files.
+        // 1) Use correct Gradle files
+        // 2) Inject Bility dependencies and test files
+        // 3) Inject permissions
         gradle.replaceGradleWrapperProperties()
+        gradle.injectBilityTester(pipelineConfig.source.appModule)
+        val projectDirectory = pipelineConfig.source.location + pipelineConfig.source.entryFolder
+        driver.addPermissionIfMissing(projectDirectory, pipelineConfig.source.appModule, AndroidDriver.PERMISSION_INTERNET)
 
         // Build and install the application
         gradle.installDebug(true)
@@ -53,19 +59,11 @@ class AndroidPipeline(override var pipelineConfig: PipelineConfig) : Pipeline {
         // TODO: Allow the user to provide a list of permissions to grant
         driver.grantEmulatorPermission(pipelineConfig.source.packageName, AndroidDriver.PERMISSION_SYSTEM_ALERT_WINDOW)
 
-        Thread.sleep(1000)
-
-        // TODO: Remove this
-        driver.emulatorOpenApp(pipelineConfig.source.packageName)
-        Thread.sleep(5000)
-
         driver.emulatorGoHome()
         Thread.sleep(2000)
 
         // FINALLY, RUN TESTS!!! This is where the magic happens!
-        gradle.connectedDebugAndroidTest("*.AccessibilityTest")
-
-
+        gradle.runConnectedTest("*.BilityTest", pipelineConfig.source.appModule, "connectedDebugAndroidTest")
 
         return PipelineStepResult("SETUP", true)
     }

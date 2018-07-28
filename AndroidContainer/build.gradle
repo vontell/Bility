@@ -45,6 +45,7 @@ dependencies {
     compile 'org.litote.kmongo:kmongo:3.8.1'
 
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
 }
 

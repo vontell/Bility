@@ -9,6 +9,7 @@
             <input type="text" name="projectName" value="Ex: My Project">
             <input type="text" name="projectPath" value="Ex: MyProject/">
             <input type="text" name="packageName" value="Ex: io.myorg.myapp">
+            <input type="text" name="appModule" value="Ex: app">
             <input type="file" name="zipFile">
             <button type="submit">Upload</button>
 
@@ -21,6 +22,7 @@
             <input type="text" name="projectName" value="Ex: My Project">
             <input type="text" name="projectPath" value="Ex: MyProject/">
             <input type="text" name="packageName" value="Ex: io.myorg.myapp">
+            <input type="text" name="appModule" value="Ex: app">
             <input type="text" name="gitPath" value="Ex: https://github.com/user/project.git">
             <button type="submit">Upload</button>
 

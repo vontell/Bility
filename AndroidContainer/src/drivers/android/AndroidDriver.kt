@@ -2,6 +2,8 @@ package org.vontech.androidserver.drivers.android
 
 import org.vontech.androidserver.logger
 import org.vontech.androidserver.utils.CommandRunner
+import org.vontech.androidserver.utils.parsers.XMLEditor
+import java.io.File
 
 class AndroidDriver {
 
@@ -27,6 +29,10 @@ class AndroidDriver {
 
         /** Android permission strings **/
         const val PERMISSION_SYSTEM_ALERT_WINDOW = "android.permission.SYSTEM_ALERT_WINDOW"
+        const val PERMISSION_INTERNET = "android.permission.INTERNET"
+
+        /** Android dependency configurations / types **/
+        const val ANDROID_TEST_IMPLEMENTATION_DEP = "androidTestImplementation"
 
     }
 
@@ -116,7 +122,7 @@ class AndroidDriver {
     }
 
     fun grantEmulatorPermission(appPackage: String, permission: String) {
-        CommandRunner.executeCommand("${getAndroidHome() + ADB} shell pm grant $appPackage $permission")
+        CommandRunner.executeCommand("${getAndroidHome() + ADB} shell pm grant $appPackage $permission", true)
         logger?.info("Requested permission '$permission' for app '$appPackage'")
     }
 
@@ -127,6 +133,14 @@ class AndroidDriver {
 
     fun killADBServer() {
         CommandRunner.executeCommand("${getAndroidHome() + ADB} kill-server")
+    }
+
+    fun addPermissionIfMissing(projectDirectory: String, appModule: String, permission: String) {
+        val filePath = File("$projectDirectory$appModule/src/main/AndroidManifest.xml").path
+        logger?.info(filePath)
+        val editor = XMLEditor(filePath)
+        editor.insertPermissionIntoManifest(permission)
+        editor.save()
     }
 
 }
