@@ -11,3 +11,6 @@ const val projectSaveLocation: String = "projectupload/project/"
 val thisContainer: ContainerInfo = ContainerInfo("0.0.1")
 
 var logger: Logger? = null
+
+// TODO: Remove the default config
+var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("org.vontech.internalbilitytester")

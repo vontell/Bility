@@ -89,7 +89,7 @@ class Gradle(var project: Project? = null) {
         val buildscriptDeclaration = "buildscript {\n${repoDeclaration.prependIndent("    ")}\n}"
         val allprojectsDeclaration = "allprojects {\n${repoDeclaration.prependIndent("    ")}\n}"
         val finalToWriteTopLevel = "\n\n$buildscriptDeclaration\n\n$allprojectsDeclaration\n"
-        val finalToWriteModuleLevel = "dependencies {\n    // The custom lib!\n    androidTestImplementation(group: 'org.vontech', name: 'bilitytester', version: '1.0.0', ext: 'aar')\n}"
+        val finalToWriteModuleLevel = "dependencies {\n    // The custom lib!\n    androidTestImplementation(group: 'org.vontech', name: 'bilitytester', version: '1.0.8', ext: 'aar')\n}"
 
         // 1) Inject maven repo info into top-level build.gradle
         val topLevelGradle = this.project!!.location + this.project!!.entryFolder + "build.gradle"

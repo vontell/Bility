@@ -1,9 +1,11 @@
 package org.vontech.androidserver.drivers.android
 
+import org.vontech.androidserver.AndroidAppTestConfig
 import org.vontech.androidserver.logger
 import org.vontech.androidserver.pipeline.Pipeline
 import org.vontech.androidserver.pipeline.PipelineConfig
 import org.vontech.androidserver.pipeline.PipelineStepResult
+import org.vontech.androidserver.testConfig
 import org.vontech.androidserver.utils.Gradle
 import java.io.File
 
@@ -53,13 +55,21 @@ class AndroidPipeline(override var pipelineConfig: PipelineConfig) : Pipeline {
         driver.addPermissionIfMissing(projectDirectory, pipelineConfig.source.appModule, AndroidDriver.PERMISSION_INTERNET)
 
         // Build and install the application
-        gradle.installDebug(true)
+        gradle.installDebug(true) // TODO: Can we skip this?
 
         // Grant permissions
         // TODO: Allow the user to provide a list of permissions to grant
         driver.grantEmulatorPermission(pipelineConfig.source.packageName, AndroidDriver.PERMISSION_SYSTEM_ALERT_WINDOW)
 
         driver.emulatorGoHome()
+
+        // At this point in the pipeline, we have setup all of the requirements to run the application
+        // in BilityTest mode. Before we do, we need to prepare the server to receive HTTP calls and requests
+        // from the Android Device. We do this by creating the project config core class, which is downloaded
+        // by the device on test start, and has all configuration options.
+        // TODO: We will use default values for the config, but in the future, the user should be
+        //       able to set these from the frontend
+        testConfig = AndroidAppTestConfig(pipelineConfig.source.packageName)
         Thread.sleep(2000)
 
         // FINALLY, RUN TESTS!!! This is where the magic happens!

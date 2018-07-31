@@ -106,7 +106,7 @@ fun Route.publicRoutes() {
             val projPath = parameters["projectPath"]
             val git = parameters["gitPath"]
             val packageName = parameters["packageName"]
-            val appModule = parameters["packageName"]
+            val appModule = parameters["appModule"]
 
             call.respondHtml {
                 body {

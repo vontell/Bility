@@ -19,11 +19,11 @@
               enctype="multipart/form-data"
               method="post">
 
-            <input type="text" name="projectName" value="Ex: My Project">
-            <input type="text" name="projectPath" value="Ex: MyProject/">
-            <input type="text" name="packageName" value="Ex: io.myorg.myapp">
-            <input type="text" name="appModule" value="Ex: app">
-            <input type="text" name="gitPath" value="Ex: https://github.com/user/project.git">
+            <input type="text" name="projectName" value="BilityExampleApp">
+            <input type="text" name="projectPath" value="">
+            <input type="text" name="packageName" value="org.vontech.bilitytestapplication">
+            <input type="text" name="appModule" value="app">
+            <input type="text" name="gitPath" value="git@github.com:vontell/BilityTestApplication.git">
             <button type="submit">Upload</button>
 
         </form>
