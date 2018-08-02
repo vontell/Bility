@@ -1,1 +1,3 @@
 rootProject.name = 'AndroidContainer'
+include 'bility-core'
+project(':bility-core').projectDir = new File('../bility-core')

@@ -2,10 +2,29 @@ buildscript {
     repositories {
         jcenter()
         maven { url "https://plugins.gradle.org/m2/" }
+        maven {
+            credentials {
+                username 'admin'
+                password 'password'
+            }
+            url 'http://localhost:8146/artifactory/libs-release-local'
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            credentials {
+                username 'admin'
+                password 'password'
+            }
+            url 'http://localhost:8146/artifactory/libs-release-local'
+        }
     }
 }
 
@@ -41,6 +60,8 @@ dependencies {
     compile "io.ktor:ktor-html-builder:$ktor_version"
     compile "io.ktor:ktor-freemarker:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
+
+    compile project(':bility-core')
 
     compile 'org.litote.kmongo:kmongo:3.8.1'
 
