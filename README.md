@@ -1,4 +1,4 @@
-# Bility Build System
+# Bility
 
 [Trello Board](https://trello.com/b/cwWM50Jf) - [Drive](https://drive.google.com/drive/folders/11ScSgQSKj3s64hVFgaWVQBWeqB_U9mU-?usp=sharing) - [Local Maven](http://localhost:8146/artifactory/webapp/home.html?5)
 
@@ -40,6 +40,10 @@ In terms of technologies, everything is pretty much a mix of Kotlin, Gradle, and
 See the [bottom of this document for]() 1) screenshots and architecture figures
 
 ## Setup Instructions
+
+The project is setup as a monorepo, managed through the Gradle build system. Their is a top-level `build.gradle` file, 
+as well as build files for each sub-project. Open the project within IntelliJ IDEA, and if you open the Gradle view / window,
+you should see **AndroidServer**, **BilityCore**, **BilityBuildSystem**, **BilityWebServer**, and **InternalBilityTester**. If these are not shown, make sure to add each `build.gradle` from each sub-project by click the '+' button.
 
 *Note, there is a `docker-compose.yml` file for setting up all of our services, but it does not work properly yet, so don't use this yet*
 

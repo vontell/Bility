@@ -20,14 +20,14 @@ class AndroidPipelineTest: FeatureSpec({
             val appModule = "app"
             val entryFolder = ""
 
-            withTestApplication(Application::main) {
-                val project = Project(ProjectSourceType.GIT, gitRepo,  projectName, packageName, appModule, entryFolder, projectSaveLocation)
-                var projectConfig = PipelineConfig(project)
-                projectConfig = generateMissingConfig(projectConfig)
+            //withTestApplication(Application::main) {
+            //    val project = Project(ProjectSourceType.GIT, gitRepo,  projectName, packageName, appModule, entryFolder, projectSaveLocation)
+            //    var projectConfig = PipelineConfig(project)
+            //    projectConfig = generateMissingConfig(projectConfig)
 
-                val runner = PipelineRunner(projectConfig)
-                runner.startRunner()
-            }
+            //    val runner = PipelineRunner(projectConfig)
+            //    runner.startRunner()
+            //}
 
         }
 

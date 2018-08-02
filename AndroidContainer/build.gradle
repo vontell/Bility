@@ -61,8 +61,6 @@ dependencies {
     compile "io.ktor:ktor-freemarker:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
 
-    compile project(':bility-core')
-
     compile 'org.litote.kmongo:kmongo:3.8.1'
 
     testCompile "io.ktor:ktor-server-tests:$ktor_version"

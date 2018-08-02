@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-  <info organisation="org.vontech" module="bility-core" revision="0.0.1" status="integration" publication="20180730192255"/>
+  <info organisation="org.vontech" module="BilityCore" revision="0.0.1" status="integration" publication="20180801224144"/>
   <configurations>
     <conf name="apiElements" visibility="private" extends="runtime"/>
     <conf name="archives" visibility="public"/>
@@ -25,7 +25,7 @@
     <conf name="testRuntimeOnly" visibility="private" extends="runtimeOnly"/>
   </configurations>
   <publications>
-    <artifact name="bility-core" type="jar" ext="jar" conf="apiElements,archives,runtime,runtimeElements"/>
+    <artifact name="BilityCore" type="jar" ext="jar" conf="apiElements,archives,runtime,runtimeElements"/>
     <artifact name="core" type="jar" ext="jar" conf="shadow"/>
   </publications>
   <dependencies>
