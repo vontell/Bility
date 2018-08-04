@@ -4,3 +4,22 @@
  * This is a general purpose Gradle build.
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven {
+            credentials {
+                username 'admin'
+                password 'password'
+            }
+            url 'http://localhost:8146/artifactory/libs-release-local'
+        }
+    }
+    project.ext {
+        kotlin_version = '1.2.51'
+        ktor_version = '0.9.3'
+        logback_version = '1.2.1'
+    }
+}

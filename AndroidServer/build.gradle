@@ -1,0 +1,79 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven {
+            credentials {
+                username 'admin'
+                password 'password'
+            }
+            url 'http://localhost:8146/artifactory/libs-release-local'
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            credentials {
+                username 'admin'
+                password 'password'
+            }
+            url 'http://localhost:8146/artifactory/libs-release-local'
+        }
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'application'
+
+group 'androidserver'
+version '0.0.1'
+mainClassName = "io.ktor.server.netty.DevelopmentEngine"
+
+sourceSets {
+    main.kotlin.srcDirs = [ 'src' ]
+    test.kotlin.srcDirs = [ 'test' ]
+    main.resources.srcDirs = [ 'resources' ]
+}
+
+repositories {
+    jcenter()
+    maven { url "https://kotlin.bintray.com/ktor" }
+}
+
+test {
+    def newEnvs = test.getEnvironment()
+    newEnvs.put("ANDROID_HOME", "/Users/vontell/Library/Android/sdk")
+    useJUnitPlatform()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-jackson:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
+    compile "io.ktor:ktor-freemarker:$ktor_version"
+    compile "ch.qos.logback:logback-classic:$logback_version"
+
+    compile 'org.litote.kmongo:kmongo:3.8.1'
+
+    compile project(':BilityCore')
+
+    testCompile "io.ktor:ktor-server-tests:$ktor_version"
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
+}
+
+kotlin.experimental.coroutines = 'enable'
+
+shadowJar {
+    baseName = 'bility-androidserver'
+    classifier = null
+    version = null
+}

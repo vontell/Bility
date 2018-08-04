@@ -82,10 +82,10 @@ fun Application.module() {
 		}
 
 		install(StatusPages) {
-			exception<AuthenticationException> {  cause ->
+			exception<AuthenticationException> {  _ ->
 				call.respond(HttpStatusCode.Unauthorized)
 			}
-			exception<AuthorizationException> {  cause ->
+			exception<AuthorizationException> {  _ ->
 				call.respond(HttpStatusCode.Forbidden)
 			}
 		}
@@ -98,7 +98,7 @@ fun Application.module() {
 
 fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
 	style(type = ContentType.Text.CSS.toString()) {
-		+CSSBuilder().apply(builder).toString()
+		CSSBuilder().apply(builder).toString()
 	}
 }
 
