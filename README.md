@@ -91,7 +91,7 @@ More information can be found here: https://hub.docker.com/r/mattgruter/artifact
 The core Bility library is a Kotlin library providing common functionality and types used across the webserver, Android tester, etc... It can be build and pushed to the Artifactory server through the following command:
 
 ```
-cd bility-core
+cd BilityCore
 ./gradlew clean build shadowJar uploadShadow
 cd ..
 ```
