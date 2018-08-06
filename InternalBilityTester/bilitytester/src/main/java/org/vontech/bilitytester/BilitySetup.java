@@ -5,7 +5,7 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.vontect.core.AndroidAppTestConfig;
+import org.vontech.core.types.AndroidAppTestConfig;
 
 import java.io.IOException;
 

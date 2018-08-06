@@ -1,3 +1,6 @@
 rootProject.name = 'InternalBilityTester'
 
 include ':app', ':bilitytester'
+
+include 'BilityCore'
+project(':BilityCore').projectDir = new File('../BilityCore')
