@@ -3,7 +3,7 @@ package org.vontech.algorithms.automatons
 import java.lang.RuntimeException
 
 /**
- * A collections of types for Automatons
+ * A collection of types for Automatons
  * @author Aaron Vontell
  * @date August 6th, 2018
  */

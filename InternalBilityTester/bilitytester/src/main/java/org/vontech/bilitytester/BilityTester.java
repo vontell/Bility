@@ -1,9 +1,12 @@
 package org.vontech.bilitytester;
 
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.Stage;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.Until;
@@ -14,11 +17,14 @@ import com.google.gson.Gson;
 import org.vontech.core.types.AndroidAppTestConfig;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -87,6 +93,59 @@ public class BilityTester {
     }
 
     // PRIVATE HELPER METHODS
+
+    public BilityTester loop() {
+
+        // 1) If this is not the first call, wait for any actions, and execute them
+        //    An action may involve a user action, waiting, quitting, meta, etc
+
+        // 2) Get information about the state of the user interface
+        Activity current = getActivityInstance();
+        AndroidUDL.getLiteralInterfaceFromActivity(current);
+
+        // 3) Send that user interface information to the server, and wait for a response
+
+
+        return this;
+
+    }
+
+    /**
+     * Returns the name of this activity by class name, or null if this activity does not
+     * belong to this package.
+     * @return The name of this activity currently in use
+     */
+    private String getActivityName() {
+        Activity act = getActivityInstance();
+        if (act == null) {
+            return null;
+        } else {
+            return act.getLocalClassName();
+        }
+    }
+
+    /**
+     * Returns a reference the current activity, if one is currently found. Generally, the
+     * activity will be <code>null</code> if the current activity does not belong to this
+     * package
+     * @return The activity currently in use
+     */
+    private Activity getActivityInstance(){
+
+        final Activity[] currentActivity = {null};
+
+        getInstrumentation().runOnMainSync(new Runnable(){
+            public void run(){
+                Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+                Iterator<Activity> it = resumedActivity.iterator();
+                if (it.hasNext()) {
+                    currentActivity[0] = it.next();
+                }
+            }
+        });
+
+        return currentActivity[0];
+    }
 
 
 }

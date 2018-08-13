@@ -22,7 +22,8 @@ public class BilityTest {
     @Test
     public void beginBilityTest() {
         BilityTester tester = new BilityTester(url, getInstrumentation())
-                .startupApp();
+            .startupApp()
+            .loop();
     }
 
 }

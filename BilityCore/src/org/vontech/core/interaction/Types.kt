@@ -3,6 +3,9 @@ package org.vontech.core.interaction
 /**
  * A collection of simple types and data classes to use when interacting
  * with a user interface.
+ * @author Aaron Vontell
+ * @date August 7th, 2018
+ *
  */
 
 /**

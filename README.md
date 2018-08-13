@@ -26,6 +26,8 @@ The advanced tech goals / bread and butter of this project is as follows:
 3) OCR and vision data for dealing with Sketch files (i.e. user study before building the apps)
 4) Advanced human-behavior modeling (i.e. simulate eye tracking, learning what 'good design' means, etc)
 
+Make sure to check out the `Theory/` folder for technical background.
+
 ## Infrastructure Overview
 
 In terms of technologies, everything is pretty much a mix of Kotlin, Gradle, and Docker. Click the links below to see the setup for each component.
