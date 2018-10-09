@@ -237,6 +237,4 @@ public class AndroidUDL {
         return rectf.intersect(screen);
     }
 
-    private static
-
 }

@@ -19,20 +19,43 @@ import java.util.*
  * A Percept is a piece of information that can be perceived
  * by a user.
  */
-data class Percept (
+class Percept (
     val type: PerceptType,
     val information: Any
-)
+) {
 
-val gen = Random();
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Percept
+
+        if (type != other.type) return false
+        if (information != other.information) return false
+
+        return true
+    }
+
+    /**
+     * This is the IntelliJ-generated hash for this object
+     */
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + information.hashCode()
+        return result
+    }
+}
+
+val gen = Random()
 
 /**
  * A Perceptifer is a bearer of percepts, or things that can
  * be perceived by a user.
  */
 class Perceptifer(val percepts: Set<Percept>?,
-                  val virtualPercepts: Set<Percept>?,
-                  val id: Long = gen.nextLong()) {
+                  val virtualPercepts: Set<Percept>?) {
+
+    val id: Long = gen.nextLong()
 
     /**
      * Returns all percepts (real and virtual) that match the given

@@ -2,6 +2,8 @@ package org.vontech.core.interfaces
 
 import org.vontech.utils.cast
 import java.util.HashSet
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * A collection of supporting types for Percepts, such as coordinates, colors,
@@ -22,6 +24,10 @@ class PerceptBuilder {
         return virtualPercepts
     }
 
+    fun buildPerceptifer(): Perceptifer {
+        return Perceptifer(percepts, virtualPercepts)
+    }
+
     // REAL PERCEPTS
 
     /**
@@ -33,6 +39,9 @@ class PerceptBuilder {
     }
 
     // TODO: Would be great to hava a color heirarchy concept
+
+    // TODO: Instead of enum type, maybe have a hash table of types
+    // to a list of percepts of that type
 
     fun createTextColorPercept(color: Int): PerceptBuilder {
         return createPercept(PerceptType.TEXT_COLOR, Color(color))
@@ -114,6 +123,25 @@ class PerceptBuilder {
         return createVirtualPercept(PerceptType.VIRTUAL_SCREEN_READER_CONTENT, content)
     }
 
+    fun createRoughViewOrderingPercept(perceptifers: List<Perceptifer>): PerceptBuilder {
+
+        // First, get all perceptifers that have a location
+        val displayed = perceptifers.filter{
+            it.percepts?.any { it.type == PerceptType.LOCATION } ?: false
+        }
+
+        // Then sort by distance to 0, 0 (top left of screen)
+        val sortedResult = displayed.sortedBy {
+            val location = PerceptParser.fromCoordinate(it.percepts!!.first { it.type == PerceptType.LOCATION})
+            location.fromOrigin()
+        }
+
+        // Finally, store the information
+        val information = PerceptiferOrdering(sortedResult)
+        return createVirtualPercept(PerceptType.CHILDREN_SPATIAL_RELATIONS, information)
+
+    }
+
     fun createVirtualPercept(type: PerceptType, info: Any): PerceptBuilder {
         val percept = Percept(type, info)
         virtualPercepts.add(percept)
@@ -131,6 +159,10 @@ class PerceptParser {
         }
 
         fun fromInvisible(percept: Percept): Boolean {
+            return percept.information.cast()
+        }
+
+        fun fromCoordinate(percept: Percept): Coordinate {
             return percept.information.cast()
         }
 
@@ -156,6 +188,7 @@ enum class PerceptType {
     PHYSICAL_BUTTON,
     MEDIA_TYPE,
     INVISIBLE,
+    CHILDREN_SPATIAL_RELATIONS,
 
     // Virtual types
     VIRTUAL_NAME,
@@ -165,10 +198,30 @@ enum class PerceptType {
 
 }
 
-data class Coordinate (
-    val left: Int,
-    val top: Int
-)
+class Coordinate (val left: Int, val top: Int) {
+
+    fun fromOrigin(): Float {
+        return sqrt(left.toFloat().pow(2) + top.toFloat().pow(2))
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Coordinate
+
+        if (left != other.left) return false
+        if (top != other.top) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = left
+        result = 31 * result + top
+        return result
+    }
+}
 
 data class Size (
     val width: Int,
@@ -197,6 +250,12 @@ class Color(val color: Int) {
     override fun toString(): String {
         return "Color(hex=${this.getHexString()})"
     }
+
+}
+
+class PerceptiferOrdering(orderedPerceptifers: List<Perceptifer>) {
+
+    val ordering = orderedPerceptifers.map { it.id }
 
 }
 

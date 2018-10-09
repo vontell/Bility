@@ -1,9 +1,6 @@
 package org.vontech.algorithms.hci
 
-import org.vontech.core.interfaces.FuzzyState
-import org.vontech.core.interfaces.LiteralInterace
-import org.vontech.core.interfaces.PerceptType
-import org.vontech.core.interfaces.Perceptifer
+import org.vontech.core.interfaces.*
 
 /**
  * The process for grouping similar components of user interfaces
@@ -18,14 +15,14 @@ import org.vontech.core.interfaces.Perceptifer
  *      3.
  */
 
-
-fun getStateFromLiteralInterface(literalInterace: LiteralInterace): FuzzyState {
-
-    val ps = literalInterace.perceptifers
-
-
-
-}
+//
+//fun getStateFromLiteralInterface(literalInterace: LiteralInterace): FuzzyState {
+//
+//    val ps = literalInterace.perceptifers
+//
+//
+//
+//}
 
 /**
  * Represents an accessibility-related hash of a Perceptifer, used
@@ -44,19 +41,46 @@ fun getStateFromLiteralInterface(literalInterace: LiteralInterace): FuzzyState {
  *      CHILDREN_SPATIAL_RELATIONS
  */
 val ACCESSIBILITY_PERCEPTS = listOf(
-    PerceptType.ALPHA
+        PerceptType.ALPHA,
+        PerceptType.BACKGROUND_COLOR,
+        PerceptType.FONT_SIZE,
+        PerceptType.FONT_STYLE,
+        PerceptType.LINE_SPACING,
+        PerceptType.TEXT_COLOR//,
+        //PerceptType.CHILDREN_SPATIAL_RELATIONS
 )
+
 class PerceptiferAccessibilityHash(val perceptifer: Perceptifer) {
 
+    var percepts: List<Percept> = perceptifer.percepts?.filter {
+        it.type in ACCESSIBILITY_PERCEPTS
+    } ?: listOf()
+
+    /**
+     * As an additional step, there may be a conversion of some percepts into another
+     * percept, to allow for fuzzy matching (for instance, using a Location object
+     * to make sure that the left alignment is tracked, but not top position)
+     */
     init {
-        val percepts = perceptifer.percepts!!.filter {
-            it.type in
+
+    }
+
+    var uiHash: Long = _getHash()
+
+    /**
+     * The definition of as hash for a set is to add the hash codes
+     * of each individual Percept. If order does matter, this can be
+     * an issue.
+     */
+    private fun _getHash(): Long {
+        return percepts.hashCode().toLong()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is PerceptiferAccessibilityHash) {
+            return other.uiHash == this.uiHash
         }
+        return false
     }
 
 }
-
-
-/** Accessibility is potentially affected by the following percepts:
-
- */
