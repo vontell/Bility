@@ -65,6 +65,9 @@ dependencies {
 
     compile project(':BilityCore')
 
+    // Selenium dependencies
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.41.0'
+
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
     testCompile "io.ktor:ktor-server-test-host:$ktor_version"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"

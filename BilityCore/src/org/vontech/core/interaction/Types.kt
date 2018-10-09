@@ -1,5 +1,7 @@
 package org.vontech.core.interaction
 
+import org.vontech.core.interfaces.Perceptifer
+
 /**
  * A collection of simple types and data classes to use when interacting
  * with a user interface.
@@ -24,8 +26,16 @@ enum class InputInteractionType {
     SHAKE,
     SPEECH,
     IMAGE,
-    SQUEEZE
+    SQUEEZE,
+    NONE,
+    QUIT,
 }
+
+data class UserAction(
+    val type: InputInteractionType,
+    val perceptifer: Perceptifer,
+    val parameters: Any? = null
+)
 
 /**
  * An OutputInteractionType is a basic type of interaction that can

@@ -1,6 +1,7 @@
 package org.vontech.androidserver
 
 import org.slf4j.Logger
+import org.vontech.androidserver.drivers.android.AndroidSession
 import org.vontech.core.types.AndroidAppTestConfig
 import org.vontech.core.types.ContainerInfo
 
@@ -16,3 +17,6 @@ var logger: Logger? = null
 
 // TODO: Remove the default config
 var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("org.vontech.internalbilitytester")
+
+// TODO: INSTEAD OF GLOBAL VARIABLES, CREATE A CONTEXT
+var androidSession: AndroidSession? = null

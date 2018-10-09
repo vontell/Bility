@@ -24,14 +24,34 @@ data class Percept (
     val information: Any
 )
 
+val gen = Random();
+
 /**
  * A Perceptifer is a bearer of percepts, or things that can
  * be perceived by a user.
  */
-data class Perceptifer(
-    val percepts: Set<Percept>?,
-    val virtualPercepts: Set<Percept>?
-)
+class Perceptifer(val percepts: Set<Percept>?,
+                  val virtualPercepts: Set<Percept>?,
+                  val id: Long = gen.nextLong()) {
+
+    /**
+     * Returns all percepts (real and virtual) that match the given
+     * Percept type.
+     */
+    fun getPerceptsOfType(pType: PerceptType): Set<Percept> {
+        val found = percepts!!.filter { it.type == pType }.toMutableSet()
+        found.addAll(virtualPercepts!!.filter { it.type == pType })
+        return found
+    }
+
+}
+
+/**
+ * Returns an empty perceptifer, useful for wait or NOOP
+ */
+fun emptyPerceptifer(): Perceptifer {
+    return Perceptifer(setOf(), setOf())
+}
 
 /**
  * The EmptyPerceptifer is a special, more abstract object that can be
@@ -40,7 +60,8 @@ data class Perceptifer(
 val EmptyPerceptifer = Perceptifer(null, null)
 
 data class LiteralInterfaceMetadata(
-    val timestamp: Date
+    //val timestamp: Date
+    val id: Long
 )
 
 data class LiteralInterace(

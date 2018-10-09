@@ -55,9 +55,14 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="logback-classic-1.2.1" level="project" />
     <orderEntry type="library" exported="" name="kotlin-stdlib-jdk8-1.2.51" level="project" />
+    <orderEntry type="library" exported="" name="jackson-module-kotlin-2.9.6" level="project" />
+    <orderEntry type="library" exported="" name="jackson-databind-2.9.6" level="project" />
+    <orderEntry type="library" exported="" name="jackson-core-2.9.6" level="project" />
+    <orderEntry type="library" exported="" name="jackson-annotations-2.9.6" level="project" />
     <orderEntry type="library" exported="" name="logback-core-1.2.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.22" level="project" />
     <orderEntry type="library" exported="" name="kotlin-stdlib-jdk7-1.2.51" level="project" />
+    <orderEntry type="library" exported="" name="kotlin-reflect-1.2.21" level="project" />
     <orderEntry type="library" exported="" name="kotlin-stdlib-1.2.51" level="project" />
     <orderEntry type="library" exported="" name="kotlin-stdlib-common-1.2.51" level="project" />
     <orderEntry type="library" exported="" name="annotations-13.0" level="project" />
@@ -66,9 +71,9 @@
     <orderEntry type="library" exported="" scope="TEST" name="slf4j-api-1.7.25" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="kotlintest-core-3.1.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="kotlintest-assertions-3.1.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="kotlin-reflect-1.2.31" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="arrow-core-0.7.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="arrow-annotations-0.7.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="kotlin-reflect-1.2.31" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-jupiter-api-5.2.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-platform-launcher-1.2.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-platform-engine-1.2.0" level="project" />

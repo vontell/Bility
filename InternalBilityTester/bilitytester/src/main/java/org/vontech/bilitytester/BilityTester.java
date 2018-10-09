@@ -14,9 +14,16 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import org.vontech.core.interaction.InputInteractionType;
+import org.vontech.core.interaction.UserAction;
+import org.vontech.core.interfaces.LiteralInterace;
+import org.vontech.core.interfaces.LiteralInterfaceMetadata;
+import org.vontech.core.interfaces.Percept;
+import org.vontech.core.interfaces.Perceptifer;
 import org.vontech.core.types.AndroidAppTestConfig;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -98,15 +105,21 @@ public class BilityTester {
 
         // 1) If this is not the first call, wait for any actions, and execute them
         //    An action may involve a user action, waiting, quitting, meta, etc
+        UserAction nextAction = serverConnection.awaitNextAction();
+        boolean shouldExit = handleAction(nextAction);
 
         // 2) Get information about the state of the user interface
         Activity current = getActivityInstance();
-        AndroidUDL.getLiteralInterfaceFromActivity(current);
+        LiteralInterace face = AndroidUDL.getLiteralInterfaceFromActivity(current);
 
         // 3) Send that user interface information to the server, and wait for a response
+        serverConnection.sendInterface(face);
 
+        if (shouldExit) {
+            return this;
+        }
 
-        return this;
+        return loop();
 
     }
 
@@ -145,6 +158,23 @@ public class BilityTester {
         });
 
         return currentActivity[0];
+    }
+
+    private boolean handleAction(UserAction action) {
+
+        // First, if do nothing, do nothing
+        if (action.getType() == InputInteractionType.NONE) {
+            return false;
+        }
+
+        if (action.getType() == InputInteractionType.QUIT) {
+            return true;
+        }
+
+        // Otherwise, do action
+        Perceptifer pf = action.getPerceptifer();
+        return false;
+
     }
 
 
