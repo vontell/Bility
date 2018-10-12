@@ -23,7 +23,7 @@ class AndroidSession(val startEvent: StartupEvent) {
     fun giveNewLiteralInterface(literalInterace: LiteralInterace) {
 
         collectedInterfaces.add(literalInterace)
-        //person.updateInternalKnowledge()
+        person.updateInternalKnowledge(literalInterace)
 
     }
 
@@ -68,7 +68,7 @@ class AndroidSession(val startEvent: StartupEvent) {
         logger?.info("Metadata: ${latest.metadata}")
         var count = 1
         for (perceptifer in latest.perceptifers) {
-            logger?.info("Perceptifer $count:")
+            logger?.info("Perceptifer $count (${perceptifer.id}):")
             for (percept in perceptifer.percepts!!) {
                 logger?.info("\t(R) $percept")
             }

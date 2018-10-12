@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Display;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -53,15 +54,10 @@ public class AndroidUDL {
         // First create perceptifers for views
         View rootView = ViewHelper.getRootView(activity);
         if (rootView != null) {
-            List<View> allViews = ViewHelper.getAllViews(rootView, true);
 
-            // For every view, create a perceptifer with all possible percepts
-            for (View v : allViews) {
-                if (isOnScreen(activity, v)) {
-                    Perceptifer p = getViewPerceptifer(v);
-                    perceptifers.add(p);
-                }
-            }
+            // Do a traversal through the tree
+            Set<Perceptifer> processed = traverseAndGeneratePerceptifers(activity, rootView).second;
+            perceptifers.addAll(processed);
 
         }
 
@@ -85,13 +81,37 @@ public class AndroidUDL {
 
     /**
      * This method takes in a View and attempts to resolve the most specific class
-     * that represents this View, returning percepts attributed to that view.
-     * @param v The view to get a Perceptifer for
+     * that represents this View, returning percepts attributed to that view. Does this
+     * recursively and propagates id's back up the tree for positional information.
+     * @param v The view to create a perceptifer for
      * @return The Perceptifer representing this View
      */
-    private static Perceptifer getViewPerceptifer(View v) {
+    private static Pair<Perceptifer, Set<Perceptifer>> traverseAndGeneratePerceptifers(Activity activity, View v) {
 
+        if (!isOnScreen(activity, v)) {
+            return null; // TODO: This makes the assumption that if the parent isn't on-screen, than the children are not as well - this could potentially be wrong
+        }
+
+        Set<Perceptifer> perceptifers = new HashSet<>();
         PerceptBuilder builder = new PerceptBuilder();
+
+        // First, build the percepts of each child if this is a ViewGroup
+        if (v instanceof ViewGroup) {
+            Set<Perceptifer> directChildren = new HashSet<>();
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View child = vg.getChildAt(i);
+                Pair<Perceptifer, Set<Perceptifer>> result = traverseAndGeneratePerceptifers(activity, child);
+                if (result != null) {
+                    perceptifers.addAll(result.second); // Add the child and all descendants of that child
+                    directChildren.add(result.first);   // Keep a pointer to that specific child
+                }
+            }
+
+            // Now that we can access the IDs of children, create a hierarchy percept
+            builder.createRoughViewOrderingPercept(directChildren);
+
+        }
 
         // TODO: This could be useful, ignoring hidden text: https://stackoverflow.com/questions/8636946/get-current-visible-text-in-textview
 
@@ -155,7 +175,10 @@ public class AndroidUDL {
             builder.createNameVirtualPercept(v.getClass().getName());
         }
 
-        return new Perceptifer(builder.buildPercepts(), builder.buildVirtualPercepts());
+        // Add this Perceptifer
+        Perceptifer finalPerceptifer = builder.buildPerceptifer();
+        perceptifers.add(finalPerceptifer);
+        return new Pair<>(finalPerceptifer, perceptifers);
 
     }
 

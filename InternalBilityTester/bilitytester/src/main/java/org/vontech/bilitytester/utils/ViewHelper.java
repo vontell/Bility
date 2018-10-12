@@ -29,7 +29,6 @@ public class ViewHelper {
         List<View> views = new LinkedList<>();
         front.add(view);
 
-        // Traverse through the tree, finding TextViews as we go
         while (!front.empty()) {
             View v = front.pop();
             if (v instanceof ViewGroup) {

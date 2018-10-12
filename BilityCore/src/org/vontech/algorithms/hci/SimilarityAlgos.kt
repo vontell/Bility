@@ -15,14 +15,28 @@ import org.vontech.core.interfaces.*
  *      3.
  */
 
-//
-//fun getStateFromLiteralInterface(literalInterace: LiteralInterace): FuzzyState {
-//
-//    val ps = literalInterace.perceptifers
-//
-//
-//
-//}
+
+fun getAccessibilityStateFromLiteralInterface(literalInterace: LiteralInterace): FuzzyState {
+
+    val ps = literalInterace.perceptifers
+
+    val idsToHash = HashMap<Long, Long>()
+
+    // 0. Create a map of IDs -> (Perceptifers, Int) by traversing through the perceptifers.
+    // The Int is the depth of that element. First find the root (the only item with CHILDREN_SPATIAL_RELATIONS
+    // but no one has pointers to them.
+
+    // 1. Sort the Perceptifers by depth, call this queue G
+
+    // 2. Initial a map M of hash(Long) -> [Perceptifers]
+
+    // 3. For each p in G, hash and append to corresponding entry in M
+
+    // 4.
+
+
+
+}
 
 /**
  * Represents an accessibility-related hash of a Perceptifer, used
@@ -46,8 +60,8 @@ val ACCESSIBILITY_PERCEPTS = listOf(
         PerceptType.FONT_SIZE,
         PerceptType.FONT_STYLE,
         PerceptType.LINE_SPACING,
-        PerceptType.TEXT_COLOR//,
-        //PerceptType.CHILDREN_SPATIAL_RELATIONS
+        PerceptType.TEXT_COLOR,
+        PerceptType.CHILDREN_SPATIAL_RELATIONS
 )
 
 class PerceptiferAccessibilityHash(val perceptifer: Perceptifer) {
@@ -65,7 +79,7 @@ class PerceptiferAccessibilityHash(val perceptifer: Perceptifer) {
 
     }
 
-    var uiHash: Long = _getHash()
+    private var uiHash: Long? = null
 
     /**
      * The definition of as hash for a set is to add the hash codes
@@ -73,6 +87,9 @@ class PerceptiferAccessibilityHash(val perceptifer: Perceptifer) {
      * an issue.
      */
     private fun _getHash(): Long {
+
+        // First
+
         return percepts.hashCode().toLong()
     }
 

@@ -44,6 +44,10 @@ class Percept (
         result = 31 * result + information.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "Percept(type=$type, info=$information)"
+    }
 }
 
 val gen = Random()

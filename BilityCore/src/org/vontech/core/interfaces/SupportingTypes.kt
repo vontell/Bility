@@ -123,7 +123,7 @@ class PerceptBuilder {
         return createVirtualPercept(PerceptType.VIRTUAL_SCREEN_READER_CONTENT, content)
     }
 
-    fun createRoughViewOrderingPercept(perceptifers: List<Perceptifer>): PerceptBuilder {
+    fun createRoughViewOrderingPercept(perceptifers: Collection<Perceptifer>): PerceptBuilder {
 
         // First, get all perceptifers that have a location
         val displayed = perceptifers.filter{
