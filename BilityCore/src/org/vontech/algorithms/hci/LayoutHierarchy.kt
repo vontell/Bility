@@ -28,10 +28,10 @@ enum class LayoutDirection {
 class LazyLayoutHierarchy {
 
     // A map of Perceptifer IDs -> Perceptifer
-    private val knownPerceptifers = mutableMapOf<Long, Perceptifer>()
+    private val knownPerceptifers = mutableMapOf<String, Perceptifer>()
 
     // Definitions of layout hierarchy
-    private val relations = mutableListOf<Triple<Long, Long, LayoutDirection>>()
+    private val relations = mutableListOf<Triple<String, String, LayoutDirection>>()
 
     /**
      * Adds a perceptifer to this layout, but without any
@@ -39,7 +39,7 @@ class LazyLayoutHierarchy {
      * @param perceptifer The perceptifer to add to this interface
      * @return The ID of the added perceptifer
      */
-    fun addUnconstrained(perceptifer: Perceptifer): Long {
+    fun addUnconstrained(perceptifer: Perceptifer): String {
         knownPerceptifers.put(perceptifer.id, perceptifer)
         return perceptifer.id
     }

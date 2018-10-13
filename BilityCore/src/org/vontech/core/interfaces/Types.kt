@@ -55,11 +55,12 @@ val gen = Random()
 /**
  * A Perceptifer is a bearer of percepts, or things that can
  * be perceived by a user.
+ * NOTE: It is important that equals() always goes by reference equality here
  */
 class Perceptifer(val percepts: Set<Percept>?,
                   val virtualPercepts: Set<Percept>?) {
 
-    val id: Long = gen.nextLong()
+    val id: String = UUID.randomUUID().toString()
 
     /**
      * Returns all percepts (real and virtual) that match the given
@@ -97,3 +98,13 @@ data class LiteralInterace(
     val inputChannels: Set<InputChannel>,
     val metadata: LiteralInterfaceMetadata
 )
+
+/**
+ * Given a perceptifer, returns the IDs of it's in-order children, or
+ * an empty list if his perceptifer has no children
+ */
+fun getIdsOfChildren(perceptifer: Perceptifer): List<String> {
+    val childrenPercepts = perceptifer.virtualPercepts!!.filter { it.type == PerceptType.CHILDREN_SPATIAL_RELATIONS}
+    if (childrenPercepts.isEmpty()) return ArrayList()
+    return PerceptParser.fromPerceptiferOrdering(childrenPercepts.first()).ordering
+}

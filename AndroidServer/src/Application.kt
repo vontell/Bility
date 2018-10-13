@@ -5,7 +5,8 @@ import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
-import io.ktor.jackson.jackson
+import io.ktor.gson.gson
+//import io.ktor.jackson.jackson
 import io.ktor.routing.*
 import org.vontech.androidserver.routing.internalRoutes
 import org.vontech.androidserver.routing.publicRoutes
@@ -64,8 +65,11 @@ fun Application.main() {
     install(Compression)
     install(CallLogging)
     install(ContentNegotiation) {
-        jackson {
-            enable(SerializationFeature.INDENT_OUTPUT)
+//        jackson {
+//            enable(SerializationFeature.INDENT_OUTPUT)
+//        }
+        gson {
+            setPrettyPrinting()
         }
     }
     install(FreeMarker) {

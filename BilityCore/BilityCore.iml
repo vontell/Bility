@@ -57,6 +57,7 @@
     <orderEntry type="library" exported="" name="Gradle: jackson-databind-2.9.6" level="project" />
     <orderEntry type="library" exported="" name="Gradle: jackson-core-2.9.6" level="project" />
     <orderEntry type="library" exported="" name="Gradle: jackson-annotations-2.9.6" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: gson-2.8.5" level="project" />
     <orderEntry type="library" exported="" name="Gradle: logback-core-1.2.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: slf4j-api-1.7.22" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk7-1.2.51" level="project" />

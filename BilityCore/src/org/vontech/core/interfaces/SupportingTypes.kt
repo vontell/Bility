@@ -1,7 +1,13 @@
 package org.vontech.core.interfaces
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.google.gson.Gson
+import com.google.gson.internal.LinkedTreeMap
 import org.vontech.utils.cast
-import java.util.HashSet
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -67,7 +73,7 @@ class PerceptBuilder {
         return createPercept(PerceptType.ALPHA, alpha)
     }
 
-    fun createFontSizePercept(size: Float): PerceptBuilder {
+    fun createFontSizePercept(size: Int): PerceptBuilder {
         return createPercept(PerceptType.FONT_SIZE, size)
     }
 
@@ -79,7 +85,7 @@ class PerceptBuilder {
         return createPercept(PerceptType.FONT_KERNING, kerning)
     }
 
-    fun createLineSpacingPercept(spacing: Float): PerceptBuilder {
+    fun createLineSpacingPercept(spacing: Int): PerceptBuilder {
         return createPercept(PerceptType.LINE_SPACING, spacing)
     }
 
@@ -142,6 +148,10 @@ class PerceptBuilder {
 
     }
 
+    fun createVirtualRootPercept(): PerceptBuilder {
+        return createVirtualPercept(PerceptType.VIRTUAL_ROOT, true)
+    }
+
     fun createVirtualPercept(type: PerceptType, info: Any): PerceptBuilder {
         val percept = Percept(type, info)
         virtualPercepts.add(percept)
@@ -166,6 +176,12 @@ class PerceptParser {
             return percept.information.cast()
         }
 
+        fun fromPerceptiferOrdering(percept: Percept): PerceptiferOrdering {
+            val map: LinkedTreeMap<String, List<String>> = percept.information as LinkedTreeMap<String, List<String>>
+            // TODO: Figure out the correct casting here
+            return PerceptiferOrdering(map.getOrDefault("ordering", listOf()), true)
+        }
+
     }
 
 }
@@ -188,13 +204,14 @@ enum class PerceptType {
     PHYSICAL_BUTTON,
     MEDIA_TYPE,
     INVISIBLE,
-    CHILDREN_SPATIAL_RELATIONS,
 
     // Virtual types
     VIRTUAL_NAME,
     VIRTUAL_IDENTIFIER,
     VIRTUAL_SCREEN_READER_CONTENT,
-    VIRTUALLY_CLICKABLE
+    VIRTUALLY_CLICKABLE,
+    CHILDREN_SPATIAL_RELATIONS,
+    VIRTUAL_ROOT
 
 }
 
@@ -241,21 +258,21 @@ data class PhysicalButton (
     val name: String
 )
 
-class Color(val color: Int) {
+class Color(color: Int) {
 
-    fun getHexString(): String {
-        return Integer.toHexString(color)
-    }
-
-    override fun toString(): String {
-        return "Color(hex=${this.getHexString()})"
-    }
+    val colorHex = Integer.toHexString(color)
 
 }
 
 class PerceptiferOrdering(orderedPerceptifers: List<Perceptifer>) {
 
-    val ordering = orderedPerceptifers.map { it.id }
+    //@JsonSerialize(`as` = java.util.ArrayList<Long>()::class.javaClass as Any)
+    var ordering = orderedPerceptifers.map { it.id }
+
+    constructor(ordering: List<String>, extra: Boolean) : this(listOf()) {
+        this.ordering = ordering
+    }
+
 
 }
 

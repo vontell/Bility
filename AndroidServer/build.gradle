@@ -56,7 +56,8 @@ test {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
-    compile "io.ktor:ktor-jackson:$ktor_version"
+    //compile "io.ktor:ktor-jackson:$ktor_version"
+    compile "io.ktor:ktor-gson:$ktor_version"
     compile "io.ktor:ktor-html-builder:$ktor_version"
     compile "io.ktor:ktor-freemarker:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"

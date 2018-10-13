@@ -1,5 +1,6 @@
 package org.vontech.androidserver.drivers.android
 
+import org.vontech.algorithms.hci.getAccessibilityStateFromLiteralInterface
 import org.vontech.algorithms.personas.Monkey
 import org.vontech.algorithms.personas.Person
 import org.vontech.algorithms.rulebased.loggers.WCAG2IssuerLogger
@@ -83,6 +84,8 @@ class AndroidSession(val startEvent: StartupEvent) {
         logger?.info("DECIDED ON ${nextAction.type} on ${nextAction.perceptifer}")
 
         actionToTake = nextAction
+
+        getAccessibilityStateFromLiteralInterface(latest)
 
     }
 

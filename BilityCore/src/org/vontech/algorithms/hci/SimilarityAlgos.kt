@@ -1,6 +1,9 @@
 package org.vontech.algorithms.hci
 
+import org.vontech.androidserver.utils.reverseMap
 import org.vontech.core.interfaces.*
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * The process for grouping similar components of user interfaces
@@ -16,23 +19,47 @@ import org.vontech.core.interfaces.*
  */
 
 
-fun getAccessibilityStateFromLiteralInterface(literalInterace: LiteralInterace): FuzzyState {
+fun getAccessibilityStateFromLiteralInterface(literalInterace: LiteralInterace) {
 
-    val ps = literalInterace.perceptifers
-
-    val idsToHash = HashMap<Long, Long>()
-
-    // 0. Create a map of IDs -> (Perceptifers, Int) by traversing through the perceptifers.
+    // 0. Create a map of IDs -> Perceptifers by traversing through the perceptifers.
     // The Int is the depth of that element. First find the root (the only item with CHILDREN_SPATIAL_RELATIONS
-    // but no one has pointers to them.
+    // but no one has pointers to them. O(n)
+    val idPerceptiferPairings = literalInterace.perceptifers.map {it.id to it}.toTypedArray()
+    val ps = hashMapOf(*idPerceptiferPairings)
+    println("ps: $ps")
+    println("ps keys: ${ps.keys}")
 
-    // 1. Sort the Perceptifers by depth, call this queue G
+    // 1. Find the root of the tree through child elimination. O(n)
+    val rootPerceptifer = ps.values.first {it.virtualPercepts!!.any { it.type == PerceptType.VIRTUAL_ROOT }}
+    println("Root node: $rootPerceptifer")
 
-    // 2. Initial a map M of hash(Long) -> [Perceptifers]
+    // 2. Recurse top to bottom, hashing children and propagating upward (this allows for one-time computation
+    //    of layout percepts. Fill the idsToHash map.
+    val idsToHash = HashMap<String, Int>()
+    println("About to get hashes...")
+    performPerceptiferAccessibilityHash(rootPerceptifer, ps, idsToHash)
+    println("Obtained hashes!")
 
-    // 3. For each p in G, hash and append to corresponding entry in M
+    // 3. Reverse idsToHash to get M, the mapping of hashes to similar elements
+    val m = reverseMap(idsToHash)
+    println("MMMMMMMMMMMMMMM")
+    println(m)
 
-    // 4.
+    // 4. Reduction
+    // Using
+    m.values.forEach {
+        println("GROUPING (${it.size})--------------")
+        it.forEach {
+            val perceptifer = ps[it]!!
+            println("\t${perceptifer.id}")
+            perceptifer.percepts!!.forEach {
+                println("\t\t(R) $it")
+            }
+            perceptifer.virtualPercepts!!.forEach {
+                println("\t\t(V) $it")
+            }
+        }
+    }
 
 
 
@@ -55,49 +82,45 @@ fun getAccessibilityStateFromLiteralInterface(literalInterace: LiteralInterace):
  *      CHILDREN_SPATIAL_RELATIONS
  */
 val ACCESSIBILITY_PERCEPTS = listOf(
-        PerceptType.ALPHA,
+        //PerceptType.ALPHA,
         PerceptType.BACKGROUND_COLOR,
-        PerceptType.FONT_SIZE,
+        //PerceptType.FONT_SIZE,
         PerceptType.FONT_STYLE,
-        PerceptType.LINE_SPACING,
-        PerceptType.TEXT_COLOR,
-        PerceptType.CHILDREN_SPATIAL_RELATIONS
+        //PerceptType.LINE_SPACING,
+        PerceptType.VIRTUAL_NAME,
+        PerceptType.TEXT_COLOR//,
+        //PerceptType.CHILDREN_SPATIAL_RELATIONS
 )
 
-class PerceptiferAccessibilityHash(val perceptifer: Perceptifer) {
+fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer, perceptiferMap: HashMap<String, Perceptifer>, hashCache: HashMap<String, Int>): Int {
 
-    var percepts: List<Percept> = perceptifer.percepts?.filter {
+    var perceptsList: List<Percept> = perceptifer.percepts?.filter {
         it.type in ACCESSIBILITY_PERCEPTS
     } ?: listOf()
 
-    /**
-     * As an additional step, there may be a conversion of some percepts into another
-     * percept, to allow for fuzzy matching (for instance, using a Location object
-     * to make sure that the left alignment is tracked, but not top position)
-     */
-    init {
+    perceptsList += perceptifer.virtualPercepts?.filter {
+        it.type in ACCESSIBILITY_PERCEPTS
+    } ?: listOf()
 
+    // remove the order constraints of percepts
+    val percepts = perceptsList.toSet()
+
+    println("Percepts to hash: " + percepts)
+
+    // First, traverse and compute children if needed (making sure to stay in order)
+    val children = getIdsOfChildren(perceptifer)
+    println("Children ids: $children")
+    if (children.isNotEmpty()) {
+        val childHashes = children.map { performPerceptiferAccessibilityHash(perceptiferMap[it]!!, perceptiferMap, hashCache) }
+        println("Child hashes: " + childHashes)
+        val hash = Objects.hash(childHashes, percepts)
+        hashCache.put(perceptifer.id, hash)
+        return hash
     }
 
-    private var uiHash: Long? = null
-
-    /**
-     * The definition of as hash for a set is to add the hash codes
-     * of each individual Percept. If order does matter, this can be
-     * an issue.
-     */
-    private fun _getHash(): Long {
-
-        // First
-
-        return percepts.hashCode().toLong()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other is PerceptiferAccessibilityHash) {
-            return other.uiHash == this.uiHash
-        }
-        return false
-    }
+    // We have reached a leaf - store and return
+    val hash =  percepts.hashCode()
+    hashCache.put(perceptifer.id, hash)
+    return hash
 
 }

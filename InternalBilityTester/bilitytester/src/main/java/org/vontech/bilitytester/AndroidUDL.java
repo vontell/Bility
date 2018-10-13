@@ -56,7 +56,7 @@ public class AndroidUDL {
         if (rootView != null) {
 
             // Do a traversal through the tree
-            Set<Perceptifer> processed = traverseAndGeneratePerceptifers(activity, rootView).second;
+            Set<Perceptifer> processed = traverseAndGeneratePerceptifers(activity, rootView, true).second;
             perceptifers.addAll(processed);
 
         }
@@ -86,7 +86,7 @@ public class AndroidUDL {
      * @param v The view to create a perceptifer for
      * @return The Perceptifer representing this View
      */
-    private static Pair<Perceptifer, Set<Perceptifer>> traverseAndGeneratePerceptifers(Activity activity, View v) {
+    private static Pair<Perceptifer, Set<Perceptifer>> traverseAndGeneratePerceptifers(Activity activity, View v, boolean isRoot) {
 
         if (!isOnScreen(activity, v)) {
             return null; // TODO: This makes the assumption that if the parent isn't on-screen, than the children are not as well - this could potentially be wrong
@@ -101,7 +101,7 @@ public class AndroidUDL {
             ViewGroup vg = (ViewGroup) v;
             for (int i = 0; i < vg.getChildCount(); i++) {
                 View child = vg.getChildAt(i);
-                Pair<Perceptifer, Set<Perceptifer>> result = traverseAndGeneratePerceptifers(activity, child);
+                Pair<Perceptifer, Set<Perceptifer>> result = traverseAndGeneratePerceptifers(activity, child, false);
                 if (result != null) {
                     perceptifers.addAll(result.second); // Add the child and all descendants of that child
                     directChildren.add(result.first);   // Keep a pointer to that specific child
@@ -118,9 +118,9 @@ public class AndroidUDL {
         if (v instanceof TextView) {
             TextView tv = (TextView) v;
             builder.createTextPercept(tv.getText().toString());
-            builder.createFontSizePercept(tv.getTextSize());
+            builder.createFontSizePercept(Math.round(tv.getTextSize()));
             builder.createLineSpacingPercept(
-                    tv.getPaint().getFontSpacing() * tv.getLineSpacingMultiplier() + tv.getLineSpacingExtra()
+                    Math.round(tv.getPaint().getFontSpacing() * tv.getLineSpacingMultiplier() + tv.getLineSpacingExtra())
             );
             boolean normal = true;
             if (tv.getTypeface().isBold()) {
@@ -173,6 +173,11 @@ public class AndroidUDL {
             builder.createNameVirtualPercept(v.getAccessibilityClassName().toString());
         } else {
             builder.createNameVirtualPercept(v.getClass().getName());
+        }
+
+        // If root, add root indicator
+        if (isRoot) {
+            builder.createVirtualRootPercept();
         }
 
         // Add this Perceptifer
