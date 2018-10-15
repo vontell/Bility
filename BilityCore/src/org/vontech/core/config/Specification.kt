@@ -2,7 +2,7 @@ package org.vontech.core.config
 
 import org.vontech.algorithms.automatons.Automaton
 import org.vontech.algorithms.automatons.AutomatonState
-import org.vontech.algorithms.rulebased.loggers.IssuerLogger
+import org.vontech.algorithms.rulebased.loggers.UiIssuerLogger
 import org.vontech.core.interaction.InputInteractionType
 import org.vontech.core.interfaces.Percept
 
@@ -89,7 +89,7 @@ class Specification {
 
     private var automaton: Automaton<SpecificationState, SpecificationStateTransition>? = null
 
-    fun testFor(vararg loggers: IssuerLogger): Specification {
+    fun testFor(vararg loggers: UiIssuerLogger): Specification {
         return this
     }
 

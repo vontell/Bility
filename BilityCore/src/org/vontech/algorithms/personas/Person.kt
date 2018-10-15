@@ -18,6 +18,8 @@ open class Person(val nickname: String, val rand: Random = Random()) {
 
     open val baseType = "Person"
 
+    var lastActionTaken: UserAction? = null
+
     open fun getDescription(): String {
         return "I am $nickname, a human, and that is all. I do not do anything with user interfaces."
     }
@@ -49,7 +51,9 @@ open class Person(val nickname: String, val rand: Random = Random()) {
     open fun reactToNewUserInterface(literalInterace: LiteralInterace): UserAction {
 
         // The base Person does nothing with the user interface
-        return UserAction(InputInteractionType.NONE, emptyPerceptifer())
+        val action = UserAction(InputInteractionType.NONE, emptyPerceptifer())
+        lastActionTaken = action
+        return action
 
     }
 

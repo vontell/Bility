@@ -129,12 +129,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Uri uri = Uri.parse(finalArticle.getUrl());
-                        CustomTabsIntent.Builder intentBuilder = new CustomTabsIntent.Builder();
-                        intentBuilder.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
-                        intentBuilder.setSecondaryToolbarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
-                        CustomTabsIntent customTabsIntent = intentBuilder.build();
-                        customTabsIntent.launchUrl(activity, uri);
+//                        Uri uri = Uri.parse(finalArticle.getUrl());
+//                        CustomTabsIntent.Builder intentBuilder = new CustomTabsIntent.Builder();
+//                        intentBuilder.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
+//                        intentBuilder.setSecondaryToolbarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+//                        CustomTabsIntent customTabsIntent = intentBuilder.build();
+//                        customTabsIntent.launchUrl(activity, uri);
 
                     }
                 });

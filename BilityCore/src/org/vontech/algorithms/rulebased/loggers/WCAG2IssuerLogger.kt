@@ -1,10 +1,10 @@
 package org.vontech.algorithms.rulebased.loggers
 
-import org.vontech.core.interfaces.PerceptParser
-import org.vontech.core.interfaces.PerceptType
-import org.vontech.core.interfaces.Perceptifer
+import org.vontech.algorithms.automatons.Automaton
 import org.vontech.constants.WCAGConstants
-import org.vontech.core.interfaces.LiteralInterace
+import org.vontech.core.interaction.UserAction
+import org.vontech.core.interfaces.*
+import java.text.SimpleDateFormat
 
 enum class WCAGLevel {
     A, AA, AAA
@@ -15,7 +15,7 @@ data class WCAGExtras(
         val link: String
 )
 
-class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
+class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
     val WCAG2_URL = "https://www.w3.org/TR/WCAG20/"
 
@@ -28,12 +28,10 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
         )
     }
 
-    override fun logStaticIssues(literalInterace: LiteralInterace) {
-        literalInterace.perceptifers.forEach { logIssuesLevelA(it) }
-    }
-
-    private fun logIssuesLevelA(p: Perceptifer) {
-        logNonTextContentTextAlternatives(p)
+    private fun getAllStaticIssues(p: Perceptifer): MutableList<StaticIssue> {
+        val staticIssues = mutableListOf<StaticIssue>()
+        logNonTextContentTextAlternatives(p)?.let { staticIssues.add(it) }
+        return staticIssues
     }
 
     /**
@@ -53,7 +51,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
      *            not based on vision
      *          - If decoration, does not need screen reader content
      */
-    private fun logNonTextContentTextAlternatives(perceptifer: Perceptifer) {
+    private fun logNonTextContentTextAlternatives(perceptifer: Perceptifer): StaticIssue? {
 
         val textInfos = perceptifer.getPerceptsOfType(PerceptType.TEXT)
         val screenReaderInfos = perceptifer.getPerceptsOfType(PerceptType.VIRTUAL_SCREEN_READER_CONTENT)
@@ -61,8 +59,11 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
         // Build the base Issue
         val builder = IssuerBuilder()
         builder.initialize(WCAGConstants.P111_NAME, WCAGConstants.P111_SHORT,
-                           WCAGConstants.P111_LONG, perceptifer)
+                           WCAGConstants.P111_LONG)
                 .extras(WCAGExtras(WCAGConstants.P111_LEVEL, WCAGConstants.P111_LINK))
+
+        // Add this perceptifer
+        builder.addPerceptifers(mutableListOf(perceptifer))
 
         var hadEmptyText = false
 
@@ -72,7 +73,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
                     .passes(true)
                     .explanation(WCAGConstants.P111_INV_EXPLANATION)
                     .suggest(WCAGConstants.SUGGEST_NONE)
-            log(builder.build())
+            return builder.buildStaticIssue()
         }
         else if (textInfos.isNotEmpty()) {
             val hasNonEmptyString = textInfos.any { PerceptParser.fromText(it).isNotBlank() }
@@ -81,31 +82,33 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
                         .passes(true)
                         .explanation(WCAGConstants.P111_TEXT_EXPLANATION)
                         .suggest(WCAGConstants.SUGGEST_NONE)
-                log(builder.build())
+                return builder.buildStaticIssue()
             } else {
-                // If there was empty text, we better check the other percepts
+                // TODO: If there was empty text, we better check the other percepts
                 hadEmptyText = true
             }
         }
         else {
 
             // If it was not text, then first check if it at least had screen reader attributes
-            if (screenReaderInfos.isNotEmpty()) {
+            return if (screenReaderInfos.isNotEmpty()) {
                 builder
                         .passes(true)
                         .explanation(WCAGConstants.P111_SCREEN_READER_AVAIL_EXPLANATION)
                         .suggest(WCAGConstants.SUGGEST_NONE)
-                log(builder.build())
+                builder.buildStaticIssue()
             } else {
                 // TODO: Only pass if this is an exception. Otherwise, fail
                 builder
                         .passes(false)
                         .explanation(WCAGConstants.P111_SCREEN_READER_GONE_EXPLANATION)
                         .suggest(WCAGConstants.SUGGEST_NONE)
-                log(builder.build())
+                builder.buildStaticIssue()
             }
 
         }
+
+        return null //this should never be reached, but for some reason that is not detected
 
     }
 
@@ -114,6 +117,97 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : IssuerLogger() {
         return perceptifer.percepts!!.any {
             it.type == PerceptType.INVISIBLE && PerceptParser.fromInvisible(it)
         }
+
+    }
+
+    override fun getFullAccessibilityReport(automaton: Automaton<CondensedState, UserAction>): String {
+
+        // For each state, log accessibility issues of that state
+        // i.e. for each state, and for each unique has (across the entirety of the automaton,
+        // pick a representative perceptifer and detect issues. Keep a count of hash occurrences)
+
+        val hashToStaticIssues = HashMap<Int, MutableList<StaticIssue>>()
+
+        automaton.states.forEach {
+            val analysisResults = it.state.hashResults
+            analysisResults.hashesToIds.keys.forEach {
+                // If the hash has not been assessed for accessibility yet, do that
+                if (!hashToStaticIssues.containsKey(it)) {
+                    val ids = analysisResults.hashesToIds[it]!!
+                    val representative = analysisResults.idsToPerceptifers[ids.first()]!!
+                    val rest = ids.subList(1, ids.count()).map { analysisResults.idsToPerceptifers[it]!! }
+                    val staticIssues = getAllStaticIssues(representative)
+                    // Then add all other perceptifers to this
+                    staticIssues.forEach {
+                        it.perceptifers.addAll(rest)
+                    }
+                    hashToStaticIssues[it] = staticIssues
+                }
+                // Otherwise, simply tack on new perceptifers
+                // TODO: This may overcount
+                else {
+                    val hash = it
+                    hashToStaticIssues[it]!!.forEach {
+                        it.perceptifers.addAll(analysisResults.hashesToIds[hash]!!.map { analysisResults.idsToPerceptifers[it]!! })
+                    }
+                }
+            }
+        }
+
+        // For each transition, log dynamic issues
+
+
+        // Now generate report
+        // First, log issues
+
+        val allStaticIssues = hashToStaticIssues.values.flatten()
+
+        val builder = StringBuilder()
+        builder.appendln("WCAG 2.0 Accessibility Report - Completed at ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")}")
+        if (allStaticIssues.isNotEmpty()) {
+            builder.appendln("Unique Static Accessibility Issues")
+            var passCount = 0
+            for (issue in allStaticIssues) {
+                if (issue.passes) {
+                    passCount++
+                }
+                else {
+                    builder.appendln("--------------------------------------")
+                    builder.appendln("\t Issue Information:")
+                    builder.appendln("\t\t Identifier: ${issue.identifier}")
+                    builder.appendln("\t\t Description: ${issue.shortDescription}")
+                    builder.appendln("\t\t Explanation: ${issue.instanceExplanation}")
+                    builder.appendln("\t\t Suggestion: ${issue.suggestionExplanation}")
+                    builder.appendln("\t\t WCAG Details: ${issue.extras}")
+                    builder.appendln("\t\t Total Violations: ${issue.perceptifers.size}")
+                    builder.appendln("\t Example:")
+                    for (percept in issue.perceptifers.first().percepts!!) {
+                        builder.appendln("\t\t(R) $percept")
+                    }
+                    for (percept in issue.perceptifers.first().virtualPercepts!!) {
+                        builder.appendln("\t\t(V) $percept")
+                    }
+                }
+            }
+            builder.appendln("-------------------------------------- (note that $passCount pass events were found) ")
+        }
+
+        return builder.toString()
+
+//        logger?.info("LATEST INTERFACE INFORMATION ---------")
+//        logger?.info("Metadata: ${latest.metadata}")
+//        var count = 1
+//        for (perceptifer in latest.perceptifers) {
+//            logger?.info("Perceptifer $count (${perceptifer.id}):")
+//            for (percept in perceptifer.percepts!!) {
+//                logger?.info("\t(R) $percept")
+//            }
+//            for (percept in perceptifer.virtualPercepts!!) {
+//                logger?.info("\t(V) $percept")
+//            }
+//            count++
+//        }
+//        logger?.info("--------------------------------------")
 
     }
 

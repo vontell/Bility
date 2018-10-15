@@ -1,7 +1,14 @@
 package org.vontech.algorithms.rulebased.loggers
 
+import org.vontech.algorithms.automatons.Automaton
+import org.vontech.algorithms.automatons.AutomatonState
+import org.vontech.algorithms.automatons.AutomatonTransition
+import org.vontech.core.interaction.UserAction
+import org.vontech.core.interfaces.CondensedState
 import org.vontech.core.interfaces.LiteralInterace
 import org.vontech.core.interfaces.Perceptifer
+
+// TODO: Possibly make these all generics
 
 /**
  * An extendable class which manages the logging of issues found within
@@ -9,25 +16,18 @@ import org.vontech.core.interfaces.Perceptifer
  * will run a series of tests.
  * @author Aaron Vontell
  * @created September 17th, 2018
- * @updated September 17th, 2018
+ * @updated October 14th, 2018
  */
-abstract class IssuerLogger {
+abstract class UiIssuerLogger {
 
     abstract fun getDescription(): LoggerDescription
-    abstract fun logStaticIssues(literalInterace: LiteralInterace)
+    abstract fun getFullAccessibilityReport(automaton: Automaton<CondensedState, UserAction>): String
 
     /**
      * The list of issues logged by this logger
      */
-    val issueList = mutableListOf<Issue>()
-
-    fun log(issue: Issue) {
-        issueList.add(issue)
-    }
-
-    fun clear() {
-        issueList.clear()
-    }
+    val staticIssueList = mutableListOf<StaticIssue>()
+    val dynamicIssueList = mutableListOf<DynamicIssue>()
 
 }
 
@@ -42,9 +42,9 @@ data class LoggerDescription(
 )
 
 /**
- * A representation of an issue that can be logged by the logger
+ * A representation of a static issue that can be logged by the logger
  */
-data class Issue(
+data class StaticIssue(
         val identifier: String,
         val shortDescription: String,
         val longDescription: String,
@@ -52,7 +52,23 @@ data class Issue(
         val suggestionExplanation: String,
         val passes: Boolean,
         val extras: Any,
-        val perceptifer: Perceptifer
+        val perceptifers: MutableList<Perceptifer>
+)
+
+/**
+ * A representation of a dynamic issue that can be logged by the logger
+ */
+data class DynamicIssue(
+        val identifier: String,
+        val shortDescription: String,
+        val longDescription: String,
+        val instanceExplanation: String,
+        val suggestionExplanation: String,
+        val passes: Boolean,
+        val extras: Any,
+        val startState: AutomatonState<CondensedState>?,
+        val endState: AutomatonState<CondensedState>?,
+        val transition: AutomatonTransition<UserAction>?
 )
 
 class IssuerBuilder {
@@ -62,18 +78,19 @@ class IssuerBuilder {
     private var longDescription: String? = null
     private var instanceExplanation: String? = null
     private var suggestionExplanation: String? = null
+    private var startState: AutomatonState<CondensedState>? = null
+    private var endState: AutomatonState<CondensedState>? = null
+    private var transition: AutomatonTransition<UserAction>? = null
     private var pass: Boolean = true
     private var extras: Any? = null
-    private var perceptifer: Perceptifer? = null
+    private var perceptifers: MutableList<Perceptifer> = mutableListOf()
 
     fun initialize(identifier: String,
                    shortDescription: String,
-                   longDescription: String,
-                   perceptifer: Perceptifer): IssuerBuilder {
+                   longDescription: String): IssuerBuilder {
         this.identifier = identifier
         this.shortDescription = shortDescription
         this.longDescription = longDescription
-        this.perceptifer = perceptifer
         return this
     }
 
@@ -97,14 +114,34 @@ class IssuerBuilder {
         return this
     }
 
-    fun build(): Issue {
+    fun addPerceptifers(perceptifers: List<Perceptifer>): IssuerBuilder {
+        this.perceptifers.addAll(perceptifers)
+        return this
+    }
+
+    fun addStartState(state: AutomatonState<CondensedState>): IssuerBuilder {
+        this.startState = state
+        return this
+    }
+
+    fun addEndState(state: AutomatonState<CondensedState>): IssuerBuilder {
+        this.endState = state
+        return this
+    }
+
+    fun addTransition(transition: AutomatonTransition<UserAction>): IssuerBuilder {
+        this.transition = transition
+        return this
+    }
+
+    fun buildStaticIssue(): StaticIssue {
 
         if (listOf(identifier, shortDescription, longDescription, instanceExplanation,
-                  suggestionExplanation, pass, extras, perceptifer).any { it == null }) {
+                  suggestionExplanation, pass, extras).any { it == null } || perceptifers.size == 0) {
             throw RuntimeException("All properties of an issue must be set")
         }
 
-        return Issue(
+        return StaticIssue(
                 identifier!!,
                 shortDescription!!,
                 longDescription!!,
@@ -112,8 +149,34 @@ class IssuerBuilder {
                 suggestionExplanation!!,
                 pass,
                 extras!!,
-                perceptifer!!
+                perceptifers
         )
+
+    }
+
+    fun buildDynamicIssue(): DynamicIssue {
+
+        if (listOf(identifier, shortDescription, longDescription, instanceExplanation,
+                        suggestionExplanation, pass, extras).any { it == null } || perceptifers.size == 0) {
+            throw RuntimeException("All required properties of an issue must be set")
+        }
+        if (listOf(startState, endState, transition).all { it == null }) {
+            throw RuntimeException("A dynamic issue must indicate at least the start state, end state, or transition")
+        }
+
+        return DynamicIssue(
+                identifier!!,
+                shortDescription!!,
+                longDescription!!,
+                instanceExplanation!!,
+                suggestionExplanation!!,
+                pass,
+                extras!!,
+                startState,
+                endState,
+                transition
+        )
+
     }
 
 }

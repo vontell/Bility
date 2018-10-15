@@ -70,6 +70,14 @@ class DataTypesTest: FeatureSpec({
 
         }
 
+        scenario("should generate and write dot and png files") {
+
+            automaton.writeDotFile()
+            automaton.dotFileToPng()
+            automaton.displayAutomatonImage()
+
+        }
+
     }
 
 })

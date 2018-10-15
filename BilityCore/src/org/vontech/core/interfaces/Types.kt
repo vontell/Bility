@@ -1,6 +1,7 @@
 package org.vontech.core.interfaces
 
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * A collection of simple types and data classes to use when interacting
@@ -89,7 +90,7 @@ val EmptyPerceptifer = Perceptifer(null, null)
 
 data class LiteralInterfaceMetadata(
     //val timestamp: Date
-    val id: Long
+    val id: String = UUID.randomUUID().toString()
 )
 
 data class LiteralInterace(
@@ -107,4 +108,16 @@ fun getIdsOfChildren(perceptifer: Perceptifer): List<String> {
     val childrenPercepts = perceptifer.virtualPercepts!!.filter { it.type == PerceptType.CHILDREN_SPATIAL_RELATIONS}
     if (childrenPercepts.isEmpty()) return ArrayList()
     return PerceptParser.fromPerceptiferOrdering(childrenPercepts.first()).ordering
+}
+
+fun getRoot(perceptifers: Iterable<Perceptifer>): Perceptifer {
+    return perceptifers.first {it.virtualPercepts!!.any { it.type == PerceptType.VIRTUAL_ROOT }}
+}
+
+fun getMidpoint(perceptifer: Perceptifer): Coordinate {
+    val location = PerceptParser.fromCoordinate(perceptifer.percepts!!.first { it.type == PerceptType.LOCATION })
+    val size = PerceptParser.fromSize(perceptifer.percepts!!.first { it.type == PerceptType.SIZE })
+    val xMidpoint = (location.left + (size.width / 2.0)).roundToInt()
+    val yMidpoint = (location.top + (size.height / 2.0)).roundToInt()
+    return Coordinate(xMidpoint, yMidpoint)
 }

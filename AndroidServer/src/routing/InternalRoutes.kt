@@ -1,18 +1,28 @@
 package org.vontech.androidserver.routing
 
 import io.ktor.application.call
+import io.ktor.content.PartData
+import io.ktor.content.forEachPart
+import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.request.receive
+import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import org.vontech.algorithms.personas.Monkey
 import org.vontech.androidserver.androidSession
 import org.vontech.androidserver.drivers.android.AndroidSession
+import org.vontech.androidserver.latestGraph
 import org.vontech.androidserver.logger
 import org.vontech.androidserver.testConfig
 import org.vontech.core.interfaces.LiteralInterace
 import org.vontech.core.server.StartupEvent
+import org.vontech.utils.cast
+import java.io.File
+
+val FILE_DB = "fileDB"
 
 fun Route.internalRoutes() {
 
@@ -44,7 +54,55 @@ fun Route.internalRoutes() {
             logger?.info("PERCEPTIFERS: ${face.perceptifers}")
             androidSession!!.giveNewLiteralInterface(face)
             androidSession!!.generateAndSaveNextAction()
+
+            latestGraph = (androidSession!!.person as Monkey).automaton.getStringForGraphVizWeb()
+
             call.respond(200)
+        }
+    }
+
+    route("/results") {
+        get {
+            call.respond(FreeMarkerContent("results.ftl", null))
+        }
+    }
+
+    route("/popGraphviz") {
+        get {
+            if (latestGraph != null) {
+                call.respond(latestGraph!!)
+                latestGraph = null
+            } else {
+                call.respond(200)
+            }
+
+        }
+    }
+
+    route("/receiveScreenshot") {
+        logger?.info("Received screenshot")
+        post {
+            val multipart = call.receiveMultipart()
+            var literalId = "unknown"
+            multipart.forEachPart { part ->
+                when (part) {
+                    is PartData.FormItem -> {
+                        if (part.name == "literalId") {
+                            literalId = part.value
+                            logger?.info("Screenshot for $literalId")
+                        }
+                        println(part)
+                    }
+                    is PartData.FileItem -> {
+                        val ext = File(part.originalFileName).extension
+                        val file = File(FILE_DB, "upload-$literalId.$ext")
+                        part.streamProvider().use { input -> file.outputStream().buffered().use { output -> input.copyToSuspend(output) } }
+                        androidSession!!.giveNewScreenshot(file)
+                    }
+                }
+
+                part.dispose()
+            }
         }
     }
 

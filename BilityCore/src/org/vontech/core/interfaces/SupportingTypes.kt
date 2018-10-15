@@ -176,6 +176,10 @@ class PerceptParser {
             return percept.information.cast()
         }
 
+        fun fromSize(percept: Percept): Size {
+            return percept.information.cast()
+        }
+
         fun fromPerceptiferOrdering(percept: Percept): PerceptiferOrdering {
             val map: LinkedTreeMap<String, List<String>> = percept.information as LinkedTreeMap<String, List<String>>
             // TODO: Figure out the correct casting here
@@ -276,3 +280,6 @@ class PerceptiferOrdering(orderedPerceptifers: List<Perceptifer>) {
 
 }
 
+fun getShortName(perceptifer: Perceptifer): String {
+    return perceptifer.virtualPercepts?.first {it.type == PerceptType.VIRTUAL_NAME}?.information?.cast<String>()?.split(".")?.last() ?: "UnknownClass"
+}

@@ -1,7 +1,11 @@
 package org.vontech.bilitytester;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
 
 import com.google.gson.Gson;
 
@@ -12,15 +16,19 @@ import org.vontech.core.interfaces.Perceptifer;
 import org.vontech.core.server.StartupEvent;
 import org.vontech.core.types.AndroidAppTestConfig;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -43,6 +51,7 @@ public class ServerConnection {
     private static final String SEND_STARTUP_ENDPOINT = "/internal/receiveStartupEvent";
     private static final String SEND_INTERFACE_ENDPOINT = "/internal/receiveInterface";
     private static final String GET_ACTION_ENDPOINT = "/internal/getNextAction";
+    private static final String SEND_SCREENSHOT_ENDPOINT = "/internal/receiveScreenshot";
 
     /**
      * Creates a connection to the AndroidServer
@@ -143,6 +152,70 @@ public class ServerConnection {
 
         }
         return new Pair<>(500, null);
+    }
+
+    /**
+     * Sends a screenshot to the server, with the given tag
+     * @param tag
+     * @param activity
+     */
+    Pair<Integer, String> sendScreenshot(String tag, Activity activity) {
+
+        try {
+
+            // First take the screenshot and save it to the device
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/bility/" + Calendar.getInstance().getTimeInMillis() + ".png";
+
+            // create bitmap screen capture
+            View v1 = activity.getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            bitmap = scaleDown(bitmap, 200, true);
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+            imageFile.getParentFile().mkdirs();
+            imageFile.createNewFile();
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+            // Then send the screenshot to the server
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .addFormDataPart("literalId", tag)
+                    .addFormDataPart("file", imageFile.getName(),
+                            RequestBody.create(MediaType.parse("image/png"), imageFile))
+                    .build();
+
+            Request request = new Request.Builder()
+                    .url(url + SEND_SCREENSHOT_ENDPOINT)
+                    .post(requestBody)
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            return new Pair<>(response.code(), response.body().string());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
+                                   boolean filter) {
+        float ratio = Math.min(
+                (float) maxImageSize / realImage.getWidth(),
+                (float) maxImageSize / realImage.getHeight());
+        int width = Math.round((float) ratio * realImage.getWidth());
+        int height = Math.round((float) ratio * realImage.getHeight());
+
+        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
+                height, filter);
+        return newBitmap;
     }
 
 }

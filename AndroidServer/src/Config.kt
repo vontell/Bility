@@ -20,3 +20,4 @@ var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("org.vontech.intern
 
 // TODO: INSTEAD OF GLOBAL VARIABLES, CREATE A CONTEXT
 var androidSession: AndroidSession? = null
+var latestGraph: String? = null

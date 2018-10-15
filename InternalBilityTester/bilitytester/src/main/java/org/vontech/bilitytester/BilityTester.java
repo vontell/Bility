@@ -13,9 +13,12 @@ import android.support.test.uiautomator.Until;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 import org.vontech.core.interaction.InputInteractionType;
+import org.vontech.core.interaction.SwipeParameters;
 import org.vontech.core.interaction.UserAction;
+import org.vontech.core.interfaces.Coordinate;
 import org.vontech.core.interfaces.LiteralInterace;
 import org.vontech.core.interfaces.LiteralInterfaceMetadata;
 import org.vontech.core.interfaces.Percept;
@@ -44,6 +47,8 @@ public class BilityTester {
     private AndroidAppTestConfig config;
     private final UiDevice device;
     private ServerConnection serverConnection;
+
+    private final int SWIPE_STEP_COUNT = 100;
 
 
     /**
@@ -115,6 +120,9 @@ public class BilityTester {
         // 3) Send that user interface information to the server, and wait for a response
         serverConnection.sendInterface(face);
 
+        // 4) Also send the screenshot to the server
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current);
+
         if (shouldExit) {
             return this;
         }
@@ -173,6 +181,27 @@ public class BilityTester {
 
         // Otherwise, do action
         Perceptifer pf = action.getPerceptifer();
+
+        if (action.getType() == InputInteractionType.SWIPE) {
+
+            // Get the object to swipe on
+            LinkedTreeMap<String, Double> params = (LinkedTreeMap) action.getParameters();
+            device.swipe(
+                    params.get("startX").intValue(),
+                    params.get("startY").intValue(),
+                    params.get("endX").intValue(),
+                    params.get("endY").intValue(),
+                    SWIPE_STEP_COUNT);
+            Log.e("SWIPING", params.values().toString());
+            return false;
+        }
+
+        if (action.getType() == InputInteractionType.CLICK) {
+            LinkedTreeMap<String, Double> params = (LinkedTreeMap) action.getParameters();
+            device.click(params.get("left").intValue(), params.get("top").intValue());
+            return false;
+        }
+
         return false;
 
     }

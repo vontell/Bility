@@ -16,7 +16,7 @@ class PersonTest: FeatureSpec({
     // Let's define the interface as a whole
     val screen = OutputChannel(ChannelType.VISUAL, "Device Screen")
     val touch = InputChannel(ChannelType.PHYSICAL, "Device Touch Display")
-    val metadata = LiteralInterfaceMetadata(Random().nextLong())
+    val metadata = LiteralInterfaceMetadata(UUID.randomUUID().toString())
 
     // Then load example screens
     val firstScreenButtonPerceptBuilder = PerceptBuilder()

@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The AndroidUDL class assists in converting Android user interfaces (i.e. objects
@@ -69,7 +70,7 @@ public class AndroidUDL {
         // Create or access the output and input channels for this interface
         // The LiteralInterace class will handle the filtering of Perceptifers based
         // on these channels
-        LiteralInterfaceMetadata metadata = new LiteralInterfaceMetadata(new Random().nextLong());
+        LiteralInterfaceMetadata metadata = new LiteralInterfaceMetadata(UUID.randomUUID().toString());
         return new LiteralInterace(
                 perceptifers,
                 new HashSet<OutputChannel>(),
