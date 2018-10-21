@@ -5,6 +5,7 @@ import org.vontech.algorithms.automatons.AutomatonState
 import org.vontech.algorithms.automatons.AutomatonTransition
 import org.vontech.algorithms.rulebased.loggers.WCAG2IssuerLogger
 import org.vontech.algorithms.rulebased.loggers.WCAGLevel
+import org.vontech.constants.FILE_DB
 import org.vontech.core.interaction.InputInteractionType
 import org.vontech.core.interaction.KeyPress
 import org.vontech.core.interaction.UserAction
@@ -13,6 +14,7 @@ import org.vontech.core.interfaces.*
 import org.vontech.utils.cast
 import org.vontech.utils.random
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * A representation of a user which clicks randomly through a user interface
@@ -31,8 +33,8 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
     var actionCount: Int = 0
 
 
-    private val CLICK_BOUND = 0.40
-    private val SWIPE_BOUND = CLICK_BOUND + 0.59
+    private val CLICK_BOUND = 0.60
+    private val SWIPE_BOUND = CLICK_BOUND + 0.41
     private val BACK_BOUND = SWIPE_BOUND + 0.0001
     private val LONGCLICK_BOUND = 1.0
 
@@ -71,7 +73,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         } else {
             automaton = Automaton(AutomatonState(newState))
             automaton.setImageFunction {
-                "/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/upload-${it.state.literalInterace.metadata.id}.png"
+                "$FILE_DB/upload-${it.state.literalInterace.metadata.id}.png"
             }
         }
 
@@ -88,9 +90,10 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         // It will randomly pick one of these actions, and then randomly select
         // an item to perform that action on
 
-        if (actionCount > 40 ) {
+        if (actionCount > 200 ) {
             automaton.writeDotFile()
-            //automaton.dotFileToPng()
+            automaton.dotFileToPng()
+            automaton.displayAutomatonImage()
             println("FINISHED WRITING DOT FILE")
             val action = UserAction(InputInteractionType.QUIT, emptyPerceptifer())
             action.provideContext(automaton.currentState.state.hashResults)
@@ -98,11 +101,11 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
             println("Generating accessibility report...")
             val result = wcagLogger.getFullAccessibilityReport(automaton)
             println(result)
+            startFinishedAnalysis()
             return action
         }
 
         // TODO: Organize elements in a way that makes searching easy
-        println("Getting clickables")
         val clickable = literalInterace.perceptifers.filter {
             it.virtualPercepts!!.any {
                 it.type == PerceptType.VIRTUALLY_CLICKABLE && it.information as Boolean } }
@@ -146,11 +149,21 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         }
 
         // For every screen, should try to navigate with the keyboard
-//        KeyPress.values().forEach {
-//            val potentialAction = AutomatonTransition(UserAction(InputInteractionType.KEYPRESS, EmptyPerceptifer, it))
-//            potentialAction.label.provideContext(automaton.currentState.state.hashResults)
-//            automaton.addTransition(potentialAction, null)
-//        }
+        KeyPress.values().forEach {
+//            if (it == KeyPress.ENTER) {
+//                clickable.forEach {
+//                    val potentialAction = AutomatonTransition(UserAction(InputInteractionType.KEYPRESS, it, KeyPress.ENTER))
+//                    potentialAction.label.provideContext(automaton.currentState.state.hashResults)
+//                    potentialAction.label.overrideString("label=KEYPRESS of ENTER on $it")
+//                    automaton.addTransition(potentialAction, null)
+//                }
+//            } else {
+                val potentialAction = AutomatonTransition(UserAction(InputInteractionType.KEYPRESS, EmptyPerceptifer, it))
+                potentialAction.label.provideContext(automaton.currentState.state.hashResults)
+                potentialAction.label.overrideString("label=KEYPRESS of ${it.name}")
+                automaton.addTransition(potentialAction, null)
+//            }
+        }
 
         val statesWithUnexplored = automaton.statesWithUnexploredEdges()
         println("Currently have ${statesWithUnexplored.size} states with unexplored edges")
@@ -166,6 +179,28 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         lastActionTaken = action
 
         return action
+
+    }
+
+    fun startFinishedAnalysis() {
+        println("Starting finish analysis")
+
+        val keyboardOnly = automaton //TODO: MAKE A DEEP COPY!!!
+        keyboardOnly.transitions.values.forEach {
+            val transitionEntry = it
+            val newTransitionMap = HashMap<AutomatonTransition<UserAction>, HashSet<AutomatonState<CondensedState>>>()
+            it.keys.forEach {
+                if (it.label.type == InputInteractionType.KEYPRESS) {
+                    newTransitionMap.put(it, transitionEntry[it]!!)
+                }
+            }
+            it.clear()
+            it.putAll(newTransitionMap)
+        }
+
+        automaton.writeDotFile("$FILE_DB/autoKeysOnly.dot")
+        automaton.dotFileToPng("$FILE_DB/autoKeysOnly.dot", "$FILE_DB/autoKeysOnly.png")
+        automaton.displayAutomatonImage("$FILE_DB/autoKeysOnly.png")
 
     }
 

@@ -1,5 +1,6 @@
 package org.vontech.algorithms.automatons
 
+import org.vontech.constants.FILE_DB
 import java.io.*
 import java.lang.RuntimeException
 
@@ -136,7 +137,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
     }
 
     fun getUnexplored(): AutomatonTransition<T>? {
-        println("Checking for unexplored...")
         if (currentState in transitions) {
             transitions[currentState]!!.keys.forEach {
                 if (transitions[currentState]!![it]!!.isEmpty()) {
@@ -150,7 +150,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
 
     fun hasExplored(transition: AutomatonTransition<T>): Boolean {
         val possibleStates = transitions[currentState]?.get(transition)
-        println("Has explored? ${possibleStates != null}")
         return possibleStates != null
     }
 
@@ -288,9 +287,9 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         this.imageGetter = imageGetter
     }
 
-    fun writeDotFile() {
+    fun writeDotFile(path: String = "$FILE_DB/auto.dot") {
         try {
-            val file = File("/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.dot")
+            val file = File(path)
             file.createNewFile()
             val writer = BufferedWriter(OutputStreamWriter(FileOutputStream(file), "utf-8"))
             writer.write(getStringForGraphViz())
@@ -300,19 +299,19 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         }
     }
 
-    fun dotFileToPng() {
+    fun dotFileToPng(dotPath: String = "$FILE_DB/auto.dot", pngPath: String = "$FILE_DB/auto.png") {
         try {
             val rt = Runtime.getRuntime()
-            val pr = rt.exec("dot -Tpng /Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.dot -o /Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.png".split(" ").toTypedArray())
+            val pr = rt.exec("dot -Tpng $dotPath -o $pngPath".split(" ").toTypedArray())
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
-    fun displayAutomatonImage() {
+    fun displayAutomatonImage(path: String = "$FILE_DB/auto.png") {
         try {
             val rt = Runtime.getRuntime()
-            val pr = rt.exec("open /Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.png".split(" ").toTypedArray())
+            val pr = rt.exec("open $path".split(" ").toTypedArray())
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -327,6 +326,15 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
 //        val problem = ProblemFactory()
 //
 //    }
+
+    fun getShallowCopy(): Automaton<S, T> {
+        val newAutomaton = Automaton<S, T>(currentState)
+        newAutomaton.states.addAll(this.states)
+        newAutomaton.transitions.putAll(this.transitions)
+        newAutomaton.acceptStates.addAll(this.acceptStates)
+        newAutomaton.imageGetter = this.imageGetter
+        return newAutomaton
+    }
 
 }
 

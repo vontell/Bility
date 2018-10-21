@@ -7,7 +7,6 @@ import org.vontech.algorithms.rulebased.loggers.WCAGLevel
 import org.vontech.androidserver.logger
 import org.vontech.core.interaction.InputInteractionType
 import org.vontech.core.interaction.UserAction
-import org.vontech.core.interfaces.CondensedState
 import org.vontech.core.interfaces.LiteralInterace
 import org.vontech.core.interfaces.emptyPerceptifer
 import org.vontech.core.server.StartupEvent

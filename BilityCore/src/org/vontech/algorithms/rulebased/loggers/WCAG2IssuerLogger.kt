@@ -112,6 +112,14 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
     }
 
+    private fun logOnFocus(automaton: Automaton<CondensedState, UserAction>): DynamicIssue? {
+
+
+
+    }
+
+    private fun log
+
     private fun wasInvisible(perceptifer: Perceptifer): Boolean {
 
         return perceptifer.percepts!!.any {

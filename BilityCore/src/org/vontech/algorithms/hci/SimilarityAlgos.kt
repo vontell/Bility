@@ -95,6 +95,7 @@ val ACCESSIBILITY_PERCEPTS = listOf(
         PerceptType.FONT_STYLE,
         PerceptType.LINE_SPACING,
         PerceptType.VIRTUAL_NAME,
+        PerceptType.VIRTUAL_FOCUSABLE,
         PerceptType.TEXT_COLOR//,
         //PerceptType.CHILDREN_SPATIAL_RELATIONS
 )

@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.vontech.core.interaction.InputInteractionType;
+import org.vontech.core.interaction.KeyPress;
 import org.vontech.core.interaction.SwipeParameters;
 import org.vontech.core.interaction.UserAction;
 import org.vontech.core.interfaces.Coordinate;
@@ -30,6 +31,7 @@ import org.vontech.core.types.AndroidAppTestConfig;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,6 +40,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.view.KeyEvent.KEYCODE_DPAD_DOWN;
+import static android.view.KeyEvent.KEYCODE_DPAD_LEFT;
+import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
+import static android.view.KeyEvent.KEYCODE_DPAD_UP;
+import static android.view.KeyEvent.KEYCODE_ENTER;
+import static android.view.KeyEvent.KEYCODE_TAB;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -53,6 +61,8 @@ public class BilityTester {
 
     private final int SWIPE_STEP_COUNT = 100;
 
+    private final HashMap<KeyPress, Integer> keyMap = new HashMap<>();
+
 
     /**
      * Sets up a BilityTester by:
@@ -64,6 +74,15 @@ public class BilityTester {
         this.device = UiDevice.getInstance(instrumentation);
         serverConnection = new ServerConnection(host);
         config = serverConnection.getAppConfig();
+
+        // Instantiate some constants
+        keyMap.put(KeyPress.TAB, KEYCODE_TAB);
+        keyMap.put(KeyPress.ENTER, KEYCODE_ENTER);
+        keyMap.put(KeyPress.UP, KEYCODE_DPAD_UP);
+        keyMap.put(KeyPress.DOWN, KEYCODE_DPAD_DOWN);
+        keyMap.put(KeyPress.LEFT, KEYCODE_DPAD_LEFT);
+        keyMap.put(KeyPress.RIGHT, KEYCODE_DPAD_RIGHT);
+
     }
 
     public BilityTester startupApp() {
@@ -115,6 +134,11 @@ public class BilityTester {
         //    An action may involve a user action, waiting, quitting, meta, etc
         UserAction nextAction = serverConnection.awaitNextAction();
         boolean shouldExit = handleAction(nextAction);
+        if (shouldExit) {
+            return this;
+        }
+
+        device.waitForIdle(200);
 
         // 2) Get information about the state of the user interface
         Activity current = getActivityInstance();
@@ -125,10 +149,6 @@ public class BilityTester {
 
         // 4) Also send the screenshot to the server
         serverConnection.sendScreenshot(face.getMetadata().getId(), current);
-
-        if (shouldExit) {
-            return this;
-        }
 
         return loop();
 
@@ -217,6 +237,13 @@ public class BilityTester {
                 }
             }
 
+        }
+
+        if(action.getType() == InputInteractionType.KEYPRESS) {
+            Log.e("KEY", action.getParameters().toString());
+            KeyPress key = KeyPress.valueOf(action.getParameters().toString());
+            device.pressKeyCode(keyMap.get(key));
+            return false;
         }
 
         return false;

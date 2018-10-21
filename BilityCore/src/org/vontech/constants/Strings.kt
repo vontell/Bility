@@ -23,4 +23,15 @@ object WCAGConstants {
     val P111_SCREEN_READER_AVAIL_EXPLANATION = "This UI component contains attributes that can be read by a screen reader."
     val P111_SCREEN_READER_GONE_EXPLANATION = "This UI component does not have any attributes that can be read by the screen reader."
 
+
+    val P321_NAME = "WCAG 2.0 - 3.2.1 On Focus"
+    val P321_SHORT = "When any component receives focus, it does not initiate a change of context."
+    val P321_LONG = "When any component receives focus, it does not initiate a change of context. Opening a new window, moving focus to a different component, going to a new page, or significantly re-arranging the content of a page are examples of changes of context."
+    val P321_LINK = "https://www.w3.org/TR/UNDERSTANDING-WCAG20/consistent-behavior-receive-focus.html"
+    val P321_LEVEL = WCAGLevel.A
+    val P111_EXPLANATION = ""
+
 }
+
+//val FILE_DB = "/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB"
+val FILE_DB = "/home/aaron/fileDB"

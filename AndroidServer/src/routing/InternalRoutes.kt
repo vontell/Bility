@@ -17,12 +17,11 @@ import org.vontech.androidserver.drivers.android.AndroidSession
 import org.vontech.androidserver.latestGraph
 import org.vontech.androidserver.logger
 import org.vontech.androidserver.testConfig
+import org.vontech.constants.FILE_DB
 import org.vontech.core.interfaces.LiteralInterace
 import org.vontech.core.server.StartupEvent
 import org.vontech.utils.cast
 import java.io.File
-
-val FILE_DB = "/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB"
 
 fun Route.internalRoutes() {
 
@@ -50,8 +49,8 @@ fun Route.internalRoutes() {
     route("/receiveInterface") {
         post {
             val face: LiteralInterace = call.receive()
-            logger?.info("METADATA: ${face.metadata}")
-            logger?.info("PERCEPTIFERS: ${face.perceptifers}")
+            //logger?.info("METADATA: ${face.metadata}")
+            //logger?.info("PERCEPTIFERS: ${face.perceptifers}")
             androidSession!!.giveNewLiteralInterface(face)
             androidSession!!.generateAndSaveNextAction()
 
@@ -89,7 +88,6 @@ fun Route.internalRoutes() {
                         if (part.name == "literalId") {
                             literalId = part.value
                         }
-                        println(part)
                     }
                     is PartData.FileItem -> {
                         val ext = File(part.originalFileName).extension

@@ -163,7 +163,7 @@ public class AndroidUDL {
         builder.createSizePercept(rectf.width(), rectf.height());
         builder.createAlphaPercept(v.getAlpha());
         builder.createClickableVirtualPercept(v.hasOnClickListeners());
-        builder.createFocusableVirtualPercept(v.isFocusable());
+        builder.createFocusableVirtualPercept(v.hasFocus());
         builder.createIdentifierVirtualPercept(v.getId());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.createNameVirtualPercept(v.getAccessibilityClassName().toString());

@@ -46,9 +46,14 @@ class UserAction(
 ) {
 
     private var hashContext: AccessibilityHashResults? = null
+    private var overrideString: String? = null
 
     fun provideContext(context: AccessibilityHashResults) {
         this.hashContext = context
+    }
+
+    fun overrideString(newString: String) {
+        this.overrideString = newString
     }
 
     /**
@@ -82,6 +87,9 @@ class UserAction(
     }
 
     override fun toString(): String {
+        if (this.overrideString != null) {
+            return this.overrideString!!
+        }
         if (this.hashContext == null) {
             return "$type"
         }
@@ -166,5 +174,7 @@ enum class KeyPress {
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT,
+    TAB,
+    ENTER,
 }
