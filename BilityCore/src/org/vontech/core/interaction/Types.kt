@@ -1,7 +1,10 @@
 package org.vontech.core.interaction
 
+import org.vontech.algorithms.hci.AccessibilityHashResults
 import org.vontech.core.interfaces.Perceptifer
 import org.vontech.core.interfaces.getMidpoint
+import org.vontech.core.interfaces.getShortName
+import org.vontech.utils.cast
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -25,6 +28,8 @@ enum class InputInteractionType {
     LONGCLICK,
     SWIPE,
     KEY,
+    FOCUS,
+    KEYPRESS,
     PHYSICAL_BUTTON,
     SHAKE,
     SPEECH,
@@ -39,28 +44,48 @@ class UserAction(
     val perceptifer: Perceptifer,
     val parameters: Any? = null
 ) {
+
+    private var hashContext: AccessibilityHashResults? = null
+
+    fun provideContext(context: AccessibilityHashResults) {
+        this.hashContext = context
+    }
+
+    /**
+     * equals for a user action is dependent on the verb
+     * and subject of the transition
+     */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as UserAction
 
-        if (type != other.type) return false
-        //if (perceptifer != other.perceptifer) return false
-        //if (parameters != other.parameters) return false
+        return this.toString() == other.toString()
 
-        return true
+//        if (type != other.type) return false
+//
+//        if (this.hashContext != null) {
+//            println("Using hashcontext")
+//            if (this.hashContext!!.idsToHashes[this.perceptifer.id] != this.hashContext!!.idsToHashes[other.perceptifer.id]) {
+//                return false
+//            }
+//        }
+//        return true
     }
 
     override fun hashCode(): Int {
-        var result = type.hashCode()
+        //var result = type.hashCode()
         //result = 31 * result + perceptifer.hashCode()
-        //result = 31 * result + (parameters?.hashCode() ?: 0)
-        return result
+        //result = 31 * result + (this.hashContext?.idsToHashes!![perceptifer.id] ?: 0)
+        return toString().hashCode()
     }
 
     override fun toString(): String {
-        return "$type"
+        if (this.hashContext == null) {
+            return "$type"
+        }
+        return "$type on ${getShortName(perceptifer)} (${hashContext!!.idsToHashes[perceptifer.id]})"
     }
 
 }
@@ -101,7 +126,7 @@ data class SwipeParameters(
         val endY: Int
 )
 
-val MAX_SWIPE_RANGE = 1000
+val MAX_SWIPE_RANGE = 2000
 val MIN_SWIPE_AMOUNT = 300
 
 fun generateRandomSwipe(perceptifer: Perceptifer): SwipeParameters {
@@ -115,4 +140,31 @@ fun generateRandomSwipe(perceptifer: Perceptifer): SwipeParameters {
         direction < 6 -> SwipeParameters(start.left, start.top, start.left, start.top  + amount)
         else -> SwipeParameters(start.left, start.top, start.left, start.top - amount)
     }
+}
+
+/**
+ * Attempts to reverse an action made by the Monkey.
+ */
+fun getBestEffortOppositeUserAction(action: UserAction): UserAction? {
+
+    if (action.type == InputInteractionType.SWIPE) {
+        val params = action.parameters?.cast<SwipeParameters>()
+        if (params != null) {
+            val newParams = params.copy(
+                    startX = params.endX,
+                    endX = params.startX,
+                    startY = params.endY,
+                    endY = params.startY)
+            return UserAction(action.type, action.perceptifer, newParams)
+        }
+    }
+    return null
+
+}
+
+enum class KeyPress {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
 }

@@ -125,19 +125,19 @@ public class MainActivity extends AppCompatActivity {
                 // For each article cards, set a click listener to open the web page
                 // NOTE: You shouldn't have to touch this code for the purpose of this project
                 final Article finalArticle = a;
-                cardContainer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
+//                cardContainer.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
 //                        Uri uri = Uri.parse(finalArticle.getUrl());
 //                        CustomTabsIntent.Builder intentBuilder = new CustomTabsIntent.Builder();
 //                        intentBuilder.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
 //                        intentBuilder.setSecondaryToolbarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
 //                        CustomTabsIntent customTabsIntent = intentBuilder.build();
 //                        customTabsIntent.launchUrl(activity, uri);
-
-                    }
-                });
+//
+//                    }
+//                });
 
                 // Finally, add this new article information to the news layout
                 newsLayout.addView(cardContainer);

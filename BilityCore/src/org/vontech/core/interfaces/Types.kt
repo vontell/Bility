@@ -116,7 +116,7 @@ fun getRoot(perceptifers: Iterable<Perceptifer>): Perceptifer {
 
 fun getMidpoint(perceptifer: Perceptifer): Coordinate {
     val location = PerceptParser.fromCoordinate(perceptifer.percepts!!.first { it.type == PerceptType.LOCATION })
-    val size = PerceptParser.fromSize(perceptifer.percepts!!.first { it.type == PerceptType.SIZE })
+    val size = PerceptParser.fromSize(perceptifer.percepts.first { it.type == PerceptType.SIZE })
     val xMidpoint = (location.left + (size.width / 2.0)).roundToInt()
     val yMidpoint = (location.top + (size.height / 2.0)).roundToInt()
     return Coordinate(xMidpoint, yMidpoint)

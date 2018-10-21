@@ -13,9 +13,7 @@ import android.view.Display;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -27,14 +25,10 @@ import org.vontech.core.interfaces.LiteralInterace;
 import org.vontech.core.interfaces.LiteralInterfaceMetadata;
 import org.vontech.core.interfaces.MediaType;
 import org.vontech.core.interfaces.OutputChannel;
-import org.vontech.core.interfaces.Percept;
 import org.vontech.core.interfaces.PerceptBuilder;
 import org.vontech.core.interfaces.Perceptifer;
 
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -169,6 +163,7 @@ public class AndroidUDL {
         builder.createSizePercept(rectf.width(), rectf.height());
         builder.createAlphaPercept(v.getAlpha());
         builder.createClickableVirtualPercept(v.hasOnClickListeners());
+        builder.createFocusableVirtualPercept(v.isFocusable());
         builder.createIdentifierVirtualPercept(v.getId());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.createNameVirtualPercept(v.getAccessibilityClassName().toString());

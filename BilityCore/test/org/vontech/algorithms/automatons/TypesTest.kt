@@ -4,6 +4,10 @@ import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FeatureSpec
+import org.vontech.algorithms.hci.AccessibilityHashResults
+import org.vontech.core.interaction.InputInteractionType
+import org.vontech.core.interaction.UserAction
+import org.vontech.core.interfaces.emptyPerceptifer
 
 class DataTypesTest: FeatureSpec({
 
@@ -75,6 +79,21 @@ class DataTypesTest: FeatureSpec({
             automaton.writeDotFile()
             automaton.dotFileToPng()
             automaton.displayAutomatonImage()
+
+        }
+
+        scenario("should use hash code correctly") {
+
+//            val hashResults = AccessibilityHashResults(
+//
+//            )
+//            val tra1 = AutomatonTransition(UserAction(InputInteractionType.CLICK, emptyPerceptifer(), null))
+//            val tra2 = AutomatonTransition(UserAction(InputInteractionType.CLICK, emptyPerceptifer(), null))
+//            val transMap1 = hashMapOf(AutomatonTransition(tra1) to hashSetOf("yolo"))
+//
+//            transMap1.contains(AutomatonTransition(tra1)) shouldBe true
+//            transMap1[AutomatonTransition(tra2)] = hashSetOf("wooooaaahhh")
+//            transMap1.keys.size shouldBe 1
 
         }
 

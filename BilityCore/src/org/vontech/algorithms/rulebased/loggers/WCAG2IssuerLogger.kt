@@ -128,6 +128,11 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         val hashToStaticIssues = HashMap<Int, MutableList<StaticIssue>>()
 
+        // In the case of accessibility, we want to trim the edges that are floating and have
+        // already been visited
+        automaton.trimEmptyEdgesIfDetermined()
+
+
         automaton.states.forEach {
             val analysisResults = it.state.hashResults
             analysisResults.hashesToIds.keys.forEach {

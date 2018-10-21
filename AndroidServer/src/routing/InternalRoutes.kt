@@ -22,7 +22,7 @@ import org.vontech.core.server.StartupEvent
 import org.vontech.utils.cast
 import java.io.File
 
-val FILE_DB = "fileDB"
+val FILE_DB = "/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB"
 
 fun Route.internalRoutes() {
 
@@ -80,7 +80,6 @@ fun Route.internalRoutes() {
     }
 
     route("/receiveScreenshot") {
-        logger?.info("Received screenshot")
         post {
             val multipart = call.receiveMultipart()
             var literalId = "unknown"
@@ -89,13 +88,14 @@ fun Route.internalRoutes() {
                     is PartData.FormItem -> {
                         if (part.name == "literalId") {
                             literalId = part.value
-                            logger?.info("Screenshot for $literalId")
                         }
                         println(part)
                     }
                     is PartData.FileItem -> {
                         val ext = File(part.originalFileName).extension
                         val file = File(FILE_DB, "upload-$literalId.$ext")
+                        file.parentFile.mkdirs()
+                        file.createNewFile()
                         part.streamProvider().use { input -> file.outputStream().buffered().use { output -> input.copyToSuspend(output) } }
                         androidSession!!.giveNewScreenshot(file)
                     }

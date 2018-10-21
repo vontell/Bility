@@ -117,6 +117,10 @@ class PerceptBuilder {
         return createVirtualPercept(PerceptType.VIRTUALLY_CLICKABLE, clickable)
     }
 
+    fun createFocusableVirtualPercept(focusable: Boolean): PerceptBuilder {
+        return createVirtualPercept(PerceptType.VIRTUAL_FOCUSABLE, focusable)
+    }
+
     fun createIdentifierVirtualPercept(identifier: Any): PerceptBuilder {
         return createVirtualPercept(PerceptType.VIRTUAL_IDENTIFIER, identifier)
     }
@@ -215,7 +219,9 @@ enum class PerceptType {
     VIRTUAL_SCREEN_READER_CONTENT,
     VIRTUALLY_CLICKABLE,
     CHILDREN_SPATIAL_RELATIONS,
-    VIRTUAL_ROOT
+    VIRTUAL_ROOT,
+    VIRTUAL_FOCUSABLE,
+    VIRTUAL_KEYBOARD_AVAILABLE,
 
 }
 
@@ -281,5 +287,14 @@ class PerceptiferOrdering(orderedPerceptifers: List<Perceptifer>) {
 }
 
 fun getShortName(perceptifer: Perceptifer): String {
-    return perceptifer.virtualPercepts?.first {it.type == PerceptType.VIRTUAL_NAME}?.information?.cast<String>()?.split(".")?.last() ?: "UnknownClass"
+    val names = perceptifer.virtualPercepts?.filter {
+        it.type == PerceptType.VIRTUAL_NAME
+    } ?: listOf()
+
+    if (names.isEmpty()) {
+        return "UnknownElement"
+    }
+
+    return names.first().information.cast<String>().split(".").last()
+
 }

@@ -43,7 +43,7 @@ fun getAccessibilityHashes(literalInterace: LiteralInterace): AccessibilityHashR
     //    of layout percepts. Fill the idsToHash map.
     val idsToHash = HashMap<String, Int>()
     //println("About to get hashes...")
-    performPerceptiferAccessibilityHash(rootPerceptifer, ps, idsToHash)
+    performPerceptiferAccessibilityHash(rootPerceptifer, ps, idsToHash, true)
     //println("Obtained hashes!")
 
     // 3. Reverse idsToHash to get M, the mapping of hashes to similar elements
@@ -51,21 +51,22 @@ fun getAccessibilityHashes(literalInterace: LiteralInterace): AccessibilityHashR
     //println("MMMMMMMMMMMMMMM")
     //println(m)
 
-    // 4. Reduction
-    // Using
-//    m.values.forEach {
-//        println("GROUPING (${it.size})--------------")
-//        it.forEach {
-//            val perceptifer = ps[it]!!
-//            println("\t${perceptifer.id}")
-//            perceptifer.percepts!!.forEach {
-//                println("\t\t(R) $it")
-//            }
-//            perceptifer.virtualPercepts!!.forEach {
-//                println("\t\t(V) $it")
-//            }
-//        }
-//    }
+    // 4. Count Reduction: Provide a further-condensed version of this hash by ignoring
+    //    repeated elements within the user interface. For instance, the following
+    //    conversion would take place:
+    //    A                 ->  A
+    //      B               ->    B
+    //        C             ->      C
+    //      B               ->    D
+    //        C             ->      E
+    //      D               ->
+    //        E             ->
+    //        E             ->
+    // NOTE: This is done by default now
+
+
+
+
 
     return AccessibilityHashResults(m, idsToHash, ps)
 
@@ -98,7 +99,10 @@ val ACCESSIBILITY_PERCEPTS = listOf(
         //PerceptType.CHILDREN_SPATIAL_RELATIONS
 )
 
-fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer, perceptiferMap: HashMap<String, Perceptifer>, hashCache: HashMap<String, Int>): Int {
+fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
+                                        perceptiferMap: HashMap<String, Perceptifer>,
+                                        hashCache: HashMap<String, Int>,
+                                        ignoreRepeatChildren: Boolean): Int {
 
     var perceptsList: List<Percept> = perceptifer.percepts?.filter {
         it.type in ACCESSIBILITY_PERCEPTS
@@ -117,8 +121,11 @@ fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer, perceptiferMap
     val children = getIdsOfChildren(perceptifer)
     //println("Children ids: $children")
     if (children.isNotEmpty()) {
-        val childHashes = children.map { performPerceptiferAccessibilityHash(perceptiferMap[it]!!, perceptiferMap, hashCache) }
+        var childHashes = children.map { performPerceptiferAccessibilityHash(perceptiferMap[it]!!, perceptiferMap, hashCache, ignoreRepeatChildren) }
         //println("Child hashes: " + childHashes)
+        if (ignoreRepeatChildren) {
+            childHashes = childHashes.toSet().toList()
+        }
         val hash = Objects.hash(childHashes, percepts)
         hashCache.put(perceptifer.id, hash)
         return hash

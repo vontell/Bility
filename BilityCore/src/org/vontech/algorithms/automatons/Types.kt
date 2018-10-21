@@ -13,8 +13,8 @@ import java.lang.RuntimeException
  * Represents a generic state within an automaton
  * @param state The representation of this Automaton state
  */
-data class AutomatonState<T> (
-    val state: T
+data class AutomatonState<S> (
+    val state: S
 )
 
 /**
@@ -36,7 +36,7 @@ class StateTransitionException(override val message: String): RuntimeException()
 
 /**
  * An automaton is a generic automaton that can be used in representing state
- * within the Bility platform. NOTE: At the moment, this is a deterministic
+ * within the Bility platform. NOTE: This is a nondeterministic
  * automaton.
  */
 class Automaton<S, T>(private val startState: AutomatonState<S>) {
@@ -46,12 +46,11 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
 
     val states = mutableSetOf<AutomatonState<S>>()
     val acceptStates = mutableSetOf<AutomatonState<S>>()
-    val alphabet = mutableSetOf<AutomatonTransition<T>>()
 
     private var imageGetter: ((AutomatonState<S>) -> String)? = null
 
     // Transitions are maps from one state to other states along transitions
-    val transitions = mutableMapOf<AutomatonState<S>, MutableMap<AutomatonTransition<T>, MutableSet<AutomatonState<S>>>>()
+    val transitions = hashMapOf<AutomatonState<S>, HashMap<AutomatonTransition<T>, HashSet<AutomatonState<S>>>>()
 
     init {
         addState(currentState)
@@ -64,19 +63,9 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
      */
     fun addState(state: AutomatonState<S>): Boolean {
         if (state !in transitions) {
-            transitions[state] = mutableMapOf()
+            transitions[state] = hashMapOf()
         }
         return states.add(state)
-    }
-
-    /**
-     * Adds a transition to this Automatons alphabet, unattached to any states
-     * @param transition The AutomatonTransition to add to this automaton
-     * @return true if this transition did not exist and was added successfully, false if the transition was
-     *         already included
-     */
-    fun addLetter(transition: AutomatonTransition<T>): Boolean {
-        return alphabet.add(transition)
     }
 
     /**
@@ -93,31 +82,23 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         if (to != null) {
             states.add(to)
         }
-        alphabet.add(transition)
 
-        return if (from in transitions) {
-            if (transition in transitions[from]!!) {
-                if (to != null) {
-                    transitions[from]!![transition]!!.add(to)
-                } else {
-                    false
-                }
-            } else {
-                if (to != null) {
-                    transitions[from]!![transition] = mutableSetOf(to)
-                } else {
-                    transitions[from]!![transition] = mutableSetOf()
-                }
-                true
-            }
-        } else {
-            if (to != null) {
-                transitions[from] = mutableMapOf(transition to mutableSetOf(to))
-            } else {
-                transitions[from] = mutableMapOf(transition to mutableSetOf())
-            }
-            true
+        // If starting state not here, add it
+        if (from !in transitions.keys) {
+            transitions[from] = hashMapOf()
         }
+
+        // Now, if transition is not here, add it
+        if (transition !in transitions[from]!!) {
+            transitions[from]!![transition] = hashSetOf()
+        }
+
+        // Finally, add the finish state to the transition, if not null
+        if (to != null) {
+            transitions[from]!![transition]!!.add(to)
+        }
+
+        return true
 
     }
 
@@ -131,7 +112,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         if (to != null) {
             currentState = to
         }
-        println("STATES: " + states)
         return result
     }
 
@@ -155,13 +135,42 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         }
     }
 
+    fun getUnexplored(): AutomatonTransition<T>? {
+        println("Checking for unexplored...")
+        if (currentState in transitions) {
+            transitions[currentState]!!.keys.forEach {
+                if (transitions[currentState]!![it]!!.isEmpty()) {
+                    return it
+                }
+            }
+        }
+
+        return null
+    }
+
+    fun hasExplored(transition: AutomatonTransition<T>): Boolean {
+        val possibleStates = transitions[currentState]?.get(transition)
+        println("Has explored? ${possibleStates != null}")
+        return possibleStates != null
+    }
+
+    fun statesWithUnexploredEdges(): List<AutomatonState<S>> {
+
+        return transitions.keys.filter {
+            transitions[it]!!.values.any {
+                it.isEmpty()
+            }
+        }
+
+    }
+
     fun getStringForGraphViz(): String {
         var hangingEdgeCount = 0
         val dotFile = StringBuilder()
         dotFile.append("digraph {\n\t")                    // Define a digraph
         dotFile.append("rankdir=LR;\n\t")                  // Draw the graph from left to right
         dotFile.append("node [shape = doublecircle]; \"")    // Draw a double circle around start state
-        dotFile.append(this.startState.toString())
+        dotFile.append(this.startState.state.toString())
         dotFile.append("\";\n\tnode [shape = circle];\n\t")      // All the rest should be circles
         for (state in transitions.keys) {
             val actionMappings = transitions[state]
@@ -171,18 +180,18 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
                     val newStates = actionMap.value
                     for (newState in newStates) {
                         dotFile.append("\"")
-                        dotFile.append(state.toString())               // Create a new state mapping going from here...
+                        dotFile.append(state.state.toString())               // Create a new state mapping going from here...
                         dotFile.append("\" -> \"")
-                        dotFile.append(newState.toString())            // .... to here ....
+                        dotFile.append(newState.state.toString())            // .... to here ....
                         dotFile.append("\" [ label = \"")                // through this action
-                        dotFile.append(action.toString())
+                        dotFile.append(action.label.toString())
                         dotFile.append("\" ];\n\t")
                     }
 
                     // If newStates was empty, these are hanging edges - add appropriately
                     if (newStates.isEmpty()) {
                         dotFile.append("secret_node_$hangingEdgeCount [style=invis];\n\t\"")
-                        dotFile.append(state.toString())
+                        dotFile.append(state.state.toString())
                         dotFile.append("\" -> \"")
                         dotFile.append("secret_node_$hangingEdgeCount")
                         dotFile.append("\" [ label = \"")                // through this action
@@ -198,7 +207,7 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         // Before finishing, if an image converter is given, add those to the end
         if (this.imageGetter != null) {
             this.states.forEach {
-                dotFile.append("\"$it\" [image=\"${this.imageGetter!!(it)}\" label=\"\" shape=\"none\"];\n\t")
+                dotFile.append("\"${it.state}\" [image=\"${this.imageGetter!!(it)}\" label=\"\" shape=\"none\"];\n\t")
             }
         }
 
@@ -214,7 +223,7 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         dotFile.append("digraph {\n\t")                    // Define a digraph
         dotFile.append("rankdir=LR;\n\t")                  // Draw the graph from left to right
         dotFile.append("node [shape = doublecircle]; \"")    // Draw a double circle around start state
-        dotFile.append(this.startState.toString())
+        dotFile.append(this.startState.state.toString())
         dotFile.append("\";\n\tnode [shape = circle];\n\t")      // All the rest should be circles
         for (state in transitions.keys) {
             val actionMappings = transitions[state]
@@ -224,9 +233,9 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
                     val newStates = actionMap.value
                     for (newState in newStates) {
                         dotFile.append("\"")
-                        dotFile.append(state.toString())               // Create a new state mapping going from here...
+                        dotFile.append(state.state.toString())               // Create a new state mapping going from here...
                         dotFile.append("\" -> \"")
-                        dotFile.append(newState.toString())            // .... to here ....
+                        dotFile.append(newState.state.toString())            // .... to here ....
                         dotFile.append("\" [ label = \"")                // through this action
                         dotFile.append(action.toString())
                         dotFile.append("\" ];\n\t")
@@ -261,6 +270,16 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         return finalString
     }
 
+    fun trimEmptyEdgesIfDetermined() {
+        transitions.values.forEach {
+            for (stateSet in it.values) {
+                if (stateSet.any { it.state != null }) {
+                    stateSet.removeIf { it.state == null }
+                }
+            }
+        }
+    }
+
     /**
      * Takes in a function which given a state, returns a path to an image
      * to display within the node, instead of a label
@@ -269,35 +288,45 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         this.imageGetter = imageGetter
     }
 
-     fun writeDotFile() {
-         try {
-             val file = File("/home/aaron/Documents/filesink/auto.dot")
-             file.createNewFile()
-             val writer = BufferedWriter(OutputStreamWriter(FileOutputStream(file), "utf-8"))
-             writer.write(getStringForGraphViz())
-             writer.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-     }
-
-     fun dotFileToPng() {
+    fun writeDotFile() {
         try {
-            val rt = Runtime.getRuntime()
-            val pr = rt.exec("dot -Tpng /home/aaron/Documents/filesink/auto.dot -o /home/aaron/Documents/filesink/auto.png")
+            val file = File("/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.dot")
+            file.createNewFile()
+            val writer = BufferedWriter(OutputStreamWriter(FileOutputStream(file), "utf-8"))
+            writer.write(getStringForGraphViz())
+            writer.close()
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
-     fun displayAutomatonImage() {
+    fun dotFileToPng() {
         try {
             val rt = Runtime.getRuntime()
-            val pr = rt.exec("open /home/aaron/Documents/filesink/auto.png")
+            val pr = rt.exec("dot -Tpng /Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.dot -o /Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.png".split(" ").toTypedArray())
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
+
+    fun displayAutomatonImage() {
+        try {
+            val rt = Runtime.getRuntime()
+            val pr = rt.exec("open /Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB/auto.png".split(" ").toTypedArray())
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Creates the domain representation of this automation, for using in path
+     * planning and solving
+     */
+//    fun createDomainPDDL(): Domain {
+//
+//        val problem = ProblemFactory()
+//
+//    }
 
 }
 

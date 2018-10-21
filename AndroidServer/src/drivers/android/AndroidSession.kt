@@ -29,7 +29,7 @@ class AndroidSession(val startEvent: StartupEvent) {
     }
 
     fun giveNewScreenshot(screenshot: File) {
-        println("We have the screenshot")
+        //println("We have the screenshot")
     }
 
     /**
@@ -40,7 +40,6 @@ class AndroidSession(val startEvent: StartupEvent) {
 
         val latest = collectedInterfaces.last()
 
-        logger?.info("DECIDING NEXT ACTION...")
         val nextAction = person.reactToNewUserInterface(latest)
         logger?.info("DECIDED ON ${nextAction.type} on ${nextAction.perceptifer}")
 

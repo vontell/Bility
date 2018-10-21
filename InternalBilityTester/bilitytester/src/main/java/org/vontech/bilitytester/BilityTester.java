@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.Until;
 import android.util.Log;
 
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -200,6 +203,20 @@ public class BilityTester {
             LinkedTreeMap<String, Double> params = (LinkedTreeMap) action.getParameters();
             device.click(params.get("left").intValue(), params.get("top").intValue());
             return false;
+        }
+
+        if (action.getType() == InputInteractionType.FOCUS) {
+            List<UiObject2> possibleFocusables = device.findObjects(By.focusable(true));
+            LinkedTreeMap<String, Double> params = (LinkedTreeMap) action.getParameters();
+            int midpointLeft = params.get("left").intValue();
+            int midpointTop = params.get("top").intValue();
+            for (UiObject2 f : possibleFocusables) {
+                Rect bounds = f.getVisibleBounds();
+                if (bounds.contains(midpointLeft, midpointTop)) {
+                    
+                }
+            }
+
         }
 
         return false;
