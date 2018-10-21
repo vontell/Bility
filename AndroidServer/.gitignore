@@ -4,3 +4,4 @@ build/
 projectupload/
 bin/
 .gradle/
+fileDB/
