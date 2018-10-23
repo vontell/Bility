@@ -317,6 +317,24 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         }
     }
 
+    fun getStatesAndIncomingEdges(): HashMap<AutomatonState<S>, MutableList<AutomatonTransition<T>>> {
+
+        val results = HashMap<AutomatonState<S>, MutableList<AutomatonTransition<T>>>()
+        transitions.values.forEach {
+            it.forEach {
+                val transition = it.key
+                it.value.forEach {
+                    if (!results.containsKey(it)) {
+                        results[it] = mutableListOf<AutomatonTransition<T>>()
+                    }
+                    results[it]!!.add(transition)
+                }
+            }
+        }
+        return results
+
+    }
+
     /**
      * Creates the domain representation of this automation, for using in path
      * planning and solving
@@ -334,6 +352,21 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         newAutomaton.acceptStates.addAll(this.acceptStates)
         newAutomaton.imageGetter = this.imageGetter
         return newAutomaton
+    }
+
+    fun removeEmptyEdges() {
+
+        transitions.values.forEach {
+            val toRemove = mutableListOf<AutomatonTransition<T>>()
+            val entry = it
+            it.keys.forEach {
+                if (entry[it]!!.filter { it.state != null }.isEmpty()) {
+                    toRemove.add(it)
+                }
+            }
+            toRemove.forEach { entry.remove(it) }
+        }
+
     }
 
 }

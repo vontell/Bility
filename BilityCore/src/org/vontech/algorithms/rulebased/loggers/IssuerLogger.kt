@@ -23,12 +23,6 @@ abstract class UiIssuerLogger {
     abstract fun getDescription(): LoggerDescription
     abstract fun getFullAccessibilityReport(automaton: Automaton<CondensedState, UserAction>): String
 
-    /**
-     * The list of issues logged by this logger
-     */
-    val staticIssueList = mutableListOf<StaticIssue>()
-    val dynamicIssueList = mutableListOf<DynamicIssue>()
-
 }
 
 /**
@@ -157,7 +151,9 @@ class IssuerBuilder {
     fun buildDynamicIssue(): DynamicIssue {
 
         if (listOf(identifier, shortDescription, longDescription, instanceExplanation,
-                        suggestionExplanation, pass, extras).any { it == null } || perceptifers.size == 0) {
+                        suggestionExplanation, pass, extras).any { it == null }) {
+            println(listOf(identifier, shortDescription, longDescription, instanceExplanation,
+                    suggestionExplanation, pass, extras))
             throw RuntimeException("All required properties of an issue must be set")
         }
         if (listOf(startState, endState, transition).all { it == null }) {

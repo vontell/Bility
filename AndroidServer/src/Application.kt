@@ -1,11 +1,13 @@
 package org.vontech.androidserver
 
-import com.fasterxml.jackson.databind.SerializationFeature
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
+import io.ktor.content.resources
+import io.ktor.content.static
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
+import io.ktor.response.respondRedirect
 //import io.ktor.jackson.jackson
 import io.ktor.routing.*
 import org.vontech.androidserver.routing.internalRoutes
@@ -64,6 +66,10 @@ fun Application.main() {
     install(DefaultHeaders)
     install(Compression)
     install(CallLogging)
+    install(CORS) // TODO: Frontend will be with the backend later
+    {
+        anyHost()
+    }
     install(ContentNegotiation) {
 //        jackson {
 //            enable(SerializationFeature.INDENT_OUTPUT)
@@ -87,6 +93,9 @@ fun Application.main() {
         }
         route("/internal") {
             internalRoutes()
+        }
+        static("/static") {
+            resources("static")
         }
     }
 

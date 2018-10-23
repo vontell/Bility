@@ -90,7 +90,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         // It will randomly pick one of these actions, and then randomly select
         // an item to perform that action on
 
-        if (actionCount > 200 ) {
+        if (actionCount > 150) {
             automaton.writeDotFile()
             automaton.dotFileToPng()
             automaton.displayAutomatonImage()
@@ -198,6 +198,8 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
             it.putAll(newTransitionMap)
         }
 
+        automaton.trimEmptyEdgesIfDetermined()
+        automaton.removeEmptyEdges()
         automaton.writeDotFile("$FILE_DB/autoKeysOnly.dot")
         automaton.dotFileToPng("$FILE_DB/autoKeysOnly.dot", "$FILE_DB/autoKeysOnly.png")
         automaton.displayAutomatonImage("$FILE_DB/autoKeysOnly.png")
