@@ -89,8 +89,9 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         //
         // It will randomly pick one of these actions, and then randomly select
         // an item to perform that action on
-
-        if (actionCount > 150) {
+        println(actionCount)
+        if (actionCount > 500 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
+            println("FINISHED AFTER $actionCount actions with ${automaton.statesWithUnexploredEdges().size} states unexplored")
             automaton.writeDotFile()
             automaton.dotFileToPng()
             automaton.displayAutomatonImage()
@@ -170,10 +171,18 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 
         action.provideContext(automaton.currentState.state.hashResults)
 
+        val pathToUnexplored = automaton.getShortestPathToClosestUnexplored(automaton.currentState)
+
         // But wait... if this action has already been taken, take an old action instead
         if (automaton.hasExplored(AutomatonTransition(action)) && automaton.getUnexplored() != null) {
             action = automaton.getUnexplored()!!.label
             println("~~~~~~ OPTED FOR UNSEEN ACTION")
+        }
+
+        // But wait... if there are states with unexplored, we should go back to them!
+        else if (pathToUnexplored != null && pathToUnexplored.isNotEmpty()) {
+            println("====== OPTED FOR TRAVELING TO OLD STATE!")
+            action = pathToUnexplored[0].label
         }
 
         lastActionTaken = action
