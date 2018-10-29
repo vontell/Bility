@@ -3,6 +3,7 @@ package org.vontech.algorithms.automatons
 import org.vontech.constants.FILE_DB
 import java.io.*
 import java.lang.RuntimeException
+import java.util.*
 
 /**
  * A collection of types for Automatons
@@ -332,6 +333,22 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
             }
         }
         return results
+
+    }
+
+    fun findPathDijkstra(startState: AutomatonState<S>, endState: AutomatonState<S>): List<AutomatonTransition<T>>? {
+
+        val dist = PriorityQueue<AutomatonState<S>>(kotlin.Comparator { o1, o2 ->  }) //HashMap<AutomatonState<S>, Int>()
+        val prev = HashMap<AutomatonState<S>, Int>()
+        this.states.forEach {
+            dist[it] = Int.MAX_VALUE
+        }
+
+        dist[startState] = 0
+        val Q = this.states.filter { true }
+        while (Q.isNotEmpty()) {
+
+        }
 
     }
 

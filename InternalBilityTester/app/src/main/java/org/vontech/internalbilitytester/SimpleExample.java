@@ -1,5 +1,6 @@
 package org.vontech.internalbilitytester;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,10 +17,13 @@ public class SimpleExample extends AppCompatActivity {
         final TextView exampleText = findViewById(R.id.exampleText);
         final Typeface original = exampleText.getTypeface();
 
+        exampleText.setBackgroundColor(Color.GREEN);
+
         findViewById(R.id.regularButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 exampleText.setTypeface(original, Typeface.NORMAL);
+                exampleText.setBackgroundColor(Color.GREEN);
             }
         });
 
@@ -27,6 +31,7 @@ public class SimpleExample extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 exampleText.setTypeface(exampleText.getTypeface(), Typeface.BOLD);
+                exampleText.setBackgroundColor(Color.RED);
             }
         });
 
@@ -34,6 +39,7 @@ public class SimpleExample extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 exampleText.setTypeface(exampleText.getTypeface(), Typeface.ITALIC);
+                exampleText.setBackgroundColor(Color.BLUE);
             }
         });
 
