@@ -4,6 +4,8 @@ import org.vontech.constants.FILE_DB
 import java.io.*
 import java.lang.RuntimeException
 import java.util.*
+import kotlin.Comparator
+import kotlin.collections.HashMap
 
 /**
  * A collection of types for Automatons
@@ -383,6 +385,72 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
             }
             toRemove.forEach { entry.remove(it) }
         }
+
+    }
+
+    fun getEdgesFrom(startState: AutomatonState<S>, endState: AutomatonState<S>): List<AutomatonTransition<T>> {
+        return transitions[startState]!!.keys.filter { transitions[startState]!![it]!!.any { it == endState } }
+    }
+
+    /**
+     * Performs Dijkstra's from a starting state to the closest state which
+     * has an unexplored edge. If no states are reachable that have an unexplored
+     * edge, returns null
+     */
+    fun getShortestPathToClosestUnexplored(startState: AutomatonState<S>): List<AutomatonTransition<T>>? {
+
+        // Standard Dijkstra's
+        val dist = hashMapOf(startState to 0)
+        val prev = HashMap<AutomatonState<S>, AutomatonState<S>>()
+        val Q = PriorityQueue<AutomatonState<S>>(Comparator { o1, o2 ->
+            dist[o1]!! - dist[o2]!!
+        })
+        this.states.forEach {
+            if (it != startState) {
+                dist[it] = Int.MAX_VALUE - 100 // Due to +1 error causing wrap-around!
+            }
+            Q.add(it)
+        }
+        println("Created init distances $dist")
+        while (Q.isNotEmpty()) {
+            val u = Q.poll()
+            transitions[u]?.values?.flatten()?.forEach {
+                val alt = dist[u]!! + 1 // TODO: Replace 1 with real weight
+                if (alt < dist[it]!!) {
+                    dist[it] = alt
+                    prev[it] = u
+                }
+            }
+        }
+        println("Created all distances, now getting unexplored $dist")
+
+        // Now get the closest state with unvisited
+        val unexplored = this.statesWithUnexploredEdges()
+        if (unexplored.isEmpty()) {
+            return null
+        }
+        var minDist = Int.MAX_VALUE
+        lateinit var minState: AutomatonState<S>
+        unexplored.forEach {
+            if (dist[it]!! < minDist) {
+                minDist = dist[it]!!
+                minState = it
+            }
+        }
+        println("Found min state: $minState")
+
+        // And create the path
+        val pathBack = mutableListOf<AutomatonTransition<T>>()
+        if (minState in prev || minState == startState) {
+            while (minState != startState) {
+                val transitions = getEdgesFrom(prev[minState]!!, minState)
+                pathBack.add(0, transitions[0]) // TODO: Sort and then choose
+                minState = prev[minState]!!
+            }
+        }
+        println("Found path back: $pathBack")
+
+        return pathBack
 
     }
 

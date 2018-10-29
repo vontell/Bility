@@ -30,6 +30,25 @@ class CondensedState(val literalInterace: LiteralInterace) {
         })
     }
 
+    fun differenceBetween(state: CondensedState): Set<Percept> {
+
+        val myPercepts = literalInterace.perceptifers.map {
+            val combination = mutableSetOf<Percept>()
+            combination.addAll(it.percepts!!)
+            combination.addAll(it.virtualPercepts!!)
+            combination
+        }.flatten().toSet()
+        val otherPercepts = state.literalInterace.perceptifers.map {
+            val combination = mutableSetOf<Percept>()
+            combination.addAll(it.percepts!!)
+            combination.addAll(it.virtualPercepts!!)
+            combination
+        }.flatten()
+
+        return myPercepts.union(otherPercepts).minus(myPercepts.intersect(otherPercepts))
+
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other is CondensedState) {
             val otherState = other.cast<CondensedState>()

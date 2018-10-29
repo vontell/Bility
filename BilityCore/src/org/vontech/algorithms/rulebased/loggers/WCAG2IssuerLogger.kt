@@ -191,20 +191,36 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
         }
 
         // For each state, make sure that the filtered result has incoming edges for
-        // each state, unless the original also did not
+        // each state, unless the original also did not. Also, if a state is not reachable but is
+        // only unreachable due to the fact that an element now has focus, ignore that state.
         val keyboardIssues = mutableListOf<DynamicIssue>()
         newStateToIncoming.forEach {
             if (it.value.size == 0) {
                 if (originalStateToIncoming[it.key]!!.size != 0) {
-                    val issue = IssuerBuilder()
-                            .initialize(WCAGConstants.P211_NAME, WCAGConstants.P211_SHORT, WCAGConstants.P211_LONG)
-                            .explanation(WCAGConstants.P211_EXPLANATION)
-                            .addEndState(it.key)
-                            .extras(WCAGExtras(WCAGConstants.P211_LEVEL, WCAGConstants.P211_LINK))
-                            .passes(false)
-                            .suggest(WCAGConstants.SUGGEST_NONE)
-                            .buildDynamicIssue()
-                    keyboardIssues.add(issue)
+
+                    // First, ignore this state if the only difference between it and all it's resulting keyboard
+                    // states is just a focus.
+                    val state = it.key
+                    val isJustUnfocused = automaton.transitions[state]!!.filter {
+                        it.key.label.type == InputInteractionType.KEYPRESS
+                    }.all {
+                        it.value.all {
+                            println("DIFFERENCES: ${state.state.differenceBetween(it.state)}")
+                            state.state.differenceBetween(it.state).all {it.type == PerceptType.VIRTUAL_FOCUSABLE}
+                        }
+                    }
+
+                    if (!isJustUnfocused) {
+                        val issue = IssuerBuilder()
+                                .initialize(WCAGConstants.P211_NAME, WCAGConstants.P211_SHORT, WCAGConstants.P211_LONG)
+                                .explanation(WCAGConstants.P211_EXPLANATION)
+                                .addEndState(it.key)
+                                .extras(WCAGExtras(WCAGConstants.P211_LEVEL, WCAGConstants.P211_LINK))
+                                .passes(false)
+                                .suggest(WCAGConstants.SUGGEST_NONE)
+                                .buildDynamicIssue()
+                        keyboardIssues.add(issue)
+                    }
                 }
             }
         }
