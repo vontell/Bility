@@ -23,6 +23,19 @@ object WCAGConstants {
     const val P111_SCREEN_READER_AVAIL_EXPLANATION = "This UI component contains attributes that can be read by a screen reader."
     const val P111_SCREEN_READER_GONE_EXPLANATION = "This UI component does not have any attributes that can be read by the screen reader."
 
+    const val P143_NAME = "WCAG 2.0 - 1.4.3 Contrast (Minimum)"
+    const val P143_SHORT = "The visual presentation of text and images of text has a contrast ratio of at least 7:1"
+    const val P143_LONG = "Text and images of text must meet the required contrast level of 7:1 for WCAG 2.0 against their background. A contrast of 4.5:1 is required of larger text, and text used purely as decoration or as logotypes can be ignored."
+    const val P143_LINK = "https://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast-contrast.html"
+    val P143_LEVEL = WCAGLevel.AA
+
+    const val P146_NAME = "WCAG 2.0 - 1.4.6 Contrast (Enhanced)"
+    const val P146_SHORT = "The visual presentation of text and images of text has a contrast ratio of at least 4.5:1"
+    const val P146_LONG = "Text and images of text must meet the required contrast level of 4.5:1 for WCAG 2.0 against their background. A contrast of 3:1 is required of larger text, and text used purely as decoration or as logotypes can be ignored."
+    const val P146_LINK = "https://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast-contrast.html"
+    val P146_LEVEL = WCAGLevel.AAA
+
+
     const val P211_NAME = "WCAG 2.0 - 2.1.1 Keyboard"
     const val P211_SHORT = "All functionality of the content is operable through a keyboard interface."
     const val P211_LONG = "All functionality of the content is operable through a keyboard interface without requiring specific timings for individual keystrokes, except where the underlying function requires input that depends on the path of the user's movement and not just the endpoints."

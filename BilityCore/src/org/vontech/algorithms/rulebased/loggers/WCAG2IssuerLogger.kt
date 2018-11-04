@@ -1,6 +1,7 @@
 package org.vontech.algorithms.rulebased.loggers
 
 import org.vontech.algorithms.automatons.Automaton
+import org.vontech.algorithms.hci.getContrast
 import org.vontech.constants.WCAGConstants
 import org.vontech.core.interaction.InputInteractionType
 import org.vontech.core.interaction.KeyPress
@@ -35,6 +36,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
     private fun getAllStaticIssues(p: Perceptifer): MutableList<StaticIssue> {
         val staticIssues = mutableListOf<StaticIssue>()
         logNonTextContentTextAlternatives(p)?.let { staticIssues.add(it) }
+        logMinimumContrast(p).let { staticIssues.addAll(it) }
         return staticIssues
     }
 
@@ -123,6 +125,97 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         return null //this should never be reached, but for some reason that is not detected
 
+    }
+
+
+    val CONTRAST_AA_NORMAL_TEXT = 4.5
+    val CONTRAST_AA_LARGE_TEXT = 3
+    val CONTRAST_AAA_NORMAL_TEXT = 7
+    val CONTRAST_AAA_LARGE_TEXT = 4.5
+    val CONTRAST_LARGE_SIZE_CUTOFF = 18
+    val CONTRAST_LARGE_BOLD_SIZE_CUTOFF = 14
+
+    private fun logMinimumContrast(perceptifer: Perceptifer): List<StaticIssue> {
+
+        // First, get text color
+        // NOTE: If there are multiple types of text in one rich text, they should be
+        // separate perceptifers
+        val foreground = perceptifer.getPerceptsOfType(PerceptType.TEXT_COLOR).firstOrNull()
+        val background = perceptifer.getPerceptsOfType(PerceptType.BACKGROUND_COLOR).firstOrNull()
+        val fontSize = perceptifer.getPerceptsOfType(PerceptType.FONT_SIZE).firstOrNull()
+        val fontStyle = perceptifer.getPerceptsOfType(PerceptType.FONT_STYLE).firstOrNull()
+
+        // Test for each level of WCAG 2.0 compliance
+        val issues = mutableListOf<StaticIssue>()
+        if (listOf(foreground, background, fontSize, fontStyle).none { it == null }) {
+            val foregroundColor = PerceptParser.fromColor(foreground!!)
+            val backgroundColor = PerceptParser.fromColor(background!!)
+            val contrast = getContrast(foregroundColor.color.toLong(), backgroundColor.color.toLong())
+            println("FOUND CONTRAST OF $contrast")
+
+            // If small text, see if fails
+            val fontSizePx = PerceptParser.fromFontSize(fontSize!!)
+            val isBold = PerceptParser.fromFontStyle(fontStyle!!) == FontStyle.BOLD
+            val isLarge = fontSizePx >= CONTRAST_LARGE_SIZE_CUTOFF && !isBold || fontSizePx > CONTRAST_LARGE_BOLD_SIZE_CUTOFF && isBold
+
+            if (isLarge) {
+
+                if (contrast < CONTRAST_AA_LARGE_TEXT) {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P143_NAME, WCAGConstants.P143_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P143_LEVEL, WCAGConstants.P143_LINK))
+                            .passes(false)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - for WCAG 2.0 Principle 1.4.3 compliance, a contrast of $CONTRAST_AA_LARGE_TEXT:1 is needed for compliance on large text.")
+                            .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AA_LARGE_TEXT:1.")
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
+                }
+                if (contrast < CONTRAST_AAA_LARGE_TEXT) {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P146_NAME, WCAGConstants.P146_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P146_LEVEL, WCAGConstants.P146_LINK))
+                            .passes(false)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - for WCAG 2.0 Principle 1.4.6 compliance, a contrast of $CONTRAST_AAA_LARGE_TEXT:1 is needed for compliance on large text.")
+                            .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AAA_LARGE_TEXT:1.")
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
+                }
+
+            } else {
+
+                if (contrast < CONTRAST_AA_NORMAL_TEXT) {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P143_NAME, WCAGConstants.P143_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P143_LEVEL, WCAGConstants.P143_LINK))
+                            .passes(false)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - for WCAG 2.0 Principle 1.4.3 compliance, a contrast of $CONTRAST_AA_NORMAL_TEXT:1 is needed for compliance on normal text.")
+                            .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AA_NORMAL_TEXT:1.")
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
+                }
+                if (contrast < CONTRAST_AAA_NORMAL_TEXT) {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P146_NAME, WCAGConstants.P146_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P146_LEVEL, WCAGConstants.P146_LINK))
+                            .passes(false)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - for WCAG 2.0 Principle 1.4.6 compliance, a contrast of $CONTRAST_AAA_NORMAL_TEXT:1 is needed for compliance on normal text.")
+                            .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AAA_NORMAL_TEXT:1.")
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
+                }
+
+            }
+
+        }
+
+
+
+
+        return issues
     }
 
     /**

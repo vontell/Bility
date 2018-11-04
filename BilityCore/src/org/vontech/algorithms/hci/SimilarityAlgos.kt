@@ -43,7 +43,7 @@ fun getAccessibilityHashes(literalInterace: LiteralInterace): AccessibilityHashR
     //    of layout percepts. Fill the idsToHash map.
     val idsToHash = HashMap<String, Int>()
     //println("About to get hashes...")
-    performPerceptiferAccessibilityHash(rootPerceptifer, ps, idsToHash, true)
+    performPerceptiferAccessibilityHash(rootPerceptifer, ps, idsToHash, true) { baseAccessibilityTransform(it) }
     //println("Obtained hashes!")
 
     // 3. Reverse idsToHash to get M, the mapping of hashes to similar elements
@@ -63,9 +63,6 @@ fun getAccessibilityHashes(literalInterace: LiteralInterace): AccessibilityHashR
     //        E             ->
     //        E             ->
     // NOTE: This is done by default now
-
-
-
 
 
     return AccessibilityHashResults(m, idsToHash, ps)
@@ -100,10 +97,7 @@ val ACCESSIBILITY_PERCEPTS = listOf(
         //PerceptType.CHILDREN_SPATIAL_RELATIONS
 )
 
-fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
-                                        perceptiferMap: HashMap<String, Perceptifer>,
-                                        hashCache: HashMap<String, Int>,
-                                        ignoreRepeatChildren: Boolean): Int {
+fun baseAccessibilityTransform(perceptifer: Perceptifer): Set<Percept> {
 
     var perceptsList: List<Percept> = perceptifer.percepts?.filter {
         it.type in ACCESSIBILITY_PERCEPTS
@@ -113,8 +107,22 @@ fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
         it.type in ACCESSIBILITY_PERCEPTS
     } ?: listOf()
 
+    return perceptsList.toSet()
+
+}
+
+
+
+fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
+                                        perceptiferMap: HashMap<String, Perceptifer>,
+                                        hashCache: HashMap<String, Int>,
+                                        ignoreRepeatChildren: Boolean,
+                                        filterAndTransform: (Perceptifer) -> Set<Percept>): Int {
+
+
+
     // remove the order constraints of percepts
-    val percepts = perceptsList.toSet()
+    val percepts = filterAndTransform(perceptifer)
 
     //println("Percepts to hash: " + percepts)
 
@@ -122,7 +130,9 @@ fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
     val children = getIdsOfChildren(perceptifer)
     //println("Children ids: $children")
     if (children.isNotEmpty()) {
-        var childHashes = children.map { performPerceptiferAccessibilityHash(perceptiferMap[it]!!, perceptiferMap, hashCache, ignoreRepeatChildren) }
+        var childHashes = children.map {
+            performPerceptiferAccessibilityHash(perceptiferMap[it]!!, perceptiferMap, hashCache, ignoreRepeatChildren, filterAndTransform)
+        }
         //println("Child hashes: " + childHashes)
         if (ignoreRepeatChildren) {
             childHashes = childHashes.toSet().toList()

@@ -11,6 +11,7 @@ import kotlin.collections.HashMap
  * A collection of types for Automatons
  * @author Aaron Vontell
  * @date August 6th, 2018
+ * @updated October 29th, 2018
  */
 
 /**
@@ -338,21 +339,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
 
     }
 
-    fun findPathDijkstra(startState: AutomatonState<S>, endState: AutomatonState<S>): List<AutomatonTransition<T>>? {
-
-        val dist = PriorityQueue<AutomatonState<S>>(kotlin.Comparator { o1, o2 ->  }) //HashMap<AutomatonState<S>, Int>()
-        val prev = HashMap<AutomatonState<S>, Int>()
-        this.states.forEach {
-            dist[it] = Int.MAX_VALUE
-        }
-
-        dist[startState] = 0
-        val Q = this.states.filter { true }
-        while (Q.isNotEmpty()) {
-
-        }
-
-    }
 
     /**
      * Creates the domain representation of this automation, for using in path

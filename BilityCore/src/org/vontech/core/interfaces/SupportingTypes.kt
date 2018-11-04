@@ -184,6 +184,19 @@ class PerceptParser {
             return percept.information.cast()
         }
 
+        fun fromColor(percept: Percept): Color {
+            return percept.information.cast()
+        }
+
+        fun fromFontSize(percept: Percept): Int {
+            return percept.information.cast()
+        }
+
+        fun fromFontStyle(percept: Percept): FontStyle {
+            return percept.information.cast()
+        }
+
+
         fun fromPerceptiferOrdering(percept: Percept): PerceptiferOrdering {
             val map: LinkedTreeMap<String, List<String>> = percept.information as LinkedTreeMap<String, List<String>>
             // TODO: Figure out the correct casting here
@@ -268,7 +281,7 @@ data class PhysicalButton (
     val name: String
 )
 
-class Color(color: Int) {
+class Color(val color: Int) {
 
     val colorHex = Integer.toHexString(color)
 
