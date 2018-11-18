@@ -65,6 +65,11 @@ public class AndroidUDL {
         // The LiteralInterace class will handle the filtering of Perceptifers based
         // on these channels
         LiteralInterfaceMetadata metadata = new LiteralInterfaceMetadata(UUID.randomUUID().toString());
+
+        for (Perceptifer p: perceptifers) {
+            p.setParentId(metadata.getId());
+        }
+
         return new LiteralInterace(
                 perceptifers,
                 new HashSet<OutputChannel>(),

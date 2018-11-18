@@ -373,7 +373,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
     }
 
-    override fun getFullAccessibilityReport(automaton: Automaton<CondensedState, UserAction>): String {
+    override fun getAccessibilityReportAsJson(automaton: Automaton<CondensedState, UserAction>): IssueReport {
 
         // For each state, log accessibility issues of that state
         // i.e. for each state, and for each unique has (across the entirety of the automaton,
@@ -408,8 +408,16 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
             }
         }
         val allStaticIssues = hashToStaticIssues.values.flatten()
-
         val allDynamicIssues = getAllDynamicIssues(automaton)
+        println("Found ${allStaticIssues.size} static issues and ${allDynamicIssues.size} dynamic issues")
+        return IssueReport(allStaticIssues, allDynamicIssues)
+    }
+
+    override fun getAccessibilityReportAsString(automaton: Automaton<CondensedState, UserAction>): String {
+
+        val issues = getAccessibilityReportAsJson(automaton)
+        val allStaticIssues = issues.staticIssues
+        val allDynamicIssues = issues.dynamicIssues
 
 
         val builder = StringBuilder()
@@ -469,20 +477,6 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         return builder.toString()
 
-//        logger?.info("LATEST INTERFACE INFORMATION ---------")
-//        logger?.info("Metadata: ${latest.metadata}")
-//        var count = 1
-//        for (perceptifer in latest.perceptifers) {
-//            logger?.info("Perceptifer $count (${perceptifer.id}):")
-//            for (percept in perceptifer.percepts!!) {
-//                logger?.info("\t(R) $percept")
-//            }
-//            for (percept in perceptifer.virtualPercepts!!) {
-//                logger?.info("\t(V) $percept")
-//            }
-//            count++
-//        }
-//        logger?.info("--------------------------------------")
 
     }
 

@@ -159,7 +159,7 @@ public class ServerConnection {
      * @param tag
      * @param activity
      */
-    Pair<Integer, String> sendScreenshot(String tag, Activity activity) {
+    Pair<Integer, String> sendScreenshot(String tag, Activity activity, int size, String sizeTag) {
 
         try {
 
@@ -170,7 +170,7 @@ public class ServerConnection {
             View v1 = activity.getWindow().getDecorView().getRootView();
             v1.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-            bitmap = scaleDown(bitmap, 200, true);
+            bitmap = scaleDown(bitmap, size, true);
             v1.setDrawingCacheEnabled(false);
 
             File imageFile = new File(mPath);
@@ -186,6 +186,7 @@ public class ServerConnection {
             // Then send the screenshot to the server
             RequestBody requestBody = new MultipartBody.Builder()
                     .addFormDataPart("literalId", tag)
+                    .addFormDataPart("sizeTag", sizeTag)
                     .addFormDataPart("file", imageFile.getName(),
                             RequestBody.create(MediaType.parse("image/png"), imageFile))
                     .build();

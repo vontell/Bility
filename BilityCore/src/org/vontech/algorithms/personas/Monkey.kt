@@ -3,6 +3,7 @@ package org.vontech.algorithms.personas
 import org.vontech.algorithms.automatons.Automaton
 import org.vontech.algorithms.automatons.AutomatonState
 import org.vontech.algorithms.automatons.AutomatonTransition
+import org.vontech.algorithms.rulebased.loggers.IssueReport
 import org.vontech.algorithms.rulebased.loggers.WCAG2IssuerLogger
 import org.vontech.algorithms.rulebased.loggers.WCAGLevel
 import org.vontech.constants.FILE_DB
@@ -73,7 +74,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         } else {
             automaton = Automaton(AutomatonState(newState))
             automaton.setImageFunction {
-                "$FILE_DB/upload-${it.state.literalInterace.metadata.id}.png"
+                "$FILE_DB/screens/upload-${it.state.literalInterace.metadata.id}.png"
             }
         }
 
@@ -100,7 +101,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
             action.provideContext(automaton.currentState.state.hashResults)
             lastActionTaken = action
             println("Generating accessibility report...")
-            val result = wcagLogger.getFullAccessibilityReport(automaton)
+            val result = wcagLogger.getAccessibilityReportAsString(automaton)
             println(result)
             startFinishedAnalysis()
             return action
@@ -213,6 +214,10 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         automaton.dotFileToPng("$FILE_DB/autoKeysOnly.dot", "$FILE_DB/autoKeysOnly.png")
         automaton.displayAutomatonImage("$FILE_DB/autoKeysOnly.png")
 
+    }
+
+    fun askAboutCurrentIssues(): IssueReport {
+        return wcagLogger.getAccessibilityReportAsJson(automaton)
     }
 
 }

@@ -2,8 +2,10 @@ package org.vontech.androidserver
 
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
+import io.ktor.content.files
 import io.ktor.content.resources
 import io.ktor.content.static
+import io.ktor.content.staticRootFolder
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
@@ -13,6 +15,8 @@ import io.ktor.routing.*
 import org.vontech.androidserver.routing.internalRoutes
 import org.vontech.androidserver.routing.publicRoutes
 import org.vontech.androidserver.routing.surfacedRoutes
+import org.vontech.constants.FILE_DB
+import java.io.File
 
 
 /**
@@ -94,8 +98,12 @@ fun Application.main() {
         route("/internal") {
             internalRoutes()
         }
-        static("/static") {
-            resources("static")
+//        static("/static") {
+//            resources("static")
+//        }
+        static("/screens") {
+            staticRootFolder = File(FILE_DB)
+            files("screens")
         }
     }
 

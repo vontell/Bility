@@ -63,6 +63,8 @@ class Perceptifer(val percepts: Set<Percept>?,
 
     val id: String = UUID.randomUUID().toString()
 
+    var parentId: String? = null
+
     /**
      * Returns all percepts (real and virtual) that match the given
      * Percept type.

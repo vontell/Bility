@@ -21,7 +21,8 @@ import org.vontech.core.interfaces.Perceptifer
 abstract class UiIssuerLogger {
 
     abstract fun getDescription(): LoggerDescription
-    abstract fun getFullAccessibilityReport(automaton: Automaton<CondensedState, UserAction>): String
+    abstract fun getAccessibilityReportAsString(automaton: Automaton<CondensedState, UserAction>): String
+    abstract fun getAccessibilityReportAsJson(automaton: Automaton<CondensedState, UserAction>): IssueReport
 
 }
 
@@ -63,6 +64,11 @@ data class DynamicIssue(
         val startState: AutomatonState<CondensedState>?,
         val endState: AutomatonState<CondensedState>?,
         val transition: AutomatonTransition<UserAction>?
+)
+
+data class IssueReport(
+        val staticIssues: List<StaticIssue>,
+        val dynamicIssues: List<DynamicIssue>
 )
 
 class IssuerBuilder {

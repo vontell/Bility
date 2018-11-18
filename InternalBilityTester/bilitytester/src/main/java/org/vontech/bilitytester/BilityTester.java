@@ -148,7 +148,8 @@ public class BilityTester {
         serverConnection.sendInterface(face);
 
         // 4) Also send the screenshot to the server
-        serverConnection.sendScreenshot(face.getMetadata().getId(), current);
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL");
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB");
 
         return loop();
 
