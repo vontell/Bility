@@ -14,6 +14,7 @@ import TextField from '@material-ui/core/TextField';
 import TestHighlightDetail from './components/TestHighlightDetail';
 import TestSummary from './components/TestSummary';
 import ReactImageMagnify from 'react-image-magnify';
+import TestDynamicDetail from './components/TestDynamicDetail';
 
 
 
@@ -78,6 +79,7 @@ class App extends Component {
     axios.get('http://localhost:8080/internal/getFrontendReport')
     .then((res) => {
       console.log(res.data);
+      showDot(res.data.automatonGraph);
       this.setState({
         currentAction: res.data.action,
         numUnexplored: res.data.numUnexplored,
@@ -88,14 +90,13 @@ class App extends Component {
   }
 
   displayIssue(issue) {
+    console.log(issue);
 
     if (issue.type === "dynamic"){
-      let endStateSource = issue.endState ? "http://localhost:8080/screens/hires-" + issue.endState + ".png" : null;
-      let startStateSource = issue.startState ? "http://localhost:8080/screens/hires-" + issue.startState + ".png" : null;
       this.setState({
-        displayed: {
-          imagePath: endStateSource,
-        }
+        displayed: null,
+        highlightedPerceptifer: null,
+        dynamicDisplay: issue
       });
     } else {
       let perceptifer = issue.perceptifers[0];
@@ -110,6 +111,8 @@ class App extends Component {
           size: sizes[0].information,
         }
         this.setState({
+          dynamicDisplay: null,
+          highlightedPerceptifer: null,
           displayed: {
             imagePath: source,
             highlights: [highlight],
@@ -203,7 +206,11 @@ class App extends Component {
                     highlights={this.state.displayed.highlights}
                     originalData={this.state.displayed.originalData} />
                 }
-                {!this.state.displayed &&
+                {this.state.dynamicDisplay &&
+                  <TestDynamicDetail
+                    issue={this.state.dynamicDisplay} />
+                }
+                {(!this.state.displayed && !this.state.dynamicDisplay) &&
                   <div>
                     <p>Hover over an issue to see more.</p>
                   </div>
@@ -218,6 +225,9 @@ class App extends Component {
             </Grid>
           </Grid>
         </Grid>
+
+        <div id="representation" style={styles.automatonGraph}></div>
+
         { /*<ReactImageMagnify {...{
             smallImage: {
                 alt: 'Automaton generated during this run',
@@ -253,7 +263,39 @@ const styles = {
   filterSearch: {
     width: '100%',
     marginTop: 0
+  },
+  automatonGraph: {
+    width: '100%',
+    height: 800
   }
+}
+
+function showDot(DOTstring) {
+  // provide data in the DOT language
+  var parsedData = window.vis.network.convertDot(DOTstring);
+
+  var data = {
+    nodes: parsedData.nodes,
+    edges: parsedData.edges
+  }
+
+  var options = parsedData.options;
+
+  // you can extend the options like a normal JSON variable:
+  options['physics'] = {
+    enabled: true,
+    repulsion: {
+        centralGravity: 0.0,
+        springLength: 335,
+        springConstant: 0.01,
+        nodeDistance: 500,
+        damping: 0.41
+    },
+    solver: 'repulsion'
+  }
+
+  // create a network
+  var network = new window.vis.Network(document.getElementById('representation'), data, options);
 }
 
 export default App;

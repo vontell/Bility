@@ -2,6 +2,7 @@ package org.vontech.algorithms.rulebased.loggers
 
 import org.vontech.algorithms.automatons.Automaton
 import org.vontech.algorithms.hci.blendColors
+import org.vontech.algorithms.hci.getContextHash
 import org.vontech.algorithms.hci.getContrast
 import org.vontech.constants.GoogleAccessibilityScannerConstants
 import org.vontech.constants.WCAGConstants
@@ -166,10 +167,6 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         // Test for each level of WCAG 2.0 compliance
         val issues = mutableListOf<StaticIssue>()
-        val sdf = listOf(foreground, background, fontSize, fontStyle)
-        if (foreground != null ) {
-            println("CONTRAST: $sdf")
-        }
         if (listOf(foreground, background, fontSize, fontStyle).none { it == null }) {
             var foregroundColor = PerceptParser.fromColor(foreground!!)
             val backgroundColor = PerceptParser.fromColor(background!!)
@@ -178,7 +175,6 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
             foregroundColor = Color(blendColors(listOf(backgroundColor.color.toLong(), foregroundColor.color.toLong())).toInt())
 
             val contrast = getContrast(foregroundColor.color.toLong(), backgroundColor.color.toLong())
-            println("FOUND CONTRAST OF $contrast")
 
             // If small text, see if fails
             val fontSizePx = PerceptParser.fromFontSize(fontSize!!)
@@ -366,6 +362,11 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
     }
 
 
+    fun isFocusChanging(transition: UserAction): Boolean {
+        return transition.type == InputInteractionType.KEYPRESS &&
+                transition.parameters!!.cast<KeyPress>() != KeyPress.ENTER
+    }
+
     /**
      * Logs any issues resulting from a change in focus causing the context of the application to change
      * drastically. This is detected by the following process:
@@ -378,19 +379,23 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
     private fun logOnFocus(automaton: Automaton<CondensedState, UserAction>): MutableList<DynamicIssue> {
         val onFocusIssues = mutableListOf<DynamicIssue>()
         automaton.transitions.forEach {
+
+            // Choose a start state
             val startState = it.key
+
+            // Then for each transition, see if it is a focus-changing-only transition
+            // up, left, right, down, and tab keypresses are focus changing
             it.value.forEach {
+
                 val transition = it.key
-                // An issue arises when one of the destination states is not the start state
-                // and when that destination state only has a difference in virtual focus
-                if (transition.label.type == InputInteractionType.KEYPRESS &&
-                        transition.label.parameters!!.cast<KeyPress>() == KeyPress.TAB) {
+                if (isFocusChanging(transition.label)) {
+
                     val badStates = it.value.filter {
-                        false
-                        //it != startState
-                        //it.state. // TODO: Allow hash to take in percepts to track as a parameters, then re-evaluate these states without virtual percept
-                                        // TODO: OORRRRR given two literal interfaces, determine if they are a change in context (should be easy?)
+                        // If focus changing, we want to check if the original state and new state
+                        // are of the same context. If not, return true
+                        !areSameContext(startState.state, it.state)
                     }
+
                     badStates.forEach {
                         val issue = IssuerBuilder()
                                 .initialize(WCAGConstants.P321_NAME, WCAGConstants.P321_SHORT, WCAGConstants.P321_LONG)
@@ -444,6 +449,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         it.key.label.type == InputInteractionType.KEYPRESS
                     }.all {
                         it.value.all {
+                            // TODO: Difference in context here as well
                             println("DIFFERENCES: ${state.state.differenceBetween(it.state)}")
                             state.state.differenceBetween(it.state).all {it.type == PerceptType.VIRTUAL_FOCUSABLE}
                         }
@@ -631,6 +637,21 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         return builder.toString()
 
+
+    }
+
+    private fun areSameContext(stateOne: CondensedState, stateTwo: CondensedState): Boolean {
+
+        val stateOneContextHash = getContextHash(stateOne.literalInterace)
+        val stateTwoContextHash = getContextHash(stateTwo.literalInterace)
+
+        if (stateOneContextHash != stateTwoContextHash) {
+            println("UNEQUAL CONTEXTS!!!!!")
+        } else {
+            println("EQUAL CONTEXTS!Q#*^")
+        }
+
+        return stateOneContextHash == stateTwoContextHash
 
     }
 

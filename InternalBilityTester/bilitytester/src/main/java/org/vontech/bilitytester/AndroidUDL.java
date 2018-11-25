@@ -227,9 +227,9 @@ public class AndroidUDL {
         if (background instanceof ColorDrawable) {
             builder.createBackgroundColorPercept(((ColorDrawable) background).getColor());
         } else if (background != null) {
-            Bitmap bitmap = drawableToBitmap(background);
-            ColorArt colorArt = new ColorArt(bitmap);
-            builder.createBackgroundColorPercept(colorArt.getBackgroundColor());
+//            Bitmap bitmap = drawableToBitmap(background);
+//            ColorArt colorArt = new ColorArt(bitmap);
+//            builder.createBackgroundColorPercept(colorArt.getBackgroundColor());
         }
 
         // If root, add root indicator

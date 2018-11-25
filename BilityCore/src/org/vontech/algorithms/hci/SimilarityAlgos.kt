@@ -43,7 +43,7 @@ fun getAccessibilityHashes(literalInterace: LiteralInterace): AccessibilityHashR
     //    of layout percepts. Fill the idsToHash map.
     val idsToHash = HashMap<String, Int>()
     //println("About to get hashes...")
-    performPerceptiferAccessibilityHash(rootPerceptifer, ps, idsToHash, true) { baseAccessibilityTransform(it) }
+    performPerceptiferHash(rootPerceptifer, ps, idsToHash, true) { baseAccessibilityTransform(it) }
     //println("Obtained hashes!")
 
     // 3. Reverse idsToHash to get M, the mapping of hashes to similar elements
@@ -113,13 +113,11 @@ fun baseAccessibilityTransform(perceptifer: Perceptifer): Set<Percept> {
 
 
 
-fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
+fun performPerceptiferHash(perceptifer: Perceptifer,
                                         perceptiferMap: HashMap<String, Perceptifer>,
                                         hashCache: HashMap<String, Int>,
                                         ignoreRepeatChildren: Boolean,
                                         filterAndTransform: (Perceptifer) -> Set<Percept>): Int {
-
-
 
     // remove the order constraints of percepts
     val percepts = filterAndTransform(perceptifer)
@@ -131,7 +129,7 @@ fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
     //println("Children ids: $children")
     if (children.isNotEmpty()) {
         var childHashes = children.map {
-            performPerceptiferAccessibilityHash(perceptiferMap[it]!!, perceptiferMap, hashCache, ignoreRepeatChildren, filterAndTransform)
+            performPerceptiferHash(perceptiferMap[it]!!, perceptiferMap, hashCache, ignoreRepeatChildren, filterAndTransform)
         }
         //println("Child hashes: " + childHashes)
         if (ignoreRepeatChildren) {
@@ -146,5 +144,49 @@ fun performPerceptiferAccessibilityHash(perceptifer: Perceptifer,
     val hash =  percepts.hashCode()
     hashCache.put(perceptifer.id, hash)
     return hash
+
+}
+
+
+// CONTEXT-CHANGING HASH FUNCTION
+// This is essentially the same as the accessibility hash, but focus does not
+// matter
+
+val CONTEXT_PERCEPTS = listOf(
+        PerceptType.ALPHA,
+        PerceptType.BACKGROUND_COLOR,
+        PerceptType.FONT_SIZE,
+        PerceptType.FONT_STYLE,
+        PerceptType.LINE_SPACING,
+        PerceptType.VIRTUAL_NAME,
+        PerceptType.TEXT_COLOR//,
+)
+
+fun baseContextTransform(perceptifer: Perceptifer): Set<Percept> {
+
+    var perceptsList: List<Percept> = perceptifer.percepts?.filter {
+        it.type in CONTEXT_PERCEPTS
+    } ?: listOf()
+
+    perceptsList += perceptifer.virtualPercepts?.filter {
+        it.type in CONTEXT_PERCEPTS
+    } ?: listOf()
+
+    return perceptsList.toSet()
+
+}
+
+fun getContextHash(literalInterace: LiteralInterace): Int {
+
+    val idPerceptiferPairings = literalInterace.perceptifers.map {it.id to it}.toTypedArray()
+    val ps = hashMapOf(*idPerceptiferPairings)
+
+    val rootPerceptifer = getRoot(ps.values)
+
+    val idsToHash = HashMap<String, Int>()
+    performPerceptiferHash(rootPerceptifer, ps, idsToHash, true) { baseContextTransform(it) }
+
+    // Return the hash of the root element
+    return idsToHash[rootPerceptifer.id]!!
 
 }

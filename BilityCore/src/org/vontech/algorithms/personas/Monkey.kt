@@ -79,7 +79,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         } else {
             automaton = Automaton(state)
             automaton.setImageFunction {
-                "$FILE_DB/screens/upload-${it.state.literalInterace.metadata.id}.png"
+                "http://localhost:8080/screens/upload-${it.state.literalInterace.metadata.id}.png"
             }
         }
 

@@ -245,27 +245,27 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
                     }
 
                     // If newStates was empty, these are hanging edges - add appropriately
-                    if (newStates.isEmpty()) {
-                        dotFile.append("secret_node_$hangingEdgeCount [style=invis];\n\t\"")
-                        dotFile.append(state.toString())
-                        dotFile.append("\" -> \"")
-                        dotFile.append("secret_node_$hangingEdgeCount")
-                        dotFile.append("\" [ label = \"")                // through this action
-                        dotFile.append(action.toString())
-                        dotFile.append("\" style=dashed, color=grey];\n\t")
-                        hangingEdgeCount++
-                    }
+//                    if (newStates.isEmpty()) {
+//                        dotFile.append("secret_node_$hangingEdgeCount [style=invis];\n\t\"")
+//                        dotFile.append(state.toString())
+//                        dotFile.append("\" -> \"")
+//                        dotFile.append("secret_node_$hangingEdgeCount")
+//                        dotFile.append("\" [ label = \"")                // through this action
+//                        dotFile.append(action.toString())
+//                        dotFile.append("\" style=dashed, color=grey];\n\t")
+//                        hangingEdgeCount++
+//                    }
 
                 }
             }
         }
 
         // Before finishing, if an image converter is given, add those to the end
-//        if (this.imageGetter != null) {
-//            this.states.forEach {
-//                dotFile.append("\"$it\" [image=\"${this.imageGetter!!(it)}\" label=\"\" shape=\"none\"];\n\t")
-//            }
-//        }
+        if (this.imageGetter != null) {
+            this.states.forEach {
+                dotFile.append("\"${it.state.toString()}\" [image=\"${this.imageGetter!!(it)}\" label=\"\" shape=\"none\"];\n\t")
+            }
+        }
 
         var finalString = dotFile.toString()
         finalString = finalString.trim()
@@ -401,7 +401,7 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
             }
             Q.add(it)
         }
-        println("Created init distances $dist")
+
         while (Q.isNotEmpty()) {
             val u = Q.poll()
             transitions[u]?.values?.flatten()?.forEach {
@@ -412,7 +412,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
                 }
             }
         }
-        println("Created all distances, now getting unexplored $dist")
 
         // Now get the closest state with unvisited
         val unexplored = this.statesWithUnexploredEdges()
@@ -427,7 +426,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
                 minState = it
             }
         }
-        println("Found min state: $minState")
 
         // And create the path
         val pathBack = mutableListOf<AutomatonTransition<T>>()
@@ -438,7 +436,6 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
                 minState = prev[minState]!!
             }
         }
-        println("Found path back: $pathBack")
 
         return pathBack
 
