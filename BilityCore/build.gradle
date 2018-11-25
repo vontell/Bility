@@ -40,7 +40,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
     compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.6'
     //compile 'com.github.pellierd:pddl4j:3.7.2'
-    annotationProcessor 'com.github.pellierd:pddl4j:3.7.2'
+    //annotationProcessor 'com.github.pellierd:pddl4j:3.7.2'
     implementation 'com.google.code.gson:gson:2.8.5'
     testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
 }

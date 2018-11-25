@@ -378,6 +378,10 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         return transitions[startState]!!.keys.filter { transitions[startState]!![it]!!.any { it == endState } }
     }
 
+    fun getUnexploredEdgesFrom(state: AutomatonState<S>):  List<AutomatonTransition<T>> {
+        return transitions[startState]!!.keys.filter { transitions[startState]!![it]!!.any { it.state == null } }
+    }
+
     /**
      * Performs Dijkstra's from a starting state to the closest state which
      * has an unexplored edge. If no states are reachable that have an unexplored

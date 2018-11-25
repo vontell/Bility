@@ -17,6 +17,8 @@ var logger: Logger? = null
 
 // TODO: Remove the default config
 var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("org.vontech.internalbilitytester")
+//var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("com.danielkim.soundrecorder")
+
 
 // TODO: INSTEAD OF GLOBAL VARIABLES, CREATE A CONTEXT
 var androidSession: AndroidSession? = null

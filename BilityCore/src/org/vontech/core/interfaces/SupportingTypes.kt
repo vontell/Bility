@@ -21,6 +21,7 @@ class PerceptBuilder {
 
     private val percepts: MutableSet<Percept> = HashSet()
     private val virtualPercepts: MutableSet<Percept> = HashSet()
+    public var latestPercept: Percept? = null
 
     fun buildPercepts(): Set<Percept> {
         return percepts
@@ -44,7 +45,7 @@ class PerceptBuilder {
         return createPercept(PerceptType.TEXT, text)
     }
 
-    // TODO: Would be great to hava a color heirarchy concept
+    // TODO: Would be great to hava a color hierarchy concept
 
     // TODO: Instead of enum type, maybe have a hash table of types
     // to a list of percepts of that type
@@ -108,6 +109,13 @@ class PerceptBuilder {
     fun createPercept(type: PerceptType, info: Any): PerceptBuilder {
         val percept = Percept(type, info)
         percepts.add(percept)
+        this.latestPercept = percept
+        return this
+    }
+
+    fun createPercept(percept: Percept): PerceptBuilder {
+        percepts.add(percept)
+        this.latestPercept = percept
         return this
     }
 
@@ -159,6 +167,7 @@ class PerceptBuilder {
     fun createVirtualPercept(type: PerceptType, info: Any): PerceptBuilder {
         val percept = Percept(type, info)
         virtualPercepts.add(percept)
+        this.latestPercept = percept
         return this
     }
 
@@ -193,6 +202,14 @@ class PerceptParser {
         }
 
         fun fromFontStyle(percept: Percept): FontStyle {
+            return percept.information.cast()
+        }
+
+        fun fromMediaType(percept: Percept): MediaType {
+            return percept.information.cast()
+        }
+
+        fun fromScreenReaderContent(percept: Percept): String {
             return percept.information.cast()
         }
 
@@ -281,7 +298,7 @@ data class PhysicalButton (
     val name: String
 )
 
-class Color(val color: Int) {
+data class Color(val color: Int) {
 
     val colorHex = Integer.toHexString(color)
 

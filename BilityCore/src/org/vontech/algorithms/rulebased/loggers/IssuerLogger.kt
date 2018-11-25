@@ -61,15 +61,20 @@ data class DynamicIssue(
         val suggestionExplanation: String,
         val passes: Boolean,
         val extras: Any,
-        val startState: AutomatonState<CondensedState>?,
-        val endState: AutomatonState<CondensedState>?,
-        val transition: AutomatonTransition<UserAction>?
+        val mappings: List<DynamicMapping>?
+)
+
+data class DynamicMapping(
+        val startState: String?,
+        val transition: UserAction?,
+        val endState: String?
 )
 
 data class IssueReport(
         val staticIssues: List<StaticIssue>,
         val dynamicIssues: List<DynamicIssue>
 )
+
 
 class IssuerBuilder {
 
@@ -78,9 +83,7 @@ class IssuerBuilder {
     private var longDescription: String? = null
     private var instanceExplanation: String? = null
     private var suggestionExplanation: String? = null
-    private var startState: AutomatonState<CondensedState>? = null
-    private var endState: AutomatonState<CondensedState>? = null
-    private var transition: AutomatonTransition<UserAction>? = null
+    private var mappings: MutableList<DynamicMapping> = mutableListOf()
     private var pass: Boolean = true
     private var extras: Any? = null
     private var perceptifers: MutableList<Perceptifer> = mutableListOf()
@@ -119,18 +122,8 @@ class IssuerBuilder {
         return this
     }
 
-    fun addStartState(state: AutomatonState<CondensedState>): IssuerBuilder {
-        this.startState = state
-        return this
-    }
-
-    fun addEndState(state: AutomatonState<CondensedState>): IssuerBuilder {
-        this.endState = state
-        return this
-    }
-
-    fun addTransition(transition: AutomatonTransition<UserAction>): IssuerBuilder {
-        this.transition = transition
+    fun addDynamicMapping(startState: String?, transition: UserAction?, endState: String?): IssuerBuilder {
+        this.mappings.add(DynamicMapping(startState, transition, endState))
         return this
     }
 
@@ -158,12 +151,7 @@ class IssuerBuilder {
 
         if (listOf(identifier, shortDescription, longDescription, instanceExplanation,
                         suggestionExplanation, pass, extras).any { it == null }) {
-            println(listOf(identifier, shortDescription, longDescription, instanceExplanation,
-                    suggestionExplanation, pass, extras))
             throw RuntimeException("All required properties of an issue must be set")
-        }
-        if (listOf(startState, endState, transition).all { it == null }) {
-            throw RuntimeException("A dynamic issue must indicate at least the start state, end state, or transition")
         }
 
         return DynamicIssue(
@@ -174,9 +162,7 @@ class IssuerBuilder {
                 suggestionExplanation!!,
                 pass,
                 extras!!,
-                startState,
-                endState,
-                transition
+                mappings
         )
 
     }

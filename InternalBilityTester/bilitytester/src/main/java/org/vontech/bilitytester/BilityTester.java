@@ -46,6 +46,7 @@ import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 import static android.view.KeyEvent.KEYCODE_ENTER;
 import static android.view.KeyEvent.KEYCODE_TAB;
+import static java.lang.Thread.sleep;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -139,6 +140,7 @@ public class BilityTester {
         }
 
         device.waitForIdle(200);
+        try { sleep(300); } catch (InterruptedException ignored) { }
 
         // 2) Get information about the state of the user interface
         Activity current = getActivityInstance();
@@ -148,8 +150,8 @@ public class BilityTester {
         serverConnection.sendInterface(face);
 
         // 4) Also send the screenshot to the server
-        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL");
-        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB");
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL", device);
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB", device);
 
         return loop();
 

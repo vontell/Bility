@@ -5,6 +5,10 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import Cancel from '@material-ui/icons/Cancel';
+import Keyboard from '@material-ui/icons/Keyboard';
+import PanTool from '@material-ui/icons/PanTool';
+import TouchApp from '@material-ui/icons/TouchApp';
+import PhoneAndroid from '@material-ui/icons/PhoneAndroid';
 import Typography from '@material-ui/core/Typography';
 
 type Props = {
@@ -26,22 +30,28 @@ export default class TestResult extends Component<State, Props> {
   
 
   componentDidMount() {
-    console.log(this.props);
+    //console.log(this.props);
   }
 
   getStatusSpan() {
     if (this.props.issue.passes) {
       return <span style={styles.passes}>- PASSED <CheckCircle style={styles.statusIcon}/></span>
-    } else {
-      return <span style={styles.fails}>- FAILURE <Cancel style={styles.statusIcon}/></span>
     }
+    return <span style={styles.fails}>- FAILURE <Cancel style={styles.statusIcon}/></span>
+  }
+
+  getTypeSpan() {
+    if (this.props.issue.type === "static") {
+      return <span><PhoneAndroid style={styles.typeIcon}/></span>
+    }
+    return <span><TouchApp style={styles.typeIcon}/></span>
   }
 
   render() {
     return (
       <ExpansionPanel onMouseEnter={() => this.props.displayIssue(this.props.issue)}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <p style={styles.issueHeading}>{this.props.issue.identifier} {this.getStatusSpan()}</p>
+          <p style={styles.issueHeading}>{this.getTypeSpan()} {this.props.issue.identifier} {this.getStatusSpan()}</p>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div>
@@ -49,6 +59,9 @@ export default class TestResult extends Component<State, Props> {
             <p><b>Explanation: </b>{this.props.issue.instanceExplanation}</p>
             {!this.props.issue.passes &&
             <div></div>
+            }
+            {this.props.issue.suggestionExplanation &&
+            <p><b>Suggestion: </b>{this.props.issue.suggestionExplanation}</p>
             }
             <p>To learn more about this guideline, visit the <a href={this.props.issue.extras.link} target="_blank">WCAG 2.0 principle reference</a></p>
           </div>
@@ -72,6 +85,10 @@ const styles = {
     fontWeight: 'bold',
   },
   statusIcon: {
+    marginBottom: -6,
+    marginLeft: 8
+  },
+  typeIcon: {
     marginBottom: -6,
     marginLeft: 8
   }

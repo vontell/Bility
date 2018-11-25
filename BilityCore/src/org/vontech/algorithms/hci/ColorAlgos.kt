@@ -1,5 +1,7 @@
 package org.vontech.algorithms.hci
 
+import kotlin.math.round
+
 /**
  * Returns the contrast of the given foreground and background colors, ranging from 1 to 21
  * Uses resources from W3 in calculations, especially from the following links:
@@ -40,5 +42,48 @@ fun calcLuminance(comps: LongArray): Float {
     val B = if (BSRGB <= 0.03928) BSRGB / 12.92f else Math.pow((BSRGB + 0.055) / 1.055f, 2.4).toFloat()
 
     return 0.2126f * R + 0.7152f * G + 0.0722f * B
+
+}
+
+/**
+ * Given a list of colors in order of background -> foreground, calculates a
+ * resulting color. Assumes that all colors are stacked on top of a white
+ * background (i.e. 0xFFFFFFFF)
+ * References:
+ *  https://web.archive.org/web/20110429041428/http://graphics.pixar.com:80/library/Compositing/paper.pdf
+ *  https://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
+ */
+fun blendColors(argbColors: List<Long>): Long {
+
+    var currentBaseColor = 0xFFFFFFFFL
+    argbColors.forEach {
+
+        // base = DST, next = SRC
+
+        val baseA = ((0xFF000000L and currentBaseColor) shr 24) / 255f
+        val baseR = ((0x00FF0000L and currentBaseColor) shr 16) / 255f
+        val baseG = ((0x0000FF00L and currentBaseColor) shr 8) / 255f
+        val baseB = ((0x000000FFL and currentBaseColor)) / 255f
+
+        val nextA = ((0xFF000000L and it) shr 24) / 255f
+        val nextR = ((0x00FF0000L and it) shr 16) / 255f
+        val nextG = ((0x0000FF00L and it) shr 8) / 255f
+        val nextB = ((0x000000FFL and it)) / 255f
+
+        val outA = nextA + baseA * (1 - nextA)
+
+        currentBaseColor = 0
+        if (outA != 0f) {
+            val outR = round(((nextR * nextA + baseR * baseA * (1 - nextA)) / outA) * 255).toInt()
+            val outG = round(((nextG * nextA + baseG * baseA * (1 - nextA)) / outA) * 255).toInt()
+            val outB = round(((nextB * nextA + baseB * baseA * (1 - nextA)) / outA) * 255).toInt()
+            val outAInt = round(outA * 255).toInt()
+            currentBaseColor = outB.toLong() + (outG shl 8).toLong() + (outR shl 16).toLong() + (outAInt shl 24).toLong()
+        }
+
+    }
+
+    return currentBaseColor
+
 
 }

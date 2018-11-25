@@ -1,10 +1,17 @@
 package org.vontech.bilitytester;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -14,10 +21,13 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.michaelevans.colorart.library.ColorArt;
 import org.vontech.bilitytester.utils.ViewHelper;
 import org.vontech.core.interfaces.FontStyle;
 import org.vontech.core.interfaces.InputChannel;
@@ -28,7 +38,12 @@ import org.vontech.core.interfaces.OutputChannel;
 import org.vontech.core.interfaces.PerceptBuilder;
 import org.vontech.core.interfaces.Perceptifer;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,19 +57,48 @@ import java.util.UUID;
  */
 public class AndroidUDL {
 
+    Integer actionBarId = null;
+
     public static LiteralInterace getLiteralInterfaceFromActivity(Activity activity) {
 
+        // First create perceptifers for views
         Set<Perceptifer> perceptifers = new HashSet<>();
 
-        // First create perceptifers for views
-        View rootView = ViewHelper.getRootView(activity);
-        if (rootView != null) {
+        // Fill up some references for later
+
+        // Then get all root views, finding the activity rootView as well
+        View activityRootView = ViewHelper.getRootView(activity);
+        List<View> rootViews = getViewRoots();
+        rootViews.remove(activityRootView);
+
+        // Create the base percepts for the activity rootView
+        // Do a traversal through the tree
+        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, false);
+        perceptifers.addAll(activityResult.second);
+
+        // Now do it for every other rootView, then adding the Perceptifer as a child of the activity perceptifer
+        Set<Perceptifer> windowChildren = new HashSet<>();
+        windowChildren.add(activityResult.first);
+        for (View rootView : rootViews) {
 
             // Do a traversal through the tree
-            Set<Perceptifer> processed = traverseAndGeneratePerceptifers(activity, rootView, true).second;
-            perceptifers.addAll(processed);
+            Pair<Perceptifer, Set<Perceptifer>> otherProcessed = traverseAndGeneratePerceptifers(activity, rootView, false);
+
+            // TODO: Now add this perceptifer as a child to the activity perceptifer
+
+            // Finally, add these percepts to all percepts as well
+            perceptifers.addAll(otherProcessed.second);
+            windowChildren.add(otherProcessed.first);
 
         }
+
+        Perceptifer finalRoot = new PerceptBuilder()
+                .createVirtualRootPercept()
+                .createLocationPercept(0, 0)
+                .createRoughViewOrderingPercept(windowChildren)
+                .buildPerceptifer();
+
+        perceptifers.add(finalRoot);
 
         // Then create perceptifers for device buttons
         perceptifers.addAll(getPhysicalButtonPerceptifers(activity));
@@ -135,10 +179,6 @@ public class AndroidUDL {
                 builder.createFontStylePercept(FontStyle.NORMAL);
             }
             builder.createTextColorPercept(tv.getCurrentTextColor());
-            Drawable background = tv.getBackground();
-            if (background instanceof ColorDrawable) {
-                builder.createBackgroundColorPercept(((ColorDrawable) background).getColor());
-            }
         }
 
         if (v instanceof ScrollView) {
@@ -164,7 +204,10 @@ public class AndroidUDL {
         Rect rectf = new Rect();
         v.getGlobalVisibleRect(rectf);
 
-        builder.createLocationPercept(rectf.left, rectf.top);
+        int[] screenLocation = new int[]{0, 0};
+        v.getLocationOnScreen(screenLocation);
+
+        builder.createLocationPercept(screenLocation[0], screenLocation[1]);
         builder.createSizePercept(rectf.width(), rectf.height());
         builder.createAlphaPercept(v.getAlpha());
         builder.createClickableVirtualPercept(v.hasOnClickListeners());
@@ -174,6 +217,19 @@ public class AndroidUDL {
             builder.createNameVirtualPercept(v.getAccessibilityClassName().toString());
         } else {
             builder.createNameVirtualPercept(v.getClass().getName());
+        }
+
+        if (v.getClass().getName().toLowerCase().contains("seekbar")) {
+            System.out.println("SEEKBAR WAS SEEN AND LOGGED");
+        }
+
+        Drawable background = v.getBackground();
+        if (background instanceof ColorDrawable) {
+            builder.createBackgroundColorPercept(((ColorDrawable) background).getColor());
+        } else if (background != null) {
+            Bitmap bitmap = drawableToBitmap(background);
+            ColorArt colorArt = new ColorArt(bitmap);
+            builder.createBackgroundColorPercept(colorArt.getBackgroundColor());
         }
 
         // If root, add root indicator
@@ -239,7 +295,6 @@ public class AndroidUDL {
     public static boolean isPurelyContainer(View view) {
 
         if (view instanceof ViewGroup) {
-            Log.e("BACKGROUND", "" + view.getBackground());
             if (view.getBackground() == null) {
                 if (((ViewGroup) view).getChildCount() > 0) {
                     return true;
@@ -265,5 +320,134 @@ public class AndroidUDL {
         final Rect screen = new Rect(0, 0, mets.widthPixels, mets.heightPixels);
         return rectf.intersect(screen);
     }
+
+    public static View getOpenDialog(Activity act) {
+
+        if (act instanceof FragmentActivity) {
+            System.out.println("IS A FRAGMENT ACTIVITY");
+            FragmentActivity activity = (FragmentActivity) act;
+            List<Fragment> fragments = activity.getSupportFragmentManager().getFragments();
+            if (fragments != null) {
+                for (Fragment fragment : fragments) {
+                    if (fragment instanceof DialogFragment) {
+                        System.out.println("HAS A DIALOG FRAGMENT");
+                        return fragment.getView();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<View> getViewRoots() {
+
+        List<ViewParent> viewRoots = new ArrayList<>();
+
+        try {
+            Object windowManager;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                windowManager = Class.forName("android.view.WindowManagerGlobal")
+                        .getMethod("getInstance").invoke(null);
+            } else {
+                Field f = Class.forName("android.view.WindowManagerImpl")
+                        .getDeclaredField("sWindowManager");
+                f.setAccessible(true);
+                windowManager = f.get(null);
+            }
+
+            Field rootsField = windowManager.getClass().getDeclaredField("mRoots");
+            rootsField.setAccessible(true);
+
+            Field stoppedField = Class.forName("android.view.ViewRootImpl")
+                    .getDeclaredField("mStopped");
+            stoppedField.setAccessible(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                List<ViewParent> viewParents = (List<ViewParent>) rootsField.get(windowManager);
+                // Filter out inactive view roots
+                for (ViewParent viewParent : viewParents) {
+                    boolean stopped = (boolean) stoppedField.get(viewParent);
+                    if (!stopped) {
+                        viewRoots.add(viewParent);
+                    }
+                }
+            } else {
+                ViewParent[] viewParents = (ViewParent[]) rootsField.get(windowManager);
+                // Filter out inactive view roots
+                for (ViewParent viewParent : viewParents) {
+                    boolean stopped = (boolean) stoppedField.get(viewParent);
+                    if (!stopped) {
+                        viewRoots.add(viewParent);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<View> rootViews = new ArrayList<>();
+        for (ViewParent vp : viewRoots) {
+            if (vp instanceof View) {
+                rootViews.add((View) vp);
+            }
+            if (vp.getClass().getCanonicalName().equals("android.view.ViewRootImpl")) {
+                try {
+                    View view = (View) Class.forName("android.view.ViewRootImpl")
+                            .getMethod("getView").invoke(vp);
+                    rootViews.add(view);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        System.out.println("&&&&&&&& " + rootViews.size());
+
+        return rootViews;
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+//    static ViewGroup combineGroups(List<View> groups) {
+//        if (groups.size() > 0) {
+//            ViewGroup vg = new FrameLayout(groups.get(0).getContext());
+//            for (View v : groups) {
+//                vg.addView(v);
+//            }
+//            if (vg.getChildCount() > 1) {
+//                System.out.println("GETTING DIALOG STUFF");
+//            }
+//            return vg;
+//        }
+//        return null;
+//    }
 
 }

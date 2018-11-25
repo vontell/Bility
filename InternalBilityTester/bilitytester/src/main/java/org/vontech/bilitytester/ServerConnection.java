@@ -3,6 +3,7 @@ package org.vontech.bilitytester;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.support.test.uiautomator.UiDevice;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -159,29 +160,43 @@ public class ServerConnection {
      * @param tag
      * @param activity
      */
-    Pair<Integer, String> sendScreenshot(String tag, Activity activity, int size, String sizeTag) {
+    Pair<Integer, String> sendScreenshot(String tag, Activity activity, int size, String sizeTag, UiDevice optionalDevice) {
 
         try {
 
             // First take the screenshot and save it to the device
             String mPath = Environment.getExternalStorageDirectory().toString() + "/bility/" + Calendar.getInstance().getTimeInMillis() + ".png";
 
-            // create bitmap screen capture
-            View v1 = activity.getWindow().getDecorView().getRootView();
-            v1.setDrawingCacheEnabled(true);
-            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-            bitmap = scaleDown(bitmap, size, true);
-            v1.setDrawingCacheEnabled(false);
-
             File imageFile = new File(mPath);
             imageFile.getParentFile().mkdirs();
             imageFile.createNewFile();
 
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
             int quality = 100;
-            bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
-            outputStream.flush();
-            outputStream.close();
+            View v1 = activity.getWindow().getDecorView().getRootView();
+
+            if (optionalDevice != null) {
+
+                // If device available, get size/scale and take screenshot
+                v1.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+                float scale = getScale(bitmap, size);
+                optionalDevice.takeScreenshot(imageFile, scale, quality);
+
+            } else {
+
+                // Otherwise, capture regular bitmapView v1 = activity.getWindow().getDecorView().getRootView();
+                v1.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+                bitmap = scaleDown(bitmap, size, true);
+                v1.setDrawingCacheEnabled(false);
+
+                FileOutputStream outputStream = new FileOutputStream(imageFile);
+
+                bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
+                outputStream.flush();
+                outputStream.close();
+
+            }
 
             // Then send the screenshot to the server
             RequestBody requestBody = new MultipartBody.Builder()
@@ -217,6 +232,12 @@ public class ServerConnection {
         Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
                 height, filter);
         return newBitmap;
+    }
+
+    public static float getScale(Bitmap realImage, float maxImageSize) {
+        return Math.min(
+                (float) maxImageSize / realImage.getWidth(),
+                (float) maxImageSize / realImage.getHeight());
     }
 
 }

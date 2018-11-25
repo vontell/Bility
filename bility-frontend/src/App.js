@@ -7,6 +7,13 @@ import axios from 'axios';
 import TestResults from './components/TestResults';
 import Grid from '@material-ui/core/Grid';
 import TestImageDisplay from './components/TestImageDisplay';
+import Paper from '@material-ui/core/Paper';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import TextField from '@material-ui/core/TextField';
+import TestHighlightDetail from './components/TestHighlightDetail';
+import TestSummary from './components/TestSummary';
+import ReactImageMagnify from 'react-image-magnify';
 
 
 
@@ -25,6 +32,10 @@ class App extends Component {
       issueReport: null,
       numUnexplored: null,
       displayed: null,
+      issueDetail: null,
+      showPassing: false,
+      searchField: undefined,
+      highlightedPerceptifer: null,
     }
   }
 
@@ -77,40 +88,103 @@ class App extends Component {
   }
 
   displayIssue(issue) {
-    console.log(issue);
 
-    let perceptifer = issue.perceptifers[0];
-    let source = "http://localhost:8080/screens/hires-" + perceptifer.parentId + ".png";
-    let highlight = {
-      location: perceptifer.percepts.filter((p) => p.type === "LOCATION")[0].information,
-      size: perceptifer.percepts.filter((p) => p.type === "SIZE")[0].information,
-    }
-    this.setState({
-      displayed: {
-        imagePath: source,
-        highlights: [highlight]
+    if (issue.type === "dynamic"){
+      let endStateSource = issue.endState ? "http://localhost:8080/screens/hires-" + issue.endState + ".png" : null;
+      let startStateSource = issue.startState ? "http://localhost:8080/screens/hires-" + issue.startState + ".png" : null;
+      this.setState({
+        displayed: {
+          imagePath: endStateSource,
+        }
+      });
+    } else {
+      let perceptifer = issue.perceptifers[0];
+      let source = "http://localhost:8080/screens/hires-" + perceptifer.parentId + ".png";
+  
+      let locations = perceptifer.percepts.filter((p) => p.type === "LOCATION");
+      let sizes = perceptifer.percepts.filter((p) => p.type === "SIZE");
+  
+      if (locations.length > 0 && sizes.length > 0) {
+        let highlight = {
+          location: locations[0].information,
+          size: sizes[0].information,
+        }
+        this.setState({
+          displayed: {
+            imagePath: source,
+            highlights: [highlight],
+            originalData: perceptifer
+          }
+        });
       }
-    });
+    }
 
+    
+
+  }
+
+  
+
+  _getFilters() {
+    return {
+      showFailuresOnly: !this.state.showPassing,
+      searchFilter: this.state.searchField
+    }
   }
 
   render() {
     return (
       <div style={styles.root}>
-        {this.state.project &&
-            <TestInfo info={this.state.project}></TestInfo>
-        }
-        <Button variant="contained" color="primary" onClick={() => this.startListeningLoop()}>
-          {this.state.listening ? 'Stop Bility Test' : 'Start Bility Test'}
-        </Button>
         <Grid container spacing={24}>
           <Grid item md={6} sm={12}>
-            <div style={styles.issuePane}>
-              {this.state.issueReport &&
-                <TestResults 
-                  displayIssue={(issue) => this.displayIssue(issue)}
-                  issueReport={this.state.issueReport}
+            <img src={'https://raw.githubusercontent.com/vontell/BilityBuildSystem/master/Design/logo.png?token=AHrh03WmzGbw1n-aev3RhfHl1pD-thw3ks5cAgluwA%3D%3D'} 
+              alt="Logo for the Bility Project"
+              style={styles.bility}/>
+            {this.state.project &&
+                <TestInfo info={this.state.project}></TestInfo>
+            }
+            <Button variant="contained" color="primary" onClick={() => this.startListeningLoop()}>
+              {this.state.listening ? 'Stop Bility Test' : 'Start Bility Test'}
+            </Button><br />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={this.state.showPassing}
+                  onChange={(e, checked) => {console.log(checked); this.setState({showPassing: checked})}}
                 />
+              }
+              label="Show Passing Results"
+            /><br />
+          </Grid>
+          <Grid item md={6} sm={12}>
+            {this.state.issueReport && 
+              <TestSummary issueReport={this.state.issueReport}/>}
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={24}>
+          <Grid item md={6} sm={12}>
+            <div>
+              {this.state.issueReport &&
+              <div>
+                <TextField
+                  id="issue-filter"
+                  label="Filtered Search"
+                  value={this.state.searchField}
+                  onChange={(e) => this.setState({searchField: e.target.value})}
+                  margin="normal"
+                  variant="filled"
+                  style={styles.filterSearch} />
+                <div style={styles.issuePane}>
+                  <TestResults 
+                    filters={this._getFilters()}
+                    displayIssue={(issue) => this.displayIssue(issue)}
+                    issueReport={this.state.issueReport}
+                  />
+                </div>
+              </div>
+                
               }
               {!this.state.issueReport &&
                 <p>No results have been received yet</p>
@@ -120,18 +194,44 @@ class App extends Component {
               <LinearProgress variant="indeterminate"/>}
           </Grid>
           <Grid item md={6} sm={12}>
-            {this.state.displayed &&
-              <TestImageDisplay
-                imagePath={this.state.displayed.imagePath}
-                highlights={this.state.displayed.highlights} />
-            }
-            {!this.state.displayed &&
-              <div>
-                <p>Hover over an issue to see more.</p>
-              </div>
-            }
+            <Grid container spacing={24}>
+              <Grid item md={12} sm={12} lg={6}>
+                {this.state.displayed &&
+                  <TestImageDisplay
+                    onHighlightHover={(p) => this.setState({highlightedPerceptifer: p})}
+                    imagePath={this.state.displayed.imagePath}
+                    highlights={this.state.displayed.highlights}
+                    originalData={this.state.displayed.originalData} />
+                }
+                {!this.state.displayed &&
+                  <div>
+                    <p>Hover over an issue to see more.</p>
+                  </div>
+                }
+              </Grid>
+              <Grid item md={12} sm={12} lg={6}>
+                {this.state.highlightedPerceptifer &&
+                  <TestHighlightDetail
+                    perceptifer={this.state.highlightedPerceptifer} />
+                }
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
+        { /*<ReactImageMagnify {...{
+            smallImage: {
+                alt: 'Automaton generated during this run',
+                isFluidWidth: true,
+                enlargedImagePosition: 'over',
+                src: 'http://localhost:8080/screens/auto.png'
+            },
+            largeImage: {
+                src: 'http://localhost:8080/screens/auto.png',
+                enlargedImagePosition: 'over',
+                width: 1200,
+                height: 1800
+            }
+        }} /> */}
       </div>
     );
   }
@@ -146,6 +246,13 @@ const styles = {
     maxHeight: 500,
     overflow: 'scroll',
     marginTop: 12,
+  },
+  bility: {
+    height: 100
+  },
+  filterSearch: {
+    width: '100%',
+    marginTop: 0
   }
 }
 

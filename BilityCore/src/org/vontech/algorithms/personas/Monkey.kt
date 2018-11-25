@@ -3,6 +3,8 @@ package org.vontech.algorithms.personas
 import org.vontech.algorithms.automatons.Automaton
 import org.vontech.algorithms.automatons.AutomatonState
 import org.vontech.algorithms.automatons.AutomatonTransition
+import org.vontech.algorithms.hci.blendColors
+import org.vontech.algorithms.personas.utils.Propagator
 import org.vontech.algorithms.rulebased.loggers.IssueReport
 import org.vontech.algorithms.rulebased.loggers.WCAG2IssuerLogger
 import org.vontech.algorithms.rulebased.loggers.WCAGLevel
@@ -41,6 +43,8 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 
     lateinit var automaton: Automaton<CondensedState, UserAction>
     var wcagLogger: WCAG2IssuerLogger = WCAG2IssuerLogger(WCAGLevel.A)
+    var visitHistory = mutableListOf<AutomatonState<CondensedState>>()
+    val visitSize = 5
 
     /**
      * A monkey employees the following internal states / goals.
@@ -61,21 +65,27 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
      */
     override fun updateInternalKnowledge(literalInterace: LiteralInterace) {
 
-        // Generate a new fuzzy state
+        // Generate a new fuzzy state, after doing some internal processing
+        understandLiteralInterface(literalInterace)
         val newState = CondensedState(literalInterace)
 
         // Update any memory based on this newState
         // ...
 
         // Add this state to the automation, based on the last decision made
+        val state = AutomatonState(newState)
         if (this.lastActionTaken != null) {
-            //this.lastActionTaken!!.provideContext(automaton.currentState.state.hashResults)
-            automaton.addTransition(AutomatonTransition(this.lastActionTaken!!), AutomatonState(newState))
+            automaton.addTransition(AutomatonTransition(this.lastActionTaken!!), state)
         } else {
-            automaton = Automaton(AutomatonState(newState))
+            automaton = Automaton(state)
             automaton.setImageFunction {
                 "$FILE_DB/screens/upload-${it.state.literalInterace.metadata.id}.png"
             }
+        }
+
+        visitHistory.add(state)
+        if (visitHistory.size > visitSize) {
+            visitHistory.removeAt(0)
         }
 
     }
@@ -91,7 +101,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         // It will randomly pick one of these actions, and then randomly select
         // an item to perform that action on
         println(actionCount)
-        if (actionCount > 500 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
+        if (actionCount > 100 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
             println("FINISHED AFTER $actionCount actions with ${automaton.statesWithUnexploredEdges().size} states unexplored")
             automaton.writeDotFile()
             automaton.dotFileToPng()
@@ -103,9 +113,20 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
             println("Generating accessibility report...")
             val result = wcagLogger.getAccessibilityReportAsString(automaton)
             println(result)
-            startFinishedAnalysis()
+            //startFinishedAnalysis()
             return action
         }
+
+        // Before anything - if there is an unexplored edge here, take it.
+        val unexploredHere = automaton.getUnexploredEdgesFrom(automaton.currentState)
+        if (unexploredHere.isNotEmpty()) {
+            println("DUDE !!!!!!! WE FOUND AN ACTION RIGHT HERE!")
+            val action = unexploredHere.first().label
+            action.provideContext(automaton.currentState.state.hashResults)
+            lastActionTaken = action
+            return action
+        }
+
 
         // TODO: Organize elements in a way that makes searching easy
         val clickable = literalInterace.perceptifers.filter {
@@ -182,8 +203,12 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 
         // But wait... if there are states with unexplored, we should go back to them!
         else if (pathToUnexplored != null && pathToUnexplored.isNotEmpty()) {
-            println("====== OPTED FOR TRAVELING TO OLD STATE!")
-            action = pathToUnexplored[0].label
+            if (isStuck()) {
+                println("$$$$$$$$ GOT STUCK $$$$$$$$")
+            } else {
+                println("====== OPTED FOR TRAVELING TO OLD STATE!")
+                action = pathToUnexplored[0].label
+            }
         }
 
         lastActionTaken = action
@@ -218,6 +243,62 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 
     fun askAboutCurrentIssues(): IssueReport {
         return wcagLogger.getAccessibilityReportAsJson(automaton)
+    }
+
+    private fun isStuck(): Boolean {
+        return visitHistory.toSet().size <= 3
+    }
+
+    private fun understandLiteralInterface(literalInterace: LiteralInterace) {
+
+        traverseAndDistributeBackgroundColor(literalInterace)
+
+    }
+
+    private fun traverseAndDistributeBackgroundColor(literalInterace: LiteralInterace) {
+
+        // Get mapping of ids to perceptifers
+        val idPerceptiferPairings = literalInterace.perceptifers.map {it.id to it}.toMap()
+
+        // Build tree using perceptifers and ids
+        val treeRoot = TreeNode(getRoot(idPerceptiferPairings.values).id)
+        buildTree(treeRoot, idPerceptiferPairings)
+
+        // Traverse through tree with prop object, setting background
+        val prop = Propagator()
+        prop.backgroundColorPercept = PerceptBuilder().createBackgroundColorPercept(0xFFFFFF).latestPercept
+        propagateBackgroundColor(treeRoot, idPerceptiferPairings, prop)
+
+
+    }
+
+    private fun propagateBackgroundColor(node: TreeNode<String>, idPerceptiferPairings: Map<String, Perceptifer>, prop: Propagator) {
+
+        val perceptifer = idPerceptiferPairings[node.value]!!
+        val theseColors = perceptifer.getPerceptsOfType(PerceptType.BACKGROUND_COLOR)
+
+        // If this node has colors, don't do anything to the Perceptifer - just update the propagated color
+        val newProp = prop.duplicate()
+        if (theseColors.isNotEmpty()) {
+
+            // First blend the colors
+            val oldColor = PerceptParser.fromColor(newProp.backgroundColorPercept!!).color.toLong()
+            val newColor = PerceptParser.fromColor(theseColors.toList()[0]).color.toLong()
+            val blendedColor = blendColors(listOf(oldColor, newColor))
+
+            newProp.backgroundColorPercept = PerceptBuilder().createBackgroundColorPercept(blendedColor.toInt()).latestPercept
+            println(newProp.backgroundColorPercept)
+
+        // Otherwise, set the color to the last prop color
+        } else {
+            perceptifer.percepts!!.add(prop.backgroundColorPercept!!)
+        }
+
+        node.children.forEach {
+            propagateBackgroundColor(it, idPerceptiferPairings, newProp)
+        }
+
+
     }
 
 }

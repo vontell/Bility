@@ -58,8 +58,8 @@ val gen = Random()
  * be perceived by a user.
  * NOTE: It is important that equals() always goes by reference equality here
  */
-class Perceptifer(val percepts: Set<Percept>?,
-                  val virtualPercepts: Set<Percept>?) {
+class Perceptifer(val percepts: MutableSet<Percept>?,
+                  val virtualPercepts: MutableSet<Percept>?) {
 
     val id: String = UUID.randomUUID().toString()
 
@@ -81,7 +81,7 @@ class Perceptifer(val percepts: Set<Percept>?,
  * Returns an empty perceptifer, useful for wait or NOOP
  */
 fun emptyPerceptifer(): Perceptifer {
-    return Perceptifer(setOf(), setOf())
+    return Perceptifer(mutableSetOf(), mutableSetOf())
 }
 
 /**

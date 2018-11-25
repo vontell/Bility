@@ -68,7 +68,7 @@ class CondensedState(val literalInterace: LiteralInterace) {
 
 }
 
-private fun buildTree(perceptifer: TreeNode<String>, idsToPerceptifers: HashMap<String, Perceptifer>) {
+fun buildTree(perceptifer: TreeNode<String>, idsToPerceptifers: Map<String, Perceptifer>) {
     val children = getIdsOfChildren(idsToPerceptifers[perceptifer.value]!!)
     children.forEach {
         val newNode = TreeNode(idsToPerceptifers[it]!!.id)

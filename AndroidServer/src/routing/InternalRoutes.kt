@@ -126,6 +126,7 @@ fun Route.internalRoutes() {
                 val numUnexplored = (androidSession?.person as Monkey).automaton.statesWithUnexploredEdges().size
                 val issues = (androidSession?.person as Monkey).askAboutCurrentIssues()
                 val toReport = FrontendReportInfo(automaton, lastAction, numUnexplored, issues)
+                println("REPORT HAS ${toReport.issueReport!!.dynamicIssues.size}")
                 call.respond(toReport)
             } else {
                 call.respond(FrontendReportInfo(null, null, null, null))

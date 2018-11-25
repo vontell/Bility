@@ -1,7 +1,9 @@
 package org.vontech.algorithms.rulebased.loggers
 
 import org.vontech.algorithms.automatons.Automaton
+import org.vontech.algorithms.hci.blendColors
 import org.vontech.algorithms.hci.getContrast
+import org.vontech.constants.GoogleAccessibilityScannerConstants
 import org.vontech.constants.WCAGConstants
 import org.vontech.core.interaction.InputInteractionType
 import org.vontech.core.interaction.KeyPress
@@ -33,10 +35,17 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
         )
     }
 
-    private fun getAllStaticIssues(p: Perceptifer): MutableList<StaticIssue> {
+    private fun getAllIndividualStaticIssues(p: Perceptifer): MutableList<StaticIssue> {
         val staticIssues = mutableListOf<StaticIssue>()
         logNonTextContentTextAlternatives(p)?.let { staticIssues.add(it) }
+        logMinimumTouchTargetSize(p)?.let { staticIssues.add(it) }
         logMinimumContrast(p).let { staticIssues.addAll(it) }
+        return staticIssues
+    }
+
+    private fun getAllScreenStaticIssues(literalInterace: LiteralInterace): MutableList<StaticIssue> {
+        val staticIssues = mutableListOf<StaticIssue>()
+        logSameScreenReaderContent(literalInterace)?.let { staticIssues.addAll(it) }
         return staticIssues
     }
 
@@ -70,6 +79,9 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         val textInfos = perceptifer.getPerceptsOfType(PerceptType.TEXT)
         val screenReaderInfos = perceptifer.getPerceptsOfType(PerceptType.VIRTUAL_SCREEN_READER_CONTENT)
+        val mediaInfos = perceptifer.getPerceptsOfType(PerceptType.MEDIA_TYPE)
+
+        val isImage = mediaInfos.any {PerceptParser.fromMediaType(it) == MediaType.IMAGE}
 
         // Build the base Issue
         val builder = IssuerBuilder()
@@ -79,8 +91,6 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         // Add this perceptifer
         builder.addPerceptifers(mutableListOf(perceptifer))
-
-        var hadEmptyText = false
 
         // First, if it was purely a container, ignore
         if (wasInvisible(perceptifer)) {
@@ -98,9 +108,12 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         .explanation(WCAGConstants.P111_TEXT_EXPLANATION)
                         .suggest(WCAGConstants.SUGGEST_NONE)
                 return builder.buildStaticIssue()
-            } else {
-                // TODO: If there was empty text, we better check the other percepts
-                hadEmptyText = true
+            } else if (screenReaderInfos.isEmpty()) {
+                builder
+                        .passes(false)
+                        .explanation(WCAGConstants.P111_SCREEN_READER_GONE_EXPLANATION)
+                        .suggest(WCAGConstants.SUGGEST_NONE)
+                return builder.buildStaticIssue()
             }
         }
         else {
@@ -112,10 +125,16 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         .explanation(WCAGConstants.P111_SCREEN_READER_AVAIL_EXPLANATION)
                         .suggest(WCAGConstants.SUGGEST_NONE)
                 builder.buildStaticIssue()
+            } else if (isImage) {
+                builder
+                        .passes(false)
+                        .explanation(WCAGConstants.P111_IMG_FAIL_EXPLANATION)
+                        .suggest(WCAGConstants.SUGGEST_NONE)
+                builder.buildStaticIssue()
             } else {
                 // TODO: Only pass if this is an exception. Otherwise, fail
                 builder
-                        .passes(false)
+                        .passes(true)
                         .explanation(WCAGConstants.P111_SCREEN_READER_GONE_EXPLANATION)
                         .suggest(WCAGConstants.SUGGEST_NONE)
                 builder.buildStaticIssue()
@@ -147,9 +166,17 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         // Test for each level of WCAG 2.0 compliance
         val issues = mutableListOf<StaticIssue>()
+        val sdf = listOf(foreground, background, fontSize, fontStyle)
+        if (foreground != null ) {
+            println("CONTRAST: $sdf")
+        }
         if (listOf(foreground, background, fontSize, fontStyle).none { it == null }) {
-            val foregroundColor = PerceptParser.fromColor(foreground!!)
+            var foregroundColor = PerceptParser.fromColor(foreground!!)
             val backgroundColor = PerceptParser.fromColor(background!!)
+
+            // Blend the foreground and background to get the true foreground with alpha
+            foregroundColor = Color(blendColors(listOf(backgroundColor.color.toLong(), foregroundColor.color.toLong())).toInt())
+
             val contrast = getContrast(foregroundColor.color.toLong(), backgroundColor.color.toLong())
             println("FOUND CONTRAST OF $contrast")
 
@@ -170,7 +197,18 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                             .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AA_LARGE_TEXT:1.")
                             .addPerceptifers(mutableListOf(perceptifer))
                     issues.add(builder.buildStaticIssue())
+                } else {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P143_NAME, WCAGConstants.P143_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P143_LEVEL, WCAGConstants.P143_LINK))
+                            .passes(true)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - this satisfies WCAG 2.0 Principle 1.4.3 compliance, which requires a contrast of $CONTRAST_AA_LARGE_TEXT:1 for large text.")
+                            .suggest(WCAGConstants.SUGGEST_NONE)
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
                 }
+
                 if (contrast < CONTRAST_AAA_LARGE_TEXT) {
                     val builder = IssuerBuilder()
                     builder.initialize(WCAGConstants.P146_NAME, WCAGConstants.P146_SHORT,
@@ -179,6 +217,16 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                             .passes(false)
                             .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - for WCAG 2.0 Principle 1.4.6 compliance, a contrast of $CONTRAST_AAA_LARGE_TEXT:1 is needed for compliance on large text.")
                             .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AAA_LARGE_TEXT:1.")
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
+                } else {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P146_NAME, WCAGConstants.P146_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P146_LEVEL, WCAGConstants.P146_LINK))
+                            .passes(true)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - this satisfies WCAG 2.0 Principle 1.4.6 compliance, which requires a contrast of $CONTRAST_AAA_LARGE_TEXT:1 for large text.")
+                            .suggest(WCAGConstants.SUGGEST_NONE)
                             .addPerceptifers(mutableListOf(perceptifer))
                     issues.add(builder.buildStaticIssue())
                 }
@@ -195,7 +243,18 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                             .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AA_NORMAL_TEXT:1.")
                             .addPerceptifers(mutableListOf(perceptifer))
                     issues.add(builder.buildStaticIssue())
+                } else {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P143_NAME, WCAGConstants.P143_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P143_LEVEL, WCAGConstants.P143_LINK))
+                            .passes(true)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - this satisfies WCAG 2.0 Principle 1.4.3 compliance, which requires a contrast of $CONTRAST_AA_NORMAL_TEXT:1 for normal text.")
+                            .suggest(WCAGConstants.SUGGEST_NONE)
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
                 }
+
                 if (contrast < CONTRAST_AAA_NORMAL_TEXT) {
                     val builder = IssuerBuilder()
                     builder.initialize(WCAGConstants.P146_NAME, WCAGConstants.P146_SHORT,
@@ -206,17 +265,106 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                             .suggest("Increase the contrast between the background and foreground text on this text object to at least $CONTRAST_AAA_NORMAL_TEXT:1.")
                             .addPerceptifers(mutableListOf(perceptifer))
                     issues.add(builder.buildStaticIssue())
+                } else {
+                    val builder = IssuerBuilder()
+                    builder.initialize(WCAGConstants.P146_NAME, WCAGConstants.P146_SHORT,
+                            WCAGConstants.P143_LONG)
+                            .extras(WCAGExtras(WCAGConstants.P146_LEVEL, WCAGConstants.P146_LINK))
+                            .passes(true)
+                            .explanation("This text object's foreground color (#${foregroundColor.colorHex}) has a contrast against the background (#${backgroundColor.colorHex}) of $contrast:1 - this satisifes WCAG 2.0 Principle 1.4.6 compliance, which requires a contrast of $CONTRAST_AAA_NORMAL_TEXT:1 for normal text.")
+                            .suggest(WCAGConstants.SUGGEST_NONE)
+                            .addPerceptifers(mutableListOf(perceptifer))
+                    issues.add(builder.buildStaticIssue())
                 }
 
             }
 
         }
 
-
-
-
         return issues
     }
+
+    private fun logSameScreenReaderContent(literalInterace: LiteralInterace): List<StaticIssue> {
+
+        val contentToPerceptifers = HashMap<String, MutableList<Perceptifer>>().withDefault { mutableListOf() }
+
+        // First collect all screen reader contents
+        literalInterace.perceptifers.forEach {
+            val screenReaderContent = it.getPerceptsOfType(PerceptType.VIRTUAL_SCREEN_READER_CONTENT).firstOrNull()
+            if (screenReaderContent != null) {
+                val content = PerceptParser.fromScreenReaderContent(screenReaderContent)
+                contentToPerceptifers[content]!!.add(it)
+            }
+        }
+
+        // For each content, check if there are multiple percepts with that information. If so, report an issue
+        val issues = mutableListOf<StaticIssue>()
+        contentToPerceptifers.forEach { t, u ->
+            if (u.size > 1) {
+                val builder = IssuerBuilder()
+                builder.initialize(GoogleAccessibilityScannerConstants.DUP_CONTENT_NAME, GoogleAccessibilityScannerConstants.DUP_CONTENT_SHORT,
+                        GoogleAccessibilityScannerConstants.DUP_CONTENT_LONG)
+                        .extras(WCAGExtras(GoogleAccessibilityScannerConstants.DUP_CONTENT_LEVEL, GoogleAccessibilityScannerConstants.DUP_CONTENT_LINK))
+                        .passes(false)
+                        .explanation(GoogleAccessibilityScannerConstants.DUP_CONTENT_EXPLANATION)
+                        .suggest(GoogleAccessibilityScannerConstants.DUP_CONTENT_SUGGESTION)
+                        .addPerceptifers(u)
+                issues.add(builder.buildStaticIssue())
+            } else {
+                val builder = IssuerBuilder()
+                builder.initialize(GoogleAccessibilityScannerConstants.DUP_CONTENT_NAME, GoogleAccessibilityScannerConstants.DUP_CONTENT_SHORT,
+                        GoogleAccessibilityScannerConstants.DUP_CONTENT_LONG)
+                        .extras(WCAGExtras(GoogleAccessibilityScannerConstants.DUP_CONTENT_LEVEL, GoogleAccessibilityScannerConstants.DUP_CONTENT_LINK))
+                        .passes(true)
+                        .explanation(GoogleAccessibilityScannerConstants.DUP_CONTENT_EXPLANATION_GOOD)
+                        .suggest(WCAGConstants.SUGGEST_NONE)
+                        .addPerceptifers(u)
+                issues.add(builder.buildStaticIssue())
+            }
+        }
+
+        return issues
+
+    }
+
+
+    private fun logMinimumTouchTargetSize(perceptifer: Perceptifer): StaticIssue? {
+
+        // Check if this element is interactive
+        val interactive = perceptifer.getPerceptsOfType(PerceptType.VIRTUALLY_CLICKABLE).isNotEmpty()
+
+        if (interactive) {
+
+            val builder = IssuerBuilder()
+            builder.initialize(WCAGConstants.P255_NAME, WCAGConstants.P255_SHORT,
+                    WCAGConstants.P255_LONG)
+                    .extras(WCAGExtras(WCAGConstants.P255_LEVEL, WCAGConstants.P255_LINK))
+
+            val size = perceptifer.getPerceptsOfType(PerceptType.SIZE).firstOrNull()
+            if (size != null) {
+                val realSize = PerceptParser.fromSize(size)
+                return if (realSize.height < 44 || realSize.width < 44) {
+                    builder
+                        .passes(false)
+                        .explanation("This interactive element had a height of ${realSize.height} and a width of ${realSize.width}.")
+                        .suggest(WCAGConstants.P255_SUGGESTION)
+                        .addPerceptifers(mutableListOf(perceptifer))
+                    builder.buildStaticIssue()
+                } else {
+                    builder
+                        .passes(true)
+                        .explanation("This interactive element had a height of ${realSize.height} and a width of ${realSize.width}.")
+                        .suggest(WCAGConstants.SUGGEST_NONE)
+                        .addPerceptifers(mutableListOf(perceptifer))
+                    builder.buildStaticIssue()
+                }
+            }
+        }
+
+        return null
+
+    }
+
 
     /**
      * Logs any issues resulting from a change in focus causing the context of the application to change
@@ -247,9 +395,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         val issue = IssuerBuilder()
                                 .initialize(WCAGConstants.P321_NAME, WCAGConstants.P321_SHORT, WCAGConstants.P321_LONG)
                                 .explanation(WCAGConstants.P321_EXPLANATION)
-                                .addStartState(startState)
-                                .addEndState(it)
-                                .addTransition(transition)
+                                .addDynamicMapping(startState.state.literalInterace.metadata.id, transition.label, it.state.literalInterace.metadata.id)
                                 .extras(WCAGExtras(WCAGConstants.P321_LEVEL, WCAGConstants.P321_LINK))
                                 .passes(false)
                                 .suggest(WCAGConstants.SUGGEST_NONE)
@@ -307,7 +453,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         val issue = IssuerBuilder()
                                 .initialize(WCAGConstants.P211_NAME, WCAGConstants.P211_SHORT, WCAGConstants.P211_LONG)
                                 .explanation(WCAGConstants.P211_EXPLANATION)
-                                .addEndState(it.key)
+                                .addDynamicMapping(null, null, it.key.state.literalInterace.metadata.id)
                                 .extras(WCAGExtras(WCAGConstants.P211_LEVEL, WCAGConstants.P211_LINK))
                                 .passes(false)
                                 .suggest(WCAGConstants.SUGGEST_NONE)
@@ -316,6 +462,18 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                     }
                 }
             }
+        }
+
+        // If no keyboard issues were found, report a pass
+        if (keyboardIssues.isEmpty()) {
+            val issue = IssuerBuilder()
+                    .initialize(WCAGConstants.P211_NAME, WCAGConstants.P211_SHORT, WCAGConstants.P211_LONG)
+                    .explanation(WCAGConstants.P211_PASS_EXPLANATION)
+                    .extras(WCAGExtras(WCAGConstants.P211_LEVEL, WCAGConstants.P211_LINK))
+                    .passes(true)
+                    .suggest(WCAGConstants.SUGGEST_NONE)
+                    .buildDynamicIssue()
+            keyboardIssues.add(issue)
         }
 
         return keyboardIssues
@@ -349,9 +507,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         val issue = IssuerBuilder()
                                 .initialize(WCAGConstants.P325_NAME, WCAGConstants.P325_SHORT, WCAGConstants.P325_LONG)
                                 .explanation(WCAGConstants.P325_EXPLANATION)
-                                .addStartState(startState)
-                                .addEndState(it)
-                                .addTransition(transition)
+                                .addDynamicMapping(startState.state.literalInterace.metadata.id, transition.label, it.state.literalInterace.metadata.id)
                                 .extras(WCAGExtras(WCAGConstants.P325_LEVEL, WCAGConstants.P325_LINK))
                                 .passes(false)
                                 .suggest(WCAGConstants.SUGGEST_NONE)
@@ -390,7 +546,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                     val ids = analysisResults.hashesToIds[it]!!
                     val representative = analysisResults.idsToPerceptifers[ids.first()]!!
                     val rest = ids.subList(1, ids.count()).map { analysisResults.idsToPerceptifers[it]!! }
-                    val staticIssues = getAllStaticIssues(representative)
+                    val staticIssues = getAllIndividualStaticIssues(representative)
                     // Then add all other perceptifers to this
                     staticIssues.forEach {
                         it.perceptifers.addAll(rest)
@@ -466,9 +622,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                     builder.appendln("\t\t Description: ${issue.shortDescription}")
                     builder.appendln("\t\t Explanation: ${issue.instanceExplanation}")
                     builder.appendln("\t\t Suggestion: ${issue.suggestionExplanation}")
-                    builder.appendln("\t\t Start state: ${issue.startState}")
-                    builder.appendln("\t\t End state: ${issue.endState}")
-                    builder.appendln("\t\t Transition: ${issue.transition}")
+                    builder.appendln("\t\t Mappings: ${issue.mappings}")
                     builder.appendln("\t\t WCAG Details: ${issue.extras}")
                 }
             }
