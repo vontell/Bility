@@ -53,6 +53,7 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
     val acceptStates = mutableSetOf<AutomatonState<S>>()
 
     private var imageGetter: ((AutomatonState<S>) -> String)? = null
+    private var webImageGetter: ((AutomatonState<S>) -> String)? = null
 
     // Transitions are maps from one state to other states along transitions
     val transitions = hashMapOf<AutomatonState<S>, HashMap<AutomatonTransition<T>, HashSet<AutomatonState<S>>>>()
@@ -143,7 +144,8 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
     fun getUnexplored(): AutomatonTransition<T>? {
         if (currentState in transitions) {
             transitions[currentState]!!.keys.forEach {
-                if (transitions[currentState]!![it]!!.isEmpty()) {
+                val dests = transitions[currentState]!![it]!!
+                if (dests.isEmpty() || ) {
                     return it
                 }
             }
@@ -261,9 +263,9 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         }
 
         // Before finishing, if an image converter is given, add those to the end
-        if (this.imageGetter != null) {
+        if (this.webImageGetter != null) {
             this.states.forEach {
-                dotFile.append("\"${it.state.toString()}\" [image=\"${this.imageGetter!!(it)}\" label=\"\" shape=\"none\"];\n\t")
+                dotFile.append("\"${it.state.toString()}\" [image=\"${this.webImageGetter!!(it)}\" label=\"\" shape=\"none\"];\n\t")
             }
         }
 
@@ -289,6 +291,10 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
      */
     fun setImageFunction(imageGetter: (AutomatonState<S>) -> String) {
         this.imageGetter = imageGetter
+    }
+
+    fun setWebImageFunction(imageGetter: (AutomatonState<S>) -> String) {
+        this.webImageGetter = imageGetter
     }
 
     fun writeDotFile(path: String = "$FILE_DB/auto.dot") {
@@ -356,6 +362,7 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         newAutomaton.transitions.putAll(this.transitions)
         newAutomaton.acceptStates.addAll(this.acceptStates)
         newAutomaton.imageGetter = this.imageGetter
+        newAutomaton.webImageGetter = this.webImageGetter
         return newAutomaton
     }
 
@@ -379,7 +386,7 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
     }
 
     fun getUnexploredEdgesFrom(state: AutomatonState<S>):  List<AutomatonTransition<T>> {
-        return transitions[startState]!!.keys.filter { transitions[startState]!![it]!!.any { it.state == null } }
+        return transitions[state]!!.keys.filter { transitions[state]!![it]!!.any { it.state == null } }
     }
 
     /**

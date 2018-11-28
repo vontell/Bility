@@ -59,6 +59,7 @@ public class BilityTester {
     private AndroidAppTestConfig config;
     private final UiDevice device;
     private ServerConnection serverConnection;
+    private BilityTestConfig setup;
 
     private final int SWIPE_STEP_COUNT = 100;
 
@@ -71,10 +72,11 @@ public class BilityTester {
      *  2) Downloading the testing configuration from the test server
      * @param instrumentation The instrumentation for this specific test
      */
-    public BilityTester(String host, Instrumentation instrumentation) {
+    public BilityTester(String host, Instrumentation instrumentation, BilityTestConfig setup) {
         this.device = UiDevice.getInstance(instrumentation);
         serverConnection = new ServerConnection(host);
         config = serverConnection.getAppConfig();
+        this.setup = setup;
 
         // Instantiate some constants
         keyMap.put(KeyPress.TAB, KEYCODE_TAB);

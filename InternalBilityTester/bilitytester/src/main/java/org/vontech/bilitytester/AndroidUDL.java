@@ -22,7 +22,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -41,7 +40,6 @@ import org.vontech.core.interfaces.Perceptifer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +55,6 @@ import java.util.UUID;
  */
 public class AndroidUDL {
 
-    Integer actionBarId = null;
-
     public static LiteralInterace getLiteralInterfaceFromActivity(Activity activity) {
 
         // First create perceptifers for views
@@ -71,34 +67,39 @@ public class AndroidUDL {
         List<View> rootViews = getViewRoots();
         rootViews.remove(activityRootView);
 
-        // Create the base percepts for the activity rootView
-        // Do a traversal through the tree
-        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, false);
+//        // Create the base percepts for the activity rootView
+//        // Do a traversal through the tree
+//        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, false);
+//        perceptifers.addAll(activityResult.second);
+//
+//        // Now do it for every other rootView, then adding the Perceptifer as a child of the activity perceptifer
+//        Set<Perceptifer> windowChildren = new HashSet<>();
+//        windowChildren.add(activityResult.first);
+//        for (View rootView : rootViews) {
+//
+//            // Do a traversal through the tree
+//            Pair<Perceptifer, Set<Perceptifer>> otherProcessed = traverseAndGeneratePerceptifers(activity, rootView, false);
+//
+//            // TODO: Now add this perceptifer as a child to the activity perceptifer
+//
+//            // Finally, add these percepts to all percepts as well
+//            perceptifers.addAll(otherProcessed.second);
+//            windowChildren.add(otherProcessed.first);
+//
+//        }
+//
+//        Perceptifer finalRoot = new PerceptBuilder()
+//                .createVirtualRootPercept()
+//                .createLocationPercept(0, 0)
+//                .createRoughViewOrderingPercept(windowChildren)
+//                .buildPerceptifer();
+//
+//        perceptifers.add(finalRoot);
+
+        // REMOVE AFTER TEST
+        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, true);
         perceptifers.addAll(activityResult.second);
 
-        // Now do it for every other rootView, then adding the Perceptifer as a child of the activity perceptifer
-        Set<Perceptifer> windowChildren = new HashSet<>();
-        windowChildren.add(activityResult.first);
-        for (View rootView : rootViews) {
-
-            // Do a traversal through the tree
-            Pair<Perceptifer, Set<Perceptifer>> otherProcessed = traverseAndGeneratePerceptifers(activity, rootView, false);
-
-            // TODO: Now add this perceptifer as a child to the activity perceptifer
-
-            // Finally, add these percepts to all percepts as well
-            perceptifers.addAll(otherProcessed.second);
-            windowChildren.add(otherProcessed.first);
-
-        }
-
-        Perceptifer finalRoot = new PerceptBuilder()
-                .createVirtualRootPercept()
-                .createLocationPercept(0, 0)
-                .createRoughViewOrderingPercept(windowChildren)
-                .buildPerceptifer();
-
-        perceptifers.add(finalRoot);
 
         // Then create perceptifers for device buttons
         perceptifers.addAll(getPhysicalButtonPerceptifers(activity));
@@ -211,7 +212,7 @@ public class AndroidUDL {
         builder.createSizePercept(rectf.width(), rectf.height());
         builder.createAlphaPercept(v.getAlpha());
         builder.createClickableVirtualPercept(v.hasOnClickListeners());
-        builder.createFocusableVirtualPercept(v.hasFocus());
+        builder.createFocusableVirtualPercept(v.isFocused());
         builder.createIdentifierVirtualPercept(v.getId());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.createNameVirtualPercept(v.getAccessibilityClassName().toString());
@@ -227,9 +228,11 @@ public class AndroidUDL {
         if (background instanceof ColorDrawable) {
             builder.createBackgroundColorPercept(((ColorDrawable) background).getColor());
         } else if (background != null) {
-//            Bitmap bitmap = drawableToBitmap(background);
-//            ColorArt colorArt = new ColorArt(bitmap);
-//            builder.createBackgroundColorPercept(colorArt.getBackgroundColor());
+            Bitmap bitmap = drawableToBitmap(background);
+            if (bitmap != null) {
+                ColorArt colorArt = new ColorArt(bitmap);
+                builder.createBackgroundColorPercept(colorArt.getBackgroundColor());
+            }
         }
 
         // If root, add root indicator
@@ -415,6 +418,7 @@ public class AndroidUDL {
     }
 
     public static Bitmap drawableToBitmap (Drawable drawable) {
+
         Bitmap bitmap = null;
 
         if (drawable instanceof BitmapDrawable) {
@@ -424,16 +428,8 @@ public class AndroidUDL {
             }
         }
 
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
-            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
-        } else {
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        }
+        return null;
 
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
     }
 
 //    static ViewGroup combineGroups(List<View> groups) {
