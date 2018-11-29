@@ -102,6 +102,20 @@ data class LiteralInterace(
     val metadata: LiteralInterfaceMetadata
 )
 
+fun getLiteralInterfacePrettyString(literalInterace: LiteralInterace): String {
+    val builder = StringBuilder()
+    builder.append(literalInterace.metadata.toString() + "\n")
+    literalInterace.perceptifers.forEach {
+        builder.append("\tPerceptifer w/ ID ${it.id}\n")
+        it.percepts!!.forEach {
+            builder.append("\t\t(R) $it\n")
+        }
+        it.virtualPercepts!!.forEach {
+            builder.append("\t\t(V) $it\n")
+        }
+    }
+    return builder.toString()
+}
 /**
  * Given a perceptifer, returns the IDs of it's in-order children, or
  * an empty list if his perceptifer has no children

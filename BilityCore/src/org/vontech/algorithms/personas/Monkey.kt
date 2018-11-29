@@ -18,6 +18,7 @@ import org.vontech.utils.cast
 import org.vontech.utils.random
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.roundToInt
 
 /**
  * A representation of a user which clicks randomly through a user interface
@@ -90,13 +91,15 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 
     override fun reactToNewUserInterface(literalInterace: LiteralInterace): UserAction {
 
+        //println(getLiteralInterfacePrettyString(literalInterace))
+
         // Print some info
         println(actionCount)
         val statesWithUnexplored = automaton.statesWithUnexploredEdges()
         println("Currently have ${statesWithUnexplored.size} states with unexplored edges")
 
         // Base case - the persona terminates the text, sending a QUIT action
-        if (actionCount > 100 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
+        if (actionCount > 400 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
             println("FINISHED AFTER $actionCount actions with ${automaton.statesWithUnexploredEdges().size} states unexplored")
             automaton.writeDotFile()
             automaton.dotFileToPng()
@@ -129,44 +132,41 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 //                it.type == PerceptType.PHYSICAL_BUTTON &&
 //                        it.information.cast<PhysicalButton>().name == "BACK" } }
 
+        // Logic:
+        // Get all potential actions this turn (DONE)
+        // Filter out actions that have been completed previously
+        // Choose an action to take, if any
+        // Remove all existing potential actions from this state
+        // Add other newly detected potential actions from this round
+
+        val currentPotentialActions = mutableListOf<AutomatonTransition<UserAction>>()
         clickable.forEach {
             val potentialAction = AutomatonTransition(UserAction(InputInteractionType.CLICK, it, getMidpoint(it)))
             potentialAction.label.provideContext(automaton.currentState.state.hashResults)
-            automaton.addTransition(potentialAction, null)
-            println("ADDED POTENTIAL CLICK")
+            currentPotentialActions.add(potentialAction)
         }
         swipeable.forEach {
             val potentialAction = AutomatonTransition(UserAction(InputInteractionType.SWIPE, it, generateRandomSwipe(it)))
             potentialAction.label.provideContext(automaton.currentState.state.hashResults)
-            automaton.addTransition(potentialAction, null)
-            println("ADDED POTENTIAL SWIPE")
+            currentPotentialActions.add(potentialAction)
         }
         KeyPress.values().forEach {
             val potentialAction = AutomatonTransition(UserAction(InputInteractionType.KEYPRESS, EmptyPerceptifer, it))
             potentialAction.label.provideContext(automaton.currentState.state.hashResults)
             potentialAction.label.overrideString("label=KEYPRESS of ${it.name}")
-            automaton.addTransition(potentialAction, null)
-            println("ADDED POTENTIAL KEYPRESS")
+            currentPotentialActions.add(potentialAction)
         }
 
+        val neverTaken = currentPotentialActions.filter { !automaton.hasExplored(it) }.toMutableList()
 
-        // If this state has unexplored, take that action
-//        val unexploredHere = automaton.getUnexploredEdgesFrom(automaton.currentState)
-//        if (unexploredHere.isNotEmpty()) {
-//            println("DUDE !!!!!!! WE FOUND AN ACTION RIGHT HERE!")
-//            val action = unexploredHere.first().label
-//            action.provideContext(automaton.currentState.state.hashResults)
-//            lastActionTaken = action
-//            return action
-//        }
-
-        val unexplored = automaton.getUnexplored()
-        if (unexplored != null) {
-            println("DUDE !!!!!!! WE FOUND AN ACTION RIGHT HERE!")
-            val action = unexplored.label
-            action.provideContext(automaton.currentState.state.hashResults)
-            lastActionTaken = action
-            return action
+        if (neverTaken.isNotEmpty()) {
+            val chosenAction = neverTaken.removeAt(0)
+            automaton.removeUnexploredFromThisState()
+            neverTaken.forEach {
+                automaton.addTransition(it, null)
+            }
+            lastActionTaken = chosenAction.label
+            return chosenAction.label
         }
 
         // If stuck, take a random action
@@ -182,11 +182,11 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         }
         randomAction.provideContext(automaton.currentState.state.hashResults)
 
-//        if (isStuck()) {
-//            println("GOT STUCK, TAKING RANDOM ACTION")
-//            lastActionTaken = randomAction
-//            return randomAction
-//        }
+        if (isStuck()) {
+            println("GOT STUCK, TAKING RANDOM ACTION")
+            lastActionTaken = randomAction
+            return randomAction
+        }
 
 
         // Otherwise, take an action towards an unexplored state
@@ -235,7 +235,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
     }
 
     private fun isStuck(): Boolean {
-        return (visitHistory.toSet().size / (visitHistory.size + 1)) <= 0.5
+        return visitHistory.toSet().size <= (0.3 * automaton.states.size).roundToInt()
     }
 
     private fun understandLiteralInterface(literalInterace: LiteralInterace) {

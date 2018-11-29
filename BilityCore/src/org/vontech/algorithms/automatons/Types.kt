@@ -145,7 +145,8 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         if (currentState in transitions) {
             transitions[currentState]!!.keys.forEach {
                 val dests = transitions[currentState]!![it]!!
-                if (dests.isEmpty() || ) {
+                if (dests.isEmpty()) {
+                    println(it)
                     return it
                 }
             }
@@ -154,9 +155,24 @@ class Automaton<S, T>(private val startState: AutomatonState<S>) {
         return null
     }
 
+    fun removeUnexploredFromThisState() {
+        if (currentState in transitions) {
+            val shouldRemove = mutableListOf<AutomatonTransition<T>>()
+            transitions[currentState]!!.keys.forEach {
+                val dests = transitions[currentState]!![it]!!
+                if (dests.isEmpty()) {
+                    shouldRemove.add(it)
+                }
+            }
+            shouldRemove.forEach {
+                transitions[currentState]!!.remove(it)
+            }
+        }
+    }
+
     fun hasExplored(transition: AutomatonTransition<T>): Boolean {
         val possibleStates = transitions[currentState]?.get(transition)
-        return possibleStates != null
+        return possibleStates != null && possibleStates.isNotEmpty()
     }
 
     fun statesWithUnexploredEdges(): List<AutomatonState<S>> {

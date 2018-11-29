@@ -40,7 +40,7 @@ class AndroidSession(val startEvent: StartupEvent) {
         val latest = collectedInterfaces.last()
 
         val nextAction = person.reactToNewUserInterface(latest)
-        logger?.info("DECIDED ON ${nextAction.type} on ${nextAction.perceptifer}")
+        logger?.info("DECIDED ON $nextAction")
 
         actionToTake = nextAction
 

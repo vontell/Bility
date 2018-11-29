@@ -162,6 +162,9 @@ public class ServerConnection {
      */
     Pair<Integer, String> sendScreenshot(String tag, Activity activity, int size, String sizeTag, UiDevice optionalDevice) {
 
+        System.out.println("SCREENSHOTTING");
+        System.out.println(optionalDevice);
+
         try {
 
             // First take the screenshot and save it to the device
@@ -179,8 +182,8 @@ public class ServerConnection {
                 // If device available, get size/scale and take screenshot
                 v1.setDrawingCacheEnabled(true);
                 Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-                float scale = getScale(bitmap, size);
-                optionalDevice.takeScreenshot(imageFile, scale, quality);
+                bitmap = scaleDown(bitmap, size, true);
+                optionalDevice.takeScreenshot(imageFile, 1.0f, quality); // TODO(google) - Gotta bug here
 
             } else {
 
@@ -229,9 +232,8 @@ public class ServerConnection {
         int width = Math.round((float) ratio * realImage.getWidth());
         int height = Math.round((float) ratio * realImage.getHeight());
 
-        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
+        return Bitmap.createScaledBitmap(realImage, width,
                 height, filter);
-        return newBitmap;
     }
 
     public static float getScale(Bitmap realImage, float maxImageSize) {
