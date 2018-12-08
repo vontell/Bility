@@ -222,3 +222,76 @@ docker pull tesseractshadow/tesseract4re
 <div align="center">
   <img height="300px" src="Design/test.png"><br />
 </div>
+
+## Comparison to Other Frameworks and Tools
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-88nc{font-weight:bold;border-color:inherit;text-align:center}
+.tg .tg-kiyi{font-weight:bold;border-color:inherit;text-align:left}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-uys7{border-color:inherit;text-align:center}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-xldj{border-color:inherit;text-align:left}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-kiyi">Feature</th>
+    <th class="tg-88nc">Bility</th>
+    <th class="tg-amwm">Google Accessibility Scanner</th>
+    <th class="tg-amwm">Espresso</th>
+    <th class="tg-amwm">Lint</th>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Automated</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Static Code Checking</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh">&#9989;</td>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Runtime Static Checking</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Low Contrast Detection</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Screen Reader Label Detection</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Keyboard Trap Detection</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Multi-platform Extendable</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+  </tr>
+</table>
