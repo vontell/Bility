@@ -16,8 +16,8 @@ val thisContainer: ContainerInfo = ContainerInfo("0.0.1")
 var logger: Logger? = null
 
 // TODO: Remove the default config
-var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("org.vontech.internalbilitytester")
-//var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("com.danielkim.soundrecorder")
+//var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("org.vontech.internalbilitytester")
+var testConfig: AndroidAppTestConfig? = AndroidAppTestConfig("com.danielkim.soundrecorder")
 
 
 // TODO: INSTEAD OF GLOBAL VARIABLES, CREATE A CONTEXT

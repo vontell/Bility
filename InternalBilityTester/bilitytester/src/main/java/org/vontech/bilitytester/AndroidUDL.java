@@ -40,6 +40,8 @@ import org.vontech.core.interfaces.Perceptifer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -414,6 +416,9 @@ public class AndroidUDL {
         }
 
         System.out.println("&&&&&&&& " + rootViews.size());
+
+        // Remove any null views
+        rootViews.removeAll(Collections.singleton(null));
 
         return rootViews;
     }

@@ -75,6 +75,26 @@ class App extends Component {
     
   }
 
+  downloadProject() {
+
+    let result = {
+      project: this.state.project,
+      issues: this.state.issueReport
+    }
+
+    var a = window.document.createElement('a');
+    a.href = window.URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], {type: 'text/plain'}));
+    a.download = 'bility.json';
+    
+    // Append anchor to body.
+    document.body.appendChild(a);
+    a.click();
+    
+    // Remove anchor from body
+    document.body.removeChild(a);
+
+  }
+
   reloadReportInfo() {
     axios.get('http://localhost:8080/internal/getFrontendReport')
     .then((res) => {
@@ -144,7 +164,9 @@ class App extends Component {
               alt="Logo for the Bility Project"
               style={styles.bility}/>
             {this.state.project &&
+              <div>
                 <TestInfo info={this.state.project}></TestInfo>
+              </div>
             }
             <Button variant="contained" color="primary" onClick={() => this.startListeningLoop()}>
               {this.state.listening ? 'Stop Bility Test' : 'Start Bility Test'}
@@ -162,7 +184,11 @@ class App extends Component {
           </Grid>
           <Grid item md={6} sm={12}>
             {this.state.issueReport && 
-              <TestSummary issueReport={this.state.issueReport}/>}
+              <div>
+                <TestSummary issueReport={this.state.issueReport}/>
+                <Button variant="contained" color="primary" onClick={() => this.downloadProject()}>Download Results</Button>
+              </div>
+            }
           </Grid>
         </Grid>
 
