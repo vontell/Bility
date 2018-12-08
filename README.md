@@ -225,18 +225,6 @@ docker pull tesseractshadow/tesseract4re
 
 ## Comparison to Other Frameworks and Tools
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-.tg .tg-88nc{font-weight:bold;border-color:inherit;text-align:center}
-.tg .tg-kiyi{font-weight:bold;border-color:inherit;text-align:left}
-.tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-uys7{border-color:inherit;text-align:center}
-.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-xldj{border-color:inherit;text-align:left}
-.tg .tg-0lax{text-align:left;vertical-align:top}
-</style>
 <table class="tg">
   <tr>
     <th class="tg-kiyi">Feature</th>
