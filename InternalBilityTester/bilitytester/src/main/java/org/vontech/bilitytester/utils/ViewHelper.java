@@ -58,4 +58,13 @@ public class ViewHelper {
         return activity.findViewById(android.R.id.content);
     }
 
+    /**
+     * Returns the root view of a given View
+     * @param view The View to get the root view of
+     * @return The root view of the View (as defined by android.R.id.content)
+     */
+    public static View getRootView(View view) {
+        return view.findViewById(android.R.id.content);
+    }
+
 }

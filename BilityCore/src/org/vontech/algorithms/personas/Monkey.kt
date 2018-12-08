@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
  * actions that it has already done.
  * @author Aaron Vontell
  * @created August 12th, 2018
- * @updated October 16th, 2018
+ * @updated December 8th, 2018
  */
 class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) {
 
@@ -99,7 +99,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
         println("Currently have ${statesWithUnexplored.size} states with unexplored edges")
 
         // Base case - the persona terminates the text, sending a QUIT action
-        if (actionCount > 400 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
+        if (actionCount > 100 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
             println("FINISHED AFTER $actionCount actions with ${automaton.statesWithUnexploredEdges().size} states unexplored")
             automaton.writeDotFile()
             automaton.dotFileToPng()

@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.vontech.bilitytester.utils.ViewHelper.getRootView;
+
 /**
  * The AndroidUDL class assists in converting Android user interfaces (i.e. objects
  * such as Activities and fragments) into literal interfaces within the Universal
@@ -63,46 +65,45 @@ public class AndroidUDL {
         // Fill up some references for later
 
         // Then get all root views, finding the activity rootView as well
-        View activityRootView = ViewHelper.getRootView(activity);
+        View activityRootView = getRootView(activity);
         List<View> rootViews = getViewRoots();
-        rootViews.remove(activityRootView);
+        boolean removed = rootViews.remove(activityRootView);
+        if (removed) {
+            System.out.println("actually removed the root view");
+        }
 
-//        // Create the base percepts for the activity rootView
-//        // Do a traversal through the tree
-//        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, false);
-//        perceptifers.addAll(activityResult.second);
-//
-//        // Now do it for every other rootView, then adding the Perceptifer as a child of the activity perceptifer
-//        Set<Perceptifer> windowChildren = new HashSet<>();
-//        windowChildren.add(activityResult.first);
-//        for (View rootView : rootViews) {
-//
-//            // Do a traversal through the tree
-//            Pair<Perceptifer, Set<Perceptifer>> otherProcessed = traverseAndGeneratePerceptifers(activity, rootView, false);
-//
-//            // TODO: Now add this perceptifer as a child to the activity perceptifer
-//
-//            // Finally, add these percepts to all percepts as well
-//            perceptifers.addAll(otherProcessed.second);
-//            windowChildren.add(otherProcessed.first);
-//
-//        }
-//
-//        Perceptifer finalRoot = new PerceptBuilder()
-//                .createVirtualRootPercept()
-//                .createLocationPercept(0, 0)
-//                .createRoughViewOrderingPercept(windowChildren)
-//                .buildPerceptifer();
-//
-//        perceptifers.add(finalRoot);
-
-        // REMOVE AFTER TEST
-        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, true);
+        // Create the base percepts for the activity rootView
+        // Do a traversal through the tree
+        Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, false);
         perceptifers.addAll(activityResult.second);
+
+        // Now do it for every other rootView, then adding the Perceptifer as a child of the activity perceptifer
+        Set<Perceptifer> windowChildren = new HashSet<>();
+        windowChildren.add(activityResult.first);
+        for (View rootView : rootViews) {
+
+            // Do a traversal through the tree
+            Pair<Perceptifer, Set<Perceptifer>> otherProcessed = traverseAndGeneratePerceptifers(activity, rootView, false);
+
+            // TODO: Now add this perceptifer as a child to the activity perceptifer
+
+            // Finally, add these percepts to all percepts as well
+            perceptifers.addAll(otherProcessed.second);
+            windowChildren.add(otherProcessed.first);
+
+        }
+
+        Perceptifer finalRoot = new PerceptBuilder()
+                .createVirtualRootPercept()
+                .createLocationPercept(0, 0)
+                .createRoughViewOrderingPercept(windowChildren)
+                .buildPerceptifer();
+
+        perceptifers.add(finalRoot);
 
 
         // Then create perceptifers for device buttons
-        perceptifers.addAll(getPhysicalButtonPerceptifers(activity));
+        //perceptifers.addAll(getPhysicalButtonPerceptifers(activity));
 
         Log.i("BILITY", "CREATED UNFILTERED PERCEPTIFERS");
 
@@ -393,13 +394,13 @@ public class AndroidUDL {
         List<View> rootViews = new ArrayList<>();
         for (ViewParent vp : viewRoots) {
             if (vp instanceof View) {
-                rootViews.add((View) vp);
+                rootViews.add(getRootView((View) vp));
             }
             if (vp.getClass().getCanonicalName().equals("android.view.ViewRootImpl")) {
                 try {
                     View view = (View) Class.forName("android.view.ViewRootImpl")
                             .getMethod("getView").invoke(vp);
-                    rootViews.add(view);
+                    rootViews.add(getRootView(view));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {

@@ -1,7 +1,10 @@
 package org.vontech.internalbilitytester;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +33,24 @@ public class SimpleExample extends AppCompatActivity {
         Button boldButton = findViewById(R.id.boldButton);
         Button italicButton = findViewById(R.id.italicButton);
 
+        final Context context = this;
+
+        findViewById(R.id.dialogButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Test Dialog")
+                        .setMessage("This is a test dialog that should be noticed during our run")
+                        .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        })
+                        .show();
+            }
+        });
+
         // Now set listeners
         regularButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,7 +58,6 @@ public class SimpleExample extends AppCompatActivity {
                 showGreenLabel();
             }
         });
-
 
         boldButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +81,9 @@ public class SimpleExample extends AppCompatActivity {
                 }
             });
         }
+
+        regularButton.setVisibility(View.GONE);
+        boldButton.setVisibility(View.GONE);
 
     }
 

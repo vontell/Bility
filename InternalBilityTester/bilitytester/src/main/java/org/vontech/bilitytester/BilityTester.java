@@ -155,8 +155,8 @@ public class BilityTester {
         //serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL", device);
         //serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB", device);
 
-        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL", null);
-        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB", null);
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL", device);
+        serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB", device);
 
         return loop();
 

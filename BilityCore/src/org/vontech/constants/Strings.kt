@@ -81,5 +81,5 @@ object GoogleAccessibilityScannerConstants {
 
 }
 
-//val FILE_DB = "/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB"
-val FILE_DB = "/home/aaron/Documents/Projects/BilityBuildSystem/AndroidServer/fileDB"
+val FILE_DB = "/Users/vontell/Documents/BilityBuildSystem/AndroidServer/fileDB"
+//val FILE_DB = "/home/aaron/Documents/Projects/BilityBuildSystem/AndroidServer/fileDB"

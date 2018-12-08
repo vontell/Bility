@@ -162,9 +162,6 @@ public class ServerConnection {
      */
     Pair<Integer, String> sendScreenshot(String tag, Activity activity, int size, String sizeTag, UiDevice optionalDevice) {
 
-        System.out.println("SCREENSHOTTING");
-        System.out.println(optionalDevice);
-
         try {
 
             // First take the screenshot and save it to the device
