@@ -222,3 +222,64 @@ docker pull tesseractshadow/tesseract4re
 <div align="center">
   <img height="300px" src="Design/test.png"><br />
 </div>
+
+## Comparison to Other Frameworks and Tools
+
+<table class="tg">
+  <tr>
+    <th class="tg-kiyi">Feature</th>
+    <th class="tg-88nc">Bility</th>
+    <th class="tg-amwm">Google Accessibility Scanner</th>
+    <th class="tg-amwm">Espresso</th>
+    <th class="tg-amwm">Lint</th>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Automated</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Static Code Checking</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh">&#9989;</td>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Runtime Static Checking</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-xldj">Low Contrast Detection</td>
+    <td class="tg-uys7">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Screen Reader Label Detection</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Keyboard Trap Detection</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Multi-platform Extendable</td>
+    <td class="tg-baqh">&#9989;</td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+    <td class="tg-baqh"></td>
+  </tr>
+</table>
