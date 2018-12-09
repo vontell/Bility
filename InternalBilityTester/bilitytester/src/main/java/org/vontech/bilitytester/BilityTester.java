@@ -92,7 +92,7 @@ public class BilityTester {
 
         Log.e("BILITY", "STARTING APP");
 
-        String appPackageName = config.getPackageName();
+        String appPackageName = setup.getPackageName();
 
         // Send info that the app has started
         serverConnection.sendStartupEvent(config);
