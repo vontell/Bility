@@ -82,6 +82,7 @@ public class ServerConnection {
 
             return testConfig;
         } catch (IOException e) {
+            Log.e("FAIL", e.getLocalizedMessage());
             e.printStackTrace();
         }
 

@@ -16,9 +16,12 @@ import java.util.*
 class AndroidSession(val startEvent: StartupEvent) {
 
     var person: Person = Monkey("Bobby", Random(2018))
+
     var collectedInterfaces: MutableList<LiteralInterace> = ArrayList()
 
     var actionToTake: UserAction = UserAction(InputInteractionType.NONE, emptyPerceptifer())
+
+    val log: SessionLogger = SessionLogger()
 
     fun giveNewLiteralInterface(literalInterace: LiteralInterace) {
 
@@ -54,6 +57,26 @@ class AndroidSession(val startEvent: StartupEvent) {
 
     fun compileResults() {
 
+    }
+
+}
+
+data class SessionLog(
+    val type: String,
+    val message: String,
+    val date: Date
+)
+
+class SessionLogger {
+
+    var logs: MutableList<SessionLog> = mutableListOf()
+
+    fun log(message: String) {
+        logs.add(SessionLog("NONE", message, Date()))
+    }
+
+    fun log(type: String, message: String) {
+        logs.add(SessionLog(type, message, Date()))
     }
 
 }

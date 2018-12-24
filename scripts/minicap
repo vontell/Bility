@@ -1,0 +1,6 @@
+NDK=/Users/vontell/Library/Android/sdk/ndk-bundle
+export PATH=$PATH:$NDK
+echo "RUNNING PROJECTION"
+./run.sh -P 1080x1920@810x1440/0 &
+echo "FORWARDING PORT"
+adb forward tcp:1717 localabstract:minicap

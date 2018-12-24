@@ -11,6 +11,7 @@ buildscript {
         //classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.51"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -40,14 +41,16 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        maven {
-            credentials {
-                username 'admin'
-                password 'password'
-            }
-            url 'http://localhost:8146/artifactory/libs-release-local'
-        }
-    }
-}
+//allprojects {
+//    repositories {
+//        maven {
+//            credentials {
+//                username 'admin'
+//                password 'password'
+//            }
+//            url 'http://localhost:8146/artifactory/libs-release-local'
+//        }
+//    }
+//}
+
+// TODO: Look at https://stackoverflow.com/questions/48027019/how-to-manage-different-support-library-versions-for-3rd-party-deps-with-gradle

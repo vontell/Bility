@@ -48,7 +48,7 @@ touch local.properties
 echo "sdk.dir=$ANDROID_SDK" > local.properties
 
 # Run Test
-echo "Installing and granting persmissing..."
+echo "Installing and granting permission..."
 ./gradlew installDebug --info
 adb shell pm grant $TEST_PACKAGE android.permission.SYSTEM_ALERT_WINDOW
 
