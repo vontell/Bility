@@ -99,6 +99,7 @@ fun Route.internalRoutes() {
                         } else {
                             File("$FILE_DB/screens", "hires-$literalId.$ext")
                         }
+                        logger?.info("$FILE_DB/screens")
                         file.parentFile.mkdirs()
                         file.createNewFile()
                         part.streamProvider().use { input -> file.outputStream().buffered().use { output -> input.copyToSuspend(output) } }

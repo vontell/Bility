@@ -16,7 +16,8 @@ public class SimpleExample extends AppCompatActivity {
     private TextView exampleText;
     private Typeface original;
 
-    private final boolean shouldBeBad = true;
+    private final boolean shouldBeFocusBad = false;
+    private final boolean shouldBeKeyboardBad = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,21 +36,21 @@ public class SimpleExample extends AppCompatActivity {
 
         final Context context = this;
 
-        findViewById(R.id.dialogButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new AlertDialog.Builder(context)
-                        .setTitle("Test Dialog")
-                        .setMessage("This is a test dialog that should be noticed during our run")
-                        .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        })
-                        .show();
-            }
-        });
+//        findViewById(R.id.dialogButton).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                new AlertDialog.Builder(context)
+//                        .setTitle("Test Dialog")
+//                        .setMessage("This is a test dialog that should be noticed during our run")
+//                        .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.cancel();
+//                            }
+//                        })
+//                        .show();
+//            }
+//        });
 
         // Now set listeners
         regularButton.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +74,7 @@ public class SimpleExample extends AppCompatActivity {
             }
         });
 
-        if (shouldBeBad) {
+        if (shouldBeFocusBad) {
             regularButton.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean b) {
@@ -82,8 +83,12 @@ public class SimpleExample extends AppCompatActivity {
             });
         }
 
-        regularButton.setVisibility(View.GONE);
-        boldButton.setVisibility(View.GONE);
+        if (shouldBeKeyboardBad) {
+            boldButton.setFocusable(false);
+        }
+
+//        regularButton.setVisibility(View.GONE);
+//        boldButton.setVisibility(View.GONE);
 
     }
 

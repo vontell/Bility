@@ -97,6 +97,7 @@ public class ServerConnection {
      */
     void sendStartupEvent(AndroidAppTestConfig config) {
         Long id = Math.abs(gen.nextLong());
+        Log.e("BILITY", id.toString() + config.toString());
         StartupEvent ev = new StartupEvent(id, config, new Date().toString());
         Log.i("SENDING STARTUP", ev.toString());
         Pair<Integer, String> result = sendGenericEvent(SEND_STARTUP_ENDPOINT, ev);

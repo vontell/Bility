@@ -47,6 +47,19 @@ export default class TestResult extends Component<State, Props> {
     return <span><TouchApp style={styles.typeIcon}/></span>
   }
 
+  getInstanceLine() {
+    if (this.props.issue.type === "static") {
+      let times = this.props.issue.perceptifers.length;
+      return (
+        <div>
+          <br />
+          <em>This issue was found {times} time{times > 1 ? 's' : null} within this application.</em>
+        </div>
+      );
+    }
+    return null;
+  }
+
   render() {
     return (
       <ExpansionPanel onMouseEnter={() => this.props.displayIssue(this.props.issue)}>
@@ -64,6 +77,7 @@ export default class TestResult extends Component<State, Props> {
             <p><b>Suggestion: </b>{this.props.issue.suggestionExplanation}</p>
             }
             <p>To learn more about this guideline, visit the <a href={this.props.issue.extras.link} target="_blank">WCAG 2.0 principle reference</a></p>
+            {this.getInstanceLine()}
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>

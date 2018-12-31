@@ -114,10 +114,10 @@ fun baseAccessibilityTransform(perceptifer: Perceptifer): Set<Percept> {
 
 
 fun performPerceptiferHash(perceptifer: Perceptifer,
-                                        perceptiferMap: HashMap<String, Perceptifer>,
-                                        hashCache: HashMap<String, Int>,
-                                        ignoreRepeatChildren: Boolean,
-                                        filterAndTransform: (Perceptifer) -> Set<Percept>): Int {
+                           perceptiferMap: HashMap<String, Perceptifer>,
+                           hashCache: HashMap<String, Int>,
+                           ignoreRepeatChildren: Boolean,
+                           filterAndTransform: (Perceptifer) -> Set<Percept>): Int {
 
     // remove the order constraints of percepts
     val percepts = filterAndTransform(perceptifer)

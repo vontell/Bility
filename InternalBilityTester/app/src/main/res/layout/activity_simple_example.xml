@@ -45,11 +45,11 @@
         android:text="Make Bold"
         android:textStyle="bold" />
 
-    <Button
+    <!--Button
         android:id="@+id/dialogButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:text="Test Dialog" />
+        android:text="Test Dialog" /-->
 </RelativeLayout>

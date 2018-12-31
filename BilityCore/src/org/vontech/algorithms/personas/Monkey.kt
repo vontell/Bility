@@ -93,13 +93,15 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
 
         //println(getLiteralInterfacePrettyString(literalInterace))
 
+        Thread.sleep(100)
+
         // Print some info
         println(actionCount)
         val statesWithUnexplored = automaton.statesWithUnexploredEdges()
         println("Currently have ${statesWithUnexplored.size} states with unexplored edges")
 
         // Base case - the persona terminates the text, sending a QUIT action
-        if (actionCount > 100 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
+        if (actionCount > 600 || (actionCount > 100 && automaton.statesWithUnexploredEdges().isEmpty())) {
             println("FINISHED AFTER $actionCount actions with ${automaton.statesWithUnexploredEdges().size} states unexplored")
             automaton.writeDotFile()
             automaton.dotFileToPng()
@@ -111,7 +113,7 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
             println("Generating accessibility report...")
             val result = wcagLogger.getAccessibilityReportAsString(automaton)
             println(result)
-            //startFinishedAnalysis()
+            startFinishedAnalysis()
             return action
         }
 
@@ -178,7 +180,10 @@ class Monkey(nickname: String, rand: Random = Random()): Person(nickname, rand) 
             val subject = swipeable.random(rand)!!
             UserAction(InputInteractionType.SWIPE, subject, generateRandomSwipe(subject))
         } else {
-            UserAction(InputInteractionType.KEYPRESS, emptyPerceptifer(), KeyPress.values().toList().random(rand))
+            val key = KeyPress.values().toList().random(rand)
+            val a = UserAction(InputInteractionType.KEYPRESS, EmptyPerceptifer, key)
+            a.overrideString("label=KEYPRESS of ${key}")
+            a
         }
         randomAction.provideContext(automaton.currentState.state.hashResults)
 

@@ -296,6 +296,7 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
         // For each content, check if there are multiple percepts with that information. If so, report an issue
         val issues = mutableListOf<StaticIssue>()
         contentToPerceptifers.forEach { t, u ->
+            // TODO: This can easily be cleaned up
             if (u.size > 1) {
                 val builder = IssuerBuilder()
                 builder.initialize(GoogleAccessibilityScannerConstants.DUP_CONTENT_NAME, GoogleAccessibilityScannerConstants.DUP_CONTENT_SHORT,
@@ -327,7 +328,9 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
     private fun logMinimumTouchTargetSize(perceptifer: Perceptifer): StaticIssue? {
 
         // Check if this element is interactive
-        val interactive = perceptifer.getPerceptsOfType(PerceptType.VIRTUALLY_CLICKABLE).isNotEmpty()
+        val interactive = perceptifer.getPerceptsOfType(PerceptType.VIRTUALLY_CLICKABLE).any {
+            PerceptParser.fromVirtuallyClickable(it)
+        }
 
         if (interactive) {
 
@@ -451,11 +454,16 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
                         it.value.all {
                             // TODO: Difference in context here as well
                             println("DIFFERENCES: ${state.state.differenceBetween(it.state)}")
-                            state.state.differenceBetween(it.state).all {it.type == PerceptType.VIRTUAL_FOCUSABLE}
+                            state.state.differenceBetween(it.state).all {it.type == PerceptType.VIRTUAL_FOCUSABLE && PerceptParser.fromVirtuallyFocusable(it)}
                         }
                     }
 
-                    if (!isJustUnfocused) {
+                    // Also, ignore state if there is no focus at all
+                    val hasFocus = it.key.state.literalInterace.perceptifers.any {
+                        it.virtualPercepts!!.any { it.type == PerceptType.VIRTUAL_FOCUSABLE && PerceptParser.fromVirtuallyFocusable(it)}
+                    }
+
+                    if (!isJustUnfocused && hasFocus) {
                         val issue = IssuerBuilder()
                                 .initialize(WCAGConstants.P211_NAME, WCAGConstants.P211_SHORT, WCAGConstants.P211_LONG)
                                 .explanation(WCAGConstants.P211_EXPLANATION)
@@ -644,12 +652,6 @@ class WCAG2IssuerLogger(val wcagLevel: WCAGLevel) : UiIssuerLogger() {
 
         val stateOneContextHash = getContextHash(stateOne.literalInterace)
         val stateTwoContextHash = getContextHash(stateTwo.literalInterace)
-
-        if (stateOneContextHash != stateTwoContextHash) {
-            println("UNEQUAL CONTEXTS!!!!!")
-        } else {
-            println("EQUAL CONTEXTS!Q#*^")
-        }
 
         return stateOneContextHash == stateTwoContextHash
 

@@ -85,5 +85,4 @@ fun blendColors(argbColors: List<Long>): Long {
 
     return currentBaseColor
 
-
 }

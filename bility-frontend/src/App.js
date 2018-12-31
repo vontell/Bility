@@ -254,7 +254,7 @@ class App extends Component {
       <div style={{paddingLeft: '35%'}}>
         <div>
         <Nexus5x
-          size={200}
+          size={275}
           getContents={(width: Float, height: Float, top: Float, left: Float) => {
             return (
               <div>
@@ -272,7 +272,6 @@ class App extends Component {
         />
         </div>
       </div>
-      
     )
   }
 
@@ -296,8 +295,6 @@ class App extends Component {
                 }
               </Grid>
             </Grid>
-            
-            
           </div>
         }
         {this.state.dynamicDisplay &&

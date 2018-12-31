@@ -99,7 +99,7 @@ public class RecordingService extends Service {
             //startTimer();
             //startForeground(1, createNotification());
 
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
     }

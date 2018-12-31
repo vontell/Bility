@@ -131,6 +131,8 @@ public class BilityTester {
 
     // PRIVATE HELPER METHODS
 
+    private final int SLEEP_TIME = 1000;
+
     public BilityTester loop() {
 
         // 1) If this is not the first call, wait for any actions, and execute them
@@ -141,8 +143,8 @@ public class BilityTester {
             return this;
         }
 
-        device.waitForIdle(200);
-        try { sleep(300); } catch (InterruptedException ignored) { }
+        device.waitForIdle(SLEEP_TIME);
+        try { sleep(SLEEP_TIME); } catch (InterruptedException ignored) { }
 
         // 2) Get information about the state of the user interface
         Activity current = getActivityInstance();
@@ -157,6 +159,8 @@ public class BilityTester {
 
         serverConnection.sendScreenshot(face.getMetadata().getId(), current, 200, "SMALL", device);
         serverConnection.sendScreenshot(face.getMetadata().getId(), current, 500, "WEB", device);
+
+        try { sleep(SLEEP_TIME); } catch (InterruptedException ignored) { }
 
         return loop();
 

@@ -51,16 +51,16 @@ const styleGen = (size) => {
             background: 'white',
             width: size * 0.89,
             height: size * 1.6,
-            top: 41,
-            left: 10
+            top: 57,
+            left: 14
         },
         content: {
             position: 'absolute',
             background: 'white',
             width: size * 0.89,
             height: size * 1.6,
-            top: 41,
-            left: 10
+            top: 57,
+            left: 14
         }
     }
 };

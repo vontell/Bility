@@ -32,12 +32,12 @@ export default class TestDynamicDetail extends Component<State, Props> {
         {mapping.hasOwnProperty('startState') && mapping.startState && 
           <img style={styles.stateImage} src={this.getUrlToImage(mapping.startState)} alt="The start state of this dynamic issue"/>}
         {(!mapping.hasOwnProperty('startState') || !mapping.startState) && 
-          <div style={styles.stateMissing}>No start state specified</div> }
+          <div style={styles.stateMissing}>No start state</div> }
         <span style={styles.arrow}>&#8594;</span>
         {mapping.hasOwnProperty('endState') && mapping.endState && 
           <img style={styles.stateImage} src={this.getUrlToImage(mapping.endState)} alt="The start state of this dynamic issue"/>}
         {(!mapping.hasOwnProperty('endState') || !mapping.endState) && 
-          <div style={styles.stateMissing}>No start state specified</div> }
+          <div style={styles.stateMissing}>No end state</div> }
       </div>
     );
   }
@@ -62,7 +62,8 @@ export default class TestDynamicDetail extends Component<State, Props> {
 
 const styles = {
   dynamicContainer: {
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
+    textAlign: 'center'
   },
   stateImage: {
     width: 200,
@@ -70,10 +71,15 @@ const styles = {
   },
   stateMissing: {
     width: 200,
-    display: 'inline-block'
+    display: 'inline-block',
+    verticalAlign: 'top',
+    marginTop: 170
   },
   arrow: {
     fontSize: 50,
-    display: 'inline-block'
+    display: 'inline-block',
+    verticalAlign: 'top',
+    marginTop: 148,
+    marginRight: 16,
   }
 };

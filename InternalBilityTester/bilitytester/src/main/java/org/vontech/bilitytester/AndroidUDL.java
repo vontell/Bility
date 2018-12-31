@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import org.michaelevans.colorart.library.ColorArt;
@@ -74,14 +75,16 @@ public class AndroidUDL {
             System.out.println("actually removed the root view");
         }
 
-        // Create the base percepts for the activity rootView
         // Do a traversal through the tree
+        Set<Perceptifer> windowChildren = new HashSet<>();
         Pair<Perceptifer, Set<Perceptifer>> activityResult = traverseAndGeneratePerceptifers(activity, activityRootView, false);
-        perceptifers.addAll(activityResult.second);
+        if (activityResult != null) {
+            perceptifers.addAll(activityResult.second);
+            windowChildren.add(activityResult.first);
+        }
 
         // Now do it for every other rootView, then adding the Perceptifer as a child of the activity perceptifer
-        Set<Perceptifer> windowChildren = new HashSet<>();
-        windowChildren.add(activityResult.first);
+
         for (View rootView : rootViews) {
 
             // Do a traversal through the tree
@@ -194,10 +197,11 @@ public class AndroidUDL {
 
         if (v instanceof ImageView) {
             ImageView iv = (ImageView) v;
-            if (iv.getContentDescription() != null) {
-                builder.createScreenReaderContentVirtualPercept(iv.getContentDescription().toString());
-                builder.createMediaTypePercept(MediaType.IMAGE);
-            }
+            builder.createMediaTypePercept(MediaType.IMAGE);
+        }
+
+        if (v.getContentDescription() != null) {
+            builder.createScreenReaderContentVirtualPercept(v.getContentDescription().toString());
         }
 
         if (isPurelyContainer(v)) {
@@ -214,7 +218,13 @@ public class AndroidUDL {
         builder.createLocationPercept(screenLocation[0], screenLocation[1]);
         builder.createSizePercept(rectf.width(), rectf.height());
         builder.createAlphaPercept(v.getAlpha());
-        builder.createClickableVirtualPercept(v.hasOnClickListeners());
+
+        if (v instanceof SeekBar) {
+            builder.createClickableVirtualPercept(true);
+        } else {
+            builder.createClickableVirtualPercept(v.hasOnClickListeners());
+        }
+
         builder.createFocusableVirtualPercept(v.isFocused());
         builder.createIdentifierVirtualPercept(v.getId());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -223,9 +233,9 @@ public class AndroidUDL {
             builder.createNameVirtualPercept(v.getClass().getName());
         }
 
-        if (v.getClass().getName().toLowerCase().contains("seekbar")) {
-            System.out.println("SEEKBAR WAS SEEN AND LOGGED");
-        }
+//        if (v.getClass().getName().toLowerCase().contains("seekbar")) {
+//            System.out.println("SEEKBAR WAS SEEN AND LOGGED");
+//        }
 
         Drawable background = v.getBackground();
         if (background instanceof ColorDrawable) {
@@ -324,7 +334,7 @@ public class AndroidUDL {
         view.getGlobalVisibleRect(rectf);
         DisplayMetrics mets = activity.getResources().getDisplayMetrics();
         final Rect screen = new Rect(0, 0, mets.widthPixels, mets.heightPixels);
-        return rectf.intersect(screen);
+        return rectf.intersect(screen) && view.isShown();
     }
 
     public static View getOpenDialog(Activity act) {

@@ -213,6 +213,14 @@ class PerceptParser {
             return percept.information.cast()
         }
 
+        fun fromVirtuallyFocusable(percept: Percept): Boolean {
+            return percept.information.cast()
+        }
+
+        fun fromVirtuallyClickable(percept: Percept): Boolean {
+            return percept.information.cast()
+        }
+
 
         fun fromPerceptiferOrdering(percept: Percept): PerceptiferOrdering {
             val map: LinkedTreeMap<String, List<String>> = percept.information as LinkedTreeMap<String, List<String>>

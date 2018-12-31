@@ -47,10 +47,10 @@
                     android:id="@+id/file_length_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00"
-                    android:textSize="12sp"
+                    android:layout_marginTop="7dp"
                     android:fontFamily="sans-serif-condensed"
-                    android:layout_marginTop="7dp"/>
+                    android:text="00:00"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/file_date_added_text"

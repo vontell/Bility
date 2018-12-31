@@ -171,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
     void defaultSelectedNavMenu(int resId) {
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
