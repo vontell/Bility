@@ -227,6 +227,13 @@ docker pull tesseractshadow/tesseract4re
 
 <table class="tg">
   <tr>
+    <th class="tg-kiyi">Feature</th>
+    <th class="tg-88nc">Bility</th>
+    <th class="tg-amwm">Google Accessibility Scanner</th>
+    <th class="tg-amwm">Espresso</th>
+    <th class="tg-amwm">Lint</th>
+  </tr>
+  <tr>
     <td class="tg-0lax">Test on Non-debug APK</td>
     <td class="tg-baqh"></td>
     <td class="tg-baqh">&#9989;</td>
@@ -239,13 +246,6 @@ docker pull tesseractshadow/tesseract4re
     <td class="tg-baqh"></td>
     <td class="tg-baqh"></td>
     <td class="tg-baqh"></td>
-  </tr>
-  <tr>
-    <th class="tg-kiyi">Feature</th>
-    <th class="tg-88nc">Bility</th>
-    <th class="tg-amwm">Google Accessibility Scanner</th>
-    <th class="tg-amwm">Espresso</th>
-    <th class="tg-amwm">Lint</th>
   </tr>
   <tr>
     <td class="tg-xldj">Automated</td>
