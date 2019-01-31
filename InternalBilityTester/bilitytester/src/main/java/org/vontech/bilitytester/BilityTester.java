@@ -148,6 +148,15 @@ public class BilityTester {
 
         // 2) Get information about the state of the user interface
         Activity current = getActivityInstance();
+        while(current == null) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            current = getActivityInstance();
+            Log.e("UH", "WAITING");
+        }
         LiteralInterace face = AndroidUDL.getLiteralInterfaceFromActivity(current);
 
         // 3) Send that user interface information to the server, and wait for a response
