@@ -1,14 +1,12 @@
-# Bility
-
-[Trello Board](https://trello.com/b/cwWM50Jf) - [Drive](https://drive.google.com/drive/folders/11ScSgQSKj3s64hVFgaWVQBWeqB_U9mU-?usp=sharing) - [Local Maven](http://localhost:8146/artifactory/webapp/home.html?5)
-
-<a href="https://www.buymeacoffee.com/SYwZPjK4F" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
-
-----------------------------------------------------------------
-
 <div align="center">
   <img height="150px" src="Design/logo.png"><br />
 </div>
+
+----------------------------------------------------------------
+
+[Trello Board](https://trello.com/b/cwWM50Jf) - [Drive](https://drive.google.com/drive/folders/11ScSgQSKj3s64hVFgaWVQBWeqB_U9mU-?usp=sharing) - [Local Maven](http://localhost:8146/artifactory/webapp/home.html?5)
+
+<a href="https://www.buymeacoffee.com/SYwZPjK4F" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important; display: inline !important;" ></a>
 
 
 The goal of Bility to provide a cheap, automated, and easy-to-use solution to user testing. Imagine your app development cycle: create a feature / UX, have CI test your code with unit tests and front end tests, and then schedule / setup a user study to evaluate results. After running the user test, if you find issues, you need to go back, address these issues, and spend more time and money conducting more user tests. *Why not move this into the CI process?*
