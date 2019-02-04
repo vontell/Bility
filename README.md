@@ -14,7 +14,7 @@ Bility is a framework for automatically scraping and assessing the accessibility
   <img height="350px" src="Design/screenshots/test_detail_large.png"><br />
 </div>
 
-Check of the [thesis paper](https://github.com/vontell/Bility/blob/master/Thesis.pdf) or conference paper (coming soon) to learn more about the theory and evaluation behind the project. 
+Check out the [thesis paper](https://github.com/vontell/Bility/blob/master/Thesis.pdf) or conference paper (coming soon) to learn more about the theory and evaluation behind the project. 
 
 # Usage
 
@@ -93,6 +93,3 @@ public class BilityTest {
                 .startupApp()
                 .loop();
     }
-
-}
-```
