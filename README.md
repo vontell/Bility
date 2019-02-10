@@ -149,3 +149,7 @@ The goal is that this data structure will permit developers to build further tes
 <div align="center">
   <img width="700px" src="screenshots/table52.png"><br />
 </div>
+
+# Next Steps
+
+Contribute! The issues page has all the information needed to begin working on new features and bug fixes.
