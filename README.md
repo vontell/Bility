@@ -6,6 +6,8 @@
 
 <a href="https://www.buymeacoffee.com/SYwZPjK4F" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/black_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important; display: inline !important;" ></a>
 
+**Warning: This library is in an alpha state, and is not very stable... I am looking for others to help in feature development, testing, etc...**
+
 Bility is a framework for automatically scraping and assessing the accessibility of mobile applications. Unlike tools such as Google Accessibility Scanner that require manual navigation and track static issues (such as contrast and small touch target sizes), Bility automatically explores the application, finding static issues as well as dynamic issues (such as keyboard traps, unexpected changes in context, etc...). A desktop or web app displays both a live recording of the test and a succinct report of all issues found. To see a demo video of the alpha version, click the image below or visit the link <a href="https://youtu.be/Y5AeZpNnp8U">here</a>.
 
 <div align="center">
