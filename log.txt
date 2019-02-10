@@ -1,0 +1,36 @@
+
+> bility-frontend@0.1.0 dev /Users/vontell/Documents/Bility/bility-frontend
+> nf start -p 3000
+
+19:35:24 react.1      |  > bility-frontend@0.1.0 start /Users/vontell/Documents/Bility/bility-frontend
+19:35:24 react.1      |  > BROWSER=none react-scripts start
+19:35:27 react.1      |  Starting the development server...
+19:35:27 electron.1   |  starting electron
+19:35:35 react.1      |  Compiled with warnings.
+19:35:35 react.1      |  ./src/App.js
+19:35:35 react.1      |    Line 2:     'TestInfo' is defined but never used                                                                       no-unused-vars
+19:35:35 react.:run FAILED
+6 actionable tasks: 1 executed, 5 up-to-date
+sed                                                                       no-unused-vars
+19:35:35 react.1      |    Line 20:    'Menu' is defined but never used                                                                           no-unused-vars
+19:35:35 react.1      |    Line 26:    'ReactImageMagnify' is defined but never used                                                              no-unused-vars
+19:35:35 react.1      |    Line 32:    'Log' is defined but never used                                                                            no-unused-vars
+19:35:35 react.1      |    Line 230:  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+19:35:35 react.1      |    Line 252:  'that' is assigned a value but never used                                                                  no-unused-vars
+19:35:35 react.1      |    Line 570:   'network' is assigned a value but never used                                                               no-unused-vars
+19:35:35 react.1      |  ./src/components/TestDynamicDetail.js
+19:35:35 react.1      |    Line 2:  'Paper' is defined but never used  no-unused-vars
+19:35:35 react.1      |  ./src/components/TestImageDisplay.js
+19:35:35 react.1      |    Line 2:  'TestResult' is defined but never used  no-unused-vars
+19:35:35 react.1      |  ./src/components/emulators/Nexus5x.js
+19:35:35 react.1      |    Line 3:  'relative' is defined but never used  no-unused-vars
+19:35:35 react.1      |  ./src/components/TestSummary.js
+19:35:35 react.1      |    Line 46:  'styles' is assigned a value but never used  no-unused-vars
+19:35:35 react.1      |  ./src/components/TestResult.js
+19:35:35 react.1      |    Line 8:     'Keyboard' is defined but never used                                                                                          no-unused-vars
+19:35:35 react.1      |    Line 9:     'PanTool' is defined but never used                                                                                           no-unused-vars
+19:35:35 react.1      |    Line 12:    'Typography' is defined but never used                                                                                        no-unused-vars
+19:35:35 react.1      |    Line 79:  Using target="_blank" without rel="noopener noreferrer" is a security risk: see https://mathiasbynens.github.io/rel-noopener  react/jsx-no-target-blank
+19:35:35 react.1      |  Search for the keywords to learn more about each warning.
+19:35:35 react.1      |  To ignore, add // eslint-disable-next-line to the line before.
+emulator: WARNING: Discarding the changed state (command-line flag).

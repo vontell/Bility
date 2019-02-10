@@ -1,0 +1,16 @@
+:BilityCore:compileKotlin UP-TO-DATE
+:BilityCore:compileJava NO-SOURCE
+:BilityCore:processResources NO-SOURCE
+:BilityCore:classes UP-TO-DATE
+:BilityCore:inspectClassesForKotlinIC UP-TO-DATE
+:BilityCore:jar UP-TO-DATE
+:compileKotlin UP-TO-DATE
+:compileJava NO-SOURCE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:run
+2019-02-09 18:36:34.855 [main] INFO  Application - No ktor.deployment.watch patterns match classpath entries, automatic reload is not active
+2019-02-09 18:36:36.356 [main] INFO  Application - ContainerInfo(version=0.0.1)
+2019-02-09 18:36:36.356 [main] INFO  Application - Responding at http://0.0.0.0:8080
+:run FAILED
+6 actionable tasks: 1 executed, 5 up-to-date
