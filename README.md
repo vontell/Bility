@@ -18,6 +18,8 @@ Bility is a framework for automatically scraping and assessing the accessibility
 
 Check out the [thesis paper](https://github.com/vontell/Bility/blob/master/Thesis.pdf) or conference paper (coming soon) to learn more about the theory and evaluation behind the project. 
 
+*Created at the Massachusetts Institute of Technology in association with CSAIL/IPRI/DIG under Lalana Kagal.*
+
 # Usage
 
 ## Start the Testing Framework
