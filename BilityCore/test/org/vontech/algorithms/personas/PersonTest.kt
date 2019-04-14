@@ -21,7 +21,8 @@ class PersonTest: FeatureSpec({
     // Then load example screens
     val firstScreenButtonPerceptBuilder = PerceptBuilder()
     firstScreenButtonPerceptBuilder.createTextPercept("Click me!")
-    val firstScreenButton = Perceptifer(firstScreenButtonPerceptBuilder.buildPercepts(), null)
+    // TODO: Input into perceptifer should not have to be a mutable set
+    val firstScreenButton = Perceptifer(firstScreenButtonPerceptBuilder.buildPercepts().toMutableSet(), null)
     val screenOne = LiteralInterace(
             setOf(firstScreenButton),
             setOf(screen),
@@ -31,7 +32,7 @@ class PersonTest: FeatureSpec({
 
     val secondScreenButtonPerceptBuilder = PerceptBuilder()
     secondScreenButtonPerceptBuilder.createTextPercept("You found me!")
-    val secondScreenText = Perceptifer(secondScreenButtonPerceptBuilder.buildPercepts(), null)
+    val secondScreenText = Perceptifer(secondScreenButtonPerceptBuilder.buildPercepts().toMutableSet(), null)
     val screenTwo = LiteralInterace(
             setOf(secondScreenText),
             setOf(screen),
