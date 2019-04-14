@@ -4,6 +4,8 @@ import org.vontech.algorithms.automatons.Automaton
 import org.vontech.algorithms.automatons.AutomatonState
 import org.vontech.algorithms.rulebased.loggers.UiIssuerLogger
 import org.vontech.core.interaction.InputInteractionType
+import org.vontech.core.interaction.UserAction
+import org.vontech.core.interfaces.CondensedState
 import org.vontech.core.interfaces.Percept
 
 /**
@@ -100,6 +102,12 @@ class Specification {
 
 }
 
+private enum class SpecificationType {
+    AT_LEAST,
+    NO_MORE_THAN,
+    EXACTLY
+}
+
 /**
  * A state is defined by the count of a certain number of
  * Perceptifers within a literal interface. For instance,
@@ -108,24 +116,46 @@ class Specification {
  */
 class SpecificationState {
 
-    fun hasAtLeast(count: Int, selector: PerceptiferSelector) {
+    private val selectorSet: MutableSet<Triple<PerceptiferSelector, Int, SpecificationType>> = mutableSetOf()
 
+    fun hasAtLeast(count: Int, selector: PerceptiferSelector): SpecificationState {
+        selectorSet.add(Triple(selector, count, SpecificationType.AT_LEAST))
+        return this
     }
 
-    fun hasNoMoreThan(count: Int, selector: PerceptiferSelector) {
-
+    fun hasNoMoreThan(count: Int, selector: PerceptiferSelector): SpecificationState {
+        selectorSet.add(Triple(selector, count, SpecificationType.NO_MORE_THAN))
+        return this
     }
 
-    fun hasExactly(count: Int, selector: PerceptiferSelector) {
-
+    fun hasExactly(count: Int, selector: PerceptiferSelector): SpecificationState {
+        selectorSet.add(Triple(selector, count, SpecificationType.EXACTLY))
+        return this
     }
 
-    fun hasZero(selector: PerceptiferSelector) {
-        hasExactly(0, selector)
+    fun hasZero(selector: PerceptiferSelector): SpecificationState {
+        return hasExactly(0, selector)
     }
 
-    fun hasSome(selector: PerceptiferSelector) {
-        hasAtLeast(1, selector)
+    fun hasSome(selector: PerceptiferSelector): SpecificationState {
+        return hasAtLeast(1, selector)
+    }
+
+    fun existsIn(automaton: Automaton<CondensedState, UserAction>): Boolean {
+
+        selectorSet.forEach { spec ->
+
+            automaton.states.forEach { state ->
+                state.state.literalInterace.perceptifers.forEach { perceptifer ->
+                    perceptifer.percepts
+                    perceptifer.virtualPercepts
+                }
+            }
+
+        }
+
+        return false
+
     }
 
 }
