@@ -1,6 +1,7 @@
 package org.vontech.core.config
 
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.FeatureSpec
 import org.vontech.algorithms.rulebased.loggers.WCAG2IssuerLogger
 import org.vontech.algorithms.rulebased.loggers.WCAGLevel
@@ -40,9 +41,60 @@ class DataTypesTest: FeatureSpec({
             val loginScreen = SpecificationState().hasExactly(1, loginTextSelector)
             val loginAndHomePage = getLoginAndHomePageAutomaton()
 
-            loginScreen.existsIn(loginAndHomePage) shouldBe true
+            val selectedMap = loginScreen.selectStates(loginAndHomePage)
+
+            // We should find that the login screen was selected
+            selectedMap.size shouldBe 1
+            selectedMap.keys.toList()[0].first shouldBe loginTextSelector
+            selectedMap.values.toList()[0]
+                    .toList()[0]
+                    .state.literalInterace.perceptifers.toList()[0]
+                    .percepts!!.filter { it.type == PerceptType.TEXT && it.information == "Login"}
+                    .size shouldBe 1
 
         }
+        scenario("should be able to get no selections back when not enough") {
+
+            val loginTextSelector = PerceptiferSelector(
+                    has = listOf(
+                            Percept(PerceptType.TEXT, "Login")
+                    ),
+                    omits = listOf(
+                            Percept(PerceptType.TEXT, "Main Screen")
+                    )
+            )
+
+            val loginScreen = SpecificationState().hasAtLeast(2, loginTextSelector)
+            val loginAndHomePage = getLoginAndHomePageAutomaton()
+
+            val selectedMap = loginScreen.selectStates(loginAndHomePage)
+
+            // We should find that the login screen was selected
+            selectedMap.size shouldBe 0
+
+        }
+        scenario("should be able to get no selections back when ommitted") {
+
+            val loginTextSelector = PerceptiferSelector(
+                    has = listOf(
+                            Percept(PerceptType.TEXT, "Login")
+                    ),
+                    omits = listOf(
+                            Percept(PerceptType.TEXT, "Main Screen"),
+                            Percept(PerceptType.TEXT, "Login")
+                    )
+            )
+
+            val loginScreen = SpecificationState().hasExactly(1, loginTextSelector)
+            val loginAndHomePage = getLoginAndHomePageAutomaton()
+
+            val selectedMap = loginScreen.selectStates(loginAndHomePage)
+
+            // We should find that the login screen was selected
+            selectedMap.size shouldBe 0
+
+        }
+
     }
 
 })

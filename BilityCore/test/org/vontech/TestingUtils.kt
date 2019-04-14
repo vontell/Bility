@@ -14,7 +14,9 @@ fun getLoginAndHomePageAutomaton(): Automaton<CondensedState, UserAction> {
         percepts = mutableSetOf(
             Percept(PerceptType.TEXT, "Login")
         ),
-        virtualPercepts = mutableSetOf()
+        virtualPercepts = mutableSetOf(
+            Percept(PerceptType.VIRTUAL_ROOT, true)
+        )
     )
     val loginInterface = LiteralInterace(
         perceptifers = setOf(loginButton),
@@ -25,16 +27,18 @@ fun getLoginAndHomePageAutomaton(): Automaton<CondensedState, UserAction> {
 
     // Create the literal interface for the home screen
     val mainPageText = Perceptifer(
-            percepts = mutableSetOf(
-                Percept(PerceptType.TEXT, "Main Screen")
-            ),
-            virtualPercepts = mutableSetOf()
+        percepts = mutableSetOf(
+            Percept(PerceptType.TEXT, "Main Screen")
+        ),
+        virtualPercepts = mutableSetOf(
+            Percept(PerceptType.VIRTUAL_ROOT, true)
+        )
     )
     val mainInterface = LiteralInterace(
-            perceptifers = setOf(mainPageText),
-            outputChannels = setOf(),
-            inputChannels = setOf(),
-            metadata = LiteralInterfaceMetadata()
+        perceptifers = setOf(mainPageText),
+        outputChannels = setOf(),
+        inputChannels = setOf(),
+        metadata = LiteralInterfaceMetadata()
     )
 
     // Generate and return the automaton

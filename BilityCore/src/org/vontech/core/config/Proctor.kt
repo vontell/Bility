@@ -18,9 +18,7 @@ class Proctor {
     val shouldTerminate: MutableSet<(Automaton<CondensedState, UserAction>) -> Boolean> = mutableSetOf()
 
     fun shouldTerminateOnCondition(condition: SpecificationState) {
-        shouldTerminate.add {
-            condition.existsIn(automaton = it)
-        }
+
     }
 
 }

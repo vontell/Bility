@@ -7,6 +7,7 @@ import org.vontech.core.interaction.InputInteractionType
 import org.vontech.core.interaction.UserAction
 import org.vontech.core.interfaces.CondensedState
 import org.vontech.core.interfaces.Percept
+import org.vontech.core.interfaces.Perceptifer
 
 /**
  * Defines a specification for interacting with and navigating
@@ -102,7 +103,7 @@ class Specification {
 
 }
 
-private enum class SpecificationType {
+enum class SpecificationType {
     AT_LEAST,
     NO_MORE_THAN,
     EXACTLY
@@ -141,20 +142,42 @@ class SpecificationState {
         return hasAtLeast(1, selector)
     }
 
-    fun existsIn(automaton: Automaton<CondensedState, UserAction>): Boolean {
+    fun selectStates(automaton: Automaton<CondensedState, UserAction>): Map<Triple<PerceptiferSelector, Int, SpecificationType>, Set<AutomatonState<CondensedState>>> {
+
+        // TODO: Make this a better type later...
+        val resultsMapping = mutableMapOf<Triple<PerceptiferSelector, Int, SpecificationType>, Set<AutomatonState<CondensedState>>>()
 
         selectorSet.forEach { spec ->
 
+            val (selector, count, type) = spec
+
+            val foundStates = mutableSetOf<AutomatonState<CondensedState>>()
+
             automaton.states.forEach { state ->
+
+                val foundPerceptifers = mutableSetOf<Perceptifer>()
                 state.state.literalInterace.perceptifers.forEach { perceptifer ->
-                    perceptifer.percepts
-                    perceptifer.virtualPercepts
+                    if (selector.selects(perceptifer)) {
+                        foundPerceptifers.add(perceptifer)
+                    }
                 }
+
+                val c = foundPerceptifers.size
+                when(type) {
+                    SpecificationType.AT_LEAST -> if (c >= count) { foundStates.add(state) }
+                    SpecificationType.NO_MORE_THAN -> if (c <= count) { foundStates.add(state) }
+                    SpecificationType.EXACTLY -> if (c == count) { foundStates.add(state) }
+                }
+
+            }
+
+            if (foundStates.isNotEmpty()) {
+                resultsMapping[spec] = foundStates
             }
 
         }
 
-        return false
+        return resultsMapping
 
     }
 
@@ -167,8 +190,31 @@ class SpecificationState {
  */
 class PerceptiferSelector(
         val has: List<Percept>,
-        val omits: List<Percept> = listOf()
-)
+        val omits: List<Percept> = listOf()) {
+
+    fun selects(perceptifer: Perceptifer): Boolean {
+
+        // The perceptifer cannot have any of the omit percepts...
+        omits.forEach {
+            val typeMatches = perceptifer.getPerceptsOfType(it.type)
+            if (typeMatches.any {p -> p.information == it.information}) {
+                return false
+            }
+        }
+
+        // And the perceptifer must have at least one of the has percepts
+        has.forEach {
+            val typeMatches = perceptifer.getPerceptsOfType(it.type)
+            if (typeMatches.any {p -> p.information == it.information}) {
+                return true
+            }
+        }
+
+        return false
+
+    }
+
+}
 
 /**
  * A transition is an interaction type on a state
