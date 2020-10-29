@@ -1,6 +1,4 @@
 rootProject.name = 'InternalBilityTester'
 
-include ':app', ':bilitytester', ':soundrecorder', ':timber', ':travel-mate'
+include ':app', ':bilitytester', ':BilityCore'
 
-include 'BilityCore'
-project(':BilityCore').projectDir = new File('../BilityCore')

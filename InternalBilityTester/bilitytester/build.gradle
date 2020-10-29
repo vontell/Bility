@@ -2,12 +2,21 @@ apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
 android {
-    compileSdkVersion 27
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -39,6 +48,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.michaelevans.colorart:library:0.0.3'
     implementation project(':BilityCore')
+    implementation 'androidx.fragment:fragment:1.2.5'
 
     // Shadow declaration for jar output
     shadow 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'

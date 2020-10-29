@@ -2,6 +2,8 @@
 
 source ~/.bility
 MINICAP_REPO=git@github.com:openstf/minicap.git
+export ANDROID_SDK_ROOT=$ANDROID_SDK
+echo $ANDROID_SDK_ROOT
 
 echo Starting Bility services...
 
@@ -30,7 +32,7 @@ else
 fi
 
 # Starting ktor test server
-echo Starting Android test server...
+echo Starting Test server...
 cd AndroidServer
 ./gradlew run >> ../log.txt &
 
@@ -46,6 +48,8 @@ while ! echo exit | nc localhost 8080; do
   sleep 1; 
   printf '.'
 done
+
+echo Test server started!
 
 cd ..
 

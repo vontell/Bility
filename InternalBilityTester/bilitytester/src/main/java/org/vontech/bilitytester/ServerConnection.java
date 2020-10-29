@@ -3,7 +3,7 @@ package org.vontech.bilitytester;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.support.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiDevice;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;

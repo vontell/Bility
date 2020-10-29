@@ -9,10 +9,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.AppCompatTextView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
@@ -26,6 +22,10 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import org.michaelevans.colorart.library.ColorArt;
 import org.vontech.bilitytester.utils.ViewHelper;
@@ -54,7 +54,7 @@ import static org.vontech.bilitytester.utils.ViewHelper.getRootView;
  * The AndroidUDL class assists in converting Android user interfaces (i.e. objects
  * such as Activities and fragments) into literal interfaces within the Universal
  * Design Language
- * @author Aron Vontell
+ * @author Aaron Vontell
  * @created August 12th, 2018
  * @updated August 12th, 2018
  */
