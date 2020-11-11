@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.51"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: "java"
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+group 'org.vontech'
+version '0.0.1'
+
+sourceSets {
+    main.kotlin.srcDirs = ['src']
+    test.kotlin.srcDirs = [ 'test' ]
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "ch.qos.logback:logback-classic:$logback_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51"
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.6'
+    //compile 'com.github.pellierd:pddl4j:3.7.2'
+    //annotationProcessor 'com.github.pellierd:pddl4j:3.7.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
+}
+
+test {
+    useJUnitPlatform()
+}
