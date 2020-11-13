@@ -1,15 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.3.31'
     repositories {
         google()
         jcenter()
-        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.0'
-        classpath 'io.fabric.tools:gradle:1.+'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -24,4 +21,33 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+// TASKS FOR BUILDING THE BILITY FRONTEND
+import org.apache.tools.ant.taskdefs.condition.Os
+
+task installUI(type: Exec) {
+    String npm = 'npm';
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        npm = 'npm.cmd'
+    }
+    workingDir 'bility-frontend'
+    commandLine npm, 'install'
+}
+
+task runUI(type: Exec, dependsOn: ['installUI']) {
+    String npm = 'npm';
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        npm = 'npm.cmd'
+    }
+    workingDir 'bility-frontend'
+    commandLine npm, 'run', 'dev'
+}
+
+task installScreenCapture(type: Exec) {
+
+}
+
+task runScreenCapture(type: Exec) {
+    
 }

@@ -1,4 +1,0 @@
-rootProject.name = 'AndroidServer'
-
-include 'BilityCore'
-project(':BilityCore').projectDir = new File('../BilityCore')

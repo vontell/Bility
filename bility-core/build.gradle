@@ -31,7 +31,7 @@ repositories {
 
 dependencies {
     compile "ch.qos.logback:logback-classic:$logback_version"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'

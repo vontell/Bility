@@ -1,6 +1,12 @@
 *.DS_Store
 *.idea/
 dependencies/*
-BilityCore/build/*
-BilityCore/out/*
+bility-core/build/*
+bility-core/out/*
+bility-android/build/*
+bility-android/out/*
+bility-server/build/*
+bility-server/out/*
+example-app/build/*
+example-app/out/*
 
