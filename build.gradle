@@ -44,15 +44,19 @@ task runUI(type: Exec, dependsOn: ['installUI']) {
     commandLine npm, 'run', 'dev'
 }
 
-task installScreenCapture(type: Exec) {
+task installScreenCapture() {
 
 }
 
-task runScreenCapture(type: Exec) {
+task runScreenCapture(type: Exec, dependsOn: ['installScreenCapture']) {
     workingDir 'scripts'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
         print("Minicap screen casting not implemented for Windows")
     } else {
         commandLine 'sh', 'start-minicap.sh'
     }
+}
+
+task runBility(dependsOn: ['bility-server:run', 'runUI', 'runScreenCapture']) {
+
 }
