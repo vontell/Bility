@@ -49,5 +49,10 @@ task installScreenCapture(type: Exec) {
 }
 
 task runScreenCapture(type: Exec) {
-    
+    workingDir 'scripts'
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        print("Minicap screen casting not implemented for Windows")
+    } else {
+        commandLine 'sh', 'start-minicap.sh'
+    }
 }

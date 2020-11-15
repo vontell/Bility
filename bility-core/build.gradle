@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.51"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -39,7 +39,8 @@ dependencies {
     //compile 'com.github.pellierd:pddl4j:3.7.2'
     //annotationProcessor 'com.github.pellierd:pddl4j:3.7.2'
     implementation 'com.google.code.gson:gson:2.8.5'
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
+    testImplementation 'junit:junit:4.13.1'
+    testImplementation "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
 }
 
 test {

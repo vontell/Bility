@@ -1,5 +1,6 @@
 *.DS_Store
 *.idea/
+build/*
 dependencies/*
 bility-core/build/*
 bility-core/out/*
@@ -9,4 +10,4 @@ bility-server/build/*
 bility-server/out/*
 example-app/build/*
 example-app/out/*
-
+AndroidServer/*

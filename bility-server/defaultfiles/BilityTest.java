@@ -7,10 +7,10 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.vontech.bilitytester.AppSpecification;
-import org.vontech.bilitytester.BilitySetup;
-import org.vontech.bilitytester.BilityTester;
-import org.vontech.bilitytester.UiInputActionType;
+import org.vontech.android.AppSpecification;
+import org.vontech.android.BilitySetup;
+import org.vontech.android.BilityTester;
+import org.vontech.android.UiInputActionType;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 

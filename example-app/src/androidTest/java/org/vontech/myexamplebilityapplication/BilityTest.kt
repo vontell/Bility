@@ -6,8 +6,8 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.vontech.bilitytester.BilityTestConfig
-import org.vontech.bilitytester.BilityTester
+import org.vontech.bility.android.BilityTestConfig
+import org.vontech.bility.android.BilityTester
 
 
 @RunWith(AndroidJUnit4::class)
