@@ -1,6 +1,6 @@
-rootProject.name = 'BilityBuildSystem'
+rootProject.name = 'bility'
 
-include 'BilityCore'
-include 'AndroidServer'
-include 'BilityWebServer'
-include 'InternalBilityTester'
+include ':bility-android'
+include ':bility-core'
+include ':bility-server'
+include ':example-app'

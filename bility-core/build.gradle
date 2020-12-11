@@ -1,0 +1,90 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+group 'org.vontech'
+version '0.0.1'
+
+sourceSets {
+    main.kotlin.srcDirs = ['src']
+    test.kotlin.srcDirs = [ 'test' ]
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    api "ch.qos.logback:logback-classic:$logback_version"
+    api 'com.fasterxml.jackson.core:jackson-core:2.9.6'
+    api 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
+    api 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.6'
+    //compile 'com.github.pellierd:pddl4j:3.7.2'
+    //annotationProcessor 'com.github.pellierd:pddl4j:3.7.2'
+    api 'com.google.code.gson:gson:2.8.5'
+    testImplementation 'junit:junit:4.13.1'
+    testImplementation "io.kotlintest:kotlintest-runner-junit5:$kotlintest_version"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// Publishing to Bintray
+
+ext {
+    bintrayRepo = 'bility'
+    bintrayName = 'core'
+
+    publishedGroupId = 'org.vontech.bility'
+    libraryName = 'bility-core'
+    artifact = 'core'
+
+    libraryDescription = 'Types and algorithms for the Bility framework'
+
+    siteUrl = 'https://github.com/vontell/bility'
+    gitUrl = 'https://github.com/vontell/bility.git'
+
+    libraryVersion = '0.0.5'
+
+    developerId = 'vontell'
+    developerName = 'Aaron Vontell'
+    developerEmail = 'aaron@vontech.org'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+
+install.repositories.mavenInstaller.pom.withXml {
+    def dependenciesNode = asNode().getAt("dependencies")[0]
+
+    configurations.api.allDependencies.each {
+        def dependencyNode = dependenciesNode.appendNode('dependency')
+        dependencyNode.appendNode('groupId', it.group)
+        dependencyNode.appendNode('artifactId', it.name)
+        dependencyNode.appendNode('version', it.version)
+    }
+}
