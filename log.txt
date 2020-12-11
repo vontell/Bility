@@ -1,0 +1,18 @@
+[  7%] /data/local/tmp/minicap-devel/minicap
+[ 14%] /data/local/tmp/minicap-devel/minicap
+[ 21%] /data/local/tmp/minicap-devel/minicap
+[ 28%] /data/local/tmp/minicap-devel/minicap
+[ 35%] /data/local/tmp/minicap-devel/minicap
+[ 42%] /data/local/tmp/minicap-devel/minicap
+[ 49%] /data/local/tmp/minicap-devel/minicap
+[ 56%] /data/local/tmp/minicap-devel/minicap
+[ 63%] /data/local/tmp/minicap-devel/minicap
+[ 70%] /data/local/tmp/minicap-devel/minicap
+[ 77%] /data/local/tmp/minicap-devel/minicap
+[ 84%] /data/local/tmp/minicap-devel/minicap
+[ 91%] /data/local/tmp/minicap-devel/minicap
+[ 98%] /data/local/tmp/minicap-devel/minicap
+[100%] /data/local/tmp/minicap-devel/minicap
+libs/x86_64/minicap: 1 file pushed. 11.7 MB/s (928624 bytes in 0.076s)
+[100%] /data/local/tmp/minicap-devel/minicap.so
+jni/minicap-shared/aosp/libs/android-28/x86_64/minicap.so: 1 file pushed. 5.1 MB/s (27776 bytes in 0.005s)

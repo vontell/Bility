@@ -1,4 +1,5 @@
 source ~/.bility
+export PATH=$PATH:$NDK:$ADB
 
 echo Starting up minicap...
 
@@ -19,6 +20,6 @@ until $(curl --output /dev/null --silent --head --fail localhost:9002); do
     sleep 1
 done
 
-trap 'kill -9 $(lsof -t -i:9002) || true; echo Killed Bility frontend server' 0
+trap 'kill -9 $(lsof -t -i:9002) || true; echo Killed Bility minicap server' 0
 
 echo Minicap casting server started

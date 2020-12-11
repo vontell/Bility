@@ -118,6 +118,8 @@ public class BilityTest {
                 .startupApp()
                 .loop();
     }
+
+}
 ```
 
 Finally, run this class as a unit test, while the services and frontend are running. You will see the result live once you click 'START BILITY TEST' in the frontend!

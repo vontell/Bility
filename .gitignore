@@ -11,3 +11,4 @@ bility-server/out/*
 example-app/build/*
 example-app/out/*
 AndroidServer/*
+*local.properties
