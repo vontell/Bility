@@ -1,0 +1,1 @@
+web: cd bility-docs && yarn run serve --build --port $PORT --host 0.0.0.0
