@@ -3,7 +3,7 @@ module.exports = {
   tagline: 'Automated accessibility testing for Android',
   url: 'https://bility.vontech.org',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'vontech', // Usually your GitHub org/user name.
