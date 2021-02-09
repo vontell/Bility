@@ -1,6 +1,6 @@
 module.exports = {
   title: 'Bility',
-  tagline: 'Automated accessibility testing',
+  tagline: 'Automated accessibility testing for Android',
   url: 'https://bility.vontech.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -55,11 +55,7 @@ module.exports = {
             },
             {
               label: 'Discord',
-              href: 'https://discordapp.com/invite/bility',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/bility',
+              href: 'https://discord.gg/dBMd9srS32',
             },
           ],
         },
@@ -78,6 +74,9 @@ module.exports = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Vontech Software, LLC. Built with Docusaurus.`,
+    },
+    prism: {
+      additionalLanguages: ['kotlin'],
     },
   },
   presets: [
