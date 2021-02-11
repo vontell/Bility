@@ -24,3 +24,13 @@ To develop documentation using Docusaurus, use the following command in `bility-
 yarn install
 yarn start
 ```
+
+## Building Docker images
+The Bility backend and frontend can be deployed using Docker.
+
+### Building the Backend
+```
+make build-backend
+```
+
+### Building the Frontend
