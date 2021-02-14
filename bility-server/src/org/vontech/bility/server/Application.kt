@@ -52,7 +52,7 @@ fun Application.main() {
     install(ContentNegotiation) {
 //        jackson {
 //            enable(SerializationFeature.INDENT_OUTPUT)
-//        }g
+//        }
         gson {
             setPrettyPrinting()
         }
