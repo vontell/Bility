@@ -14,3 +14,5 @@ AndroidServer/*
 *local.properties
 private_key_sender.asc
 public_key_sender.asc
+.gradle/*
+bility-frontend/out/*
