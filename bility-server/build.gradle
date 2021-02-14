@@ -42,7 +42,7 @@ dependencies {
     implementation "io.ktor:ktor-freemarker:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
 
-    implementation 'org.litote.kmongo:kmongo:3.8.1'
+    implementation 'org.litote.kmongo:kmongo:4.2.4'
 
     implementation project(':bility-core')
 

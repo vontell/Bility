@@ -7,4 +7,4 @@ build-backend:
 	docker build -t vontech/bility-server .
 
 run-backend: 
-	docker run --rm --name vontech-bility-server vontech/bility-server:latest
+	docker run --rm --name vontech-bility-server -p 8080:8080 vontech/bility-server:latest 

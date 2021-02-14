@@ -6,8 +6,7 @@ import org.vontech.bility.core.types.AndroidAppTestConfig
 import org.vontech.bility.core.types.ContainerInfo
 
 const val databaseName: String = "bility"
-const val databaseHost: String = "localhost"
-const val databasePort: Int = 27017
+const val databaseURI: String = "mongodb://localhost"
 
 const val projectSaveLocation: String = "projectupload/project/"
 

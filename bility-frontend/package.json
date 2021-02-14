@@ -7,6 +7,7 @@
     "@material-ui/icons": "^3.0.1",
     "@trodi/electron-splashscreen": "^0.3.4",
     "axios": "^0.18.0",
+    "electron-squirrel-startup": "^1.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-dropzone": "^8.0.2",
@@ -16,12 +17,14 @@
   "homepage": "./",
   "main": "src/ElectronStarter.js",
   "scripts": {
-    "start": "BROWSER=none react-scripts start",
+    "start": "electron-forge start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "dev": "nf start -p 1996"
+    "dev": "nf start -p 1996",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -33,7 +36,39 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
     "electron": "^3.0.12",
     "foreman": "^3.0.1"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "bility_frontend"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }
