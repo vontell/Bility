@@ -2,13 +2,10 @@ package org.vontech.bility.server
 
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
-import io.ktor.content.files
-import io.ktor.content.static
-import io.ktor.content.staticRootFolder
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.gson.gson
-//import io.ktor.jackson.jackson
+import io.ktor.http.content.*
 import io.ktor.routing.*
 import org.vontech.bility.server.routing.internalRoutes
 import org.vontech.bility.server.routing.publicRoutes
@@ -39,7 +36,7 @@ import java.io.File
  *
  */
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.main() {
     install(DefaultHeaders)

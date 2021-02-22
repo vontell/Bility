@@ -1,12 +1,10 @@
 package org.vontech.bility.server.routing
 
 import io.ktor.application.*
-import io.ktor.content.PartData
-import io.ktor.content.forEachPart
 import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.html.respondHtml
+import io.ktor.http.content.*
 import io.ktor.network.util.ioCoroutineDispatcher
-import io.ktor.request.receive
 import io.ktor.request.receiveMultipart
 import io.ktor.request.receiveParameters
 import io.ktor.response.respond
@@ -15,14 +13,14 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.withContext
-import kotlinx.coroutines.experimental.yield
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import kotlinx.html.body
 import kotlinx.html.h1
 import org.vontech.bility.server.pipeline.*
 import org.vontech.bility.server.projectSaveLocation
-import org.vontech.bility.server.utils.CommandRunner
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -130,7 +128,7 @@ suspend fun InputStream.copyToSuspend(
         out: OutputStream,
         bufferSize: Int = DEFAULT_BUFFER_SIZE,
         yieldSize: Int = 4 * 1024 * 1024,
-        dispatcher: CoroutineDispatcher = ioCoroutineDispatcher
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): Long {
     return withContext(dispatcher) {
         val buffer = ByteArray(bufferSize)

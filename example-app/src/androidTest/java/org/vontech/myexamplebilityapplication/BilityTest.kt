@@ -21,7 +21,7 @@ class BilityTest {
         Log.e("Bility", "STARTING APP SPEC")
         config = BilityTestConfig()
         config.packageName = "org.vontech.myexamplebilityapplication"
-        config.maxActions = 400
+        config.maxActions = 20
     }
 
     @Test

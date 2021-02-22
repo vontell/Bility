@@ -46,6 +46,11 @@ task runUI(type: Exec, dependsOn: ['installUI']) {
     commandLine npm, 'run', 'dev'
 }
 
+task packageFrontend(type: Exec) {
+    workingDir 'bility-frontend'
+
+}
+
 task installScreenCapture() {
 
 }

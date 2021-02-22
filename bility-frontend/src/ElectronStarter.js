@@ -25,7 +25,7 @@ function createWindow () {
         protocol: 'file:',
         slashes: true
     });
-  mainWindow.loadURL('http://localhost:1996');
+  mainWindow.loadURL(startUrl);
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
